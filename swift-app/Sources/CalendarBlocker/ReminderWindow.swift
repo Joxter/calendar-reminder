@@ -59,9 +59,9 @@ final class TimelineView: NSView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         // No background fill — NSVisualEffectView parent (sidebar) shows through
-        guard !todayEvents.isEmpty, let focused else { return }
+        guard !todayEvents.isEmpty else { return }
 
-        let now  = Date()
+        let now  = Config.now
         let w    = bounds.width
         let barW = w - lPad - rPad
 
@@ -127,7 +127,7 @@ final class TimelineView: NSView {
 
             let done      = ev.end   <= now
             let active    = ev.start <= now && now < ev.end
-            let isFocused = ev.title == focused.title && ev.start == focused.start
+            let isFocused = focused.map { $0.title == ev.title && $0.start == ev.start } ?? false
 
             let color: NSColor
             if done                      { color = .tertiaryLabelColor }
@@ -140,10 +140,16 @@ final class TimelineView: NSView {
             let lineY = cy + bh2   // bottom of badge = top of underline
 
             // Duration underline (slightly transparent for done events)
-            color.withAlphaComponent(done ? 0.35 : 0.7).setFill()
-            NSBezierPath(rect: NSRect(x: x1, y: lineY, width: x2 - x1, height: lineH)).fill()
+            color.withAlphaComponent(done ? 0.35 : 1).setFill()
+            NSBezierPath(rect: NSRect(
+                x: x1,
+                y: lineY - lineH,
+                width: x2 - x1,
+                height: lineH
+            )).fill()
 
             // Badge: TL, TR, BL rounded; BR square (where underline connects)
+            color.withAlphaComponent(done ? 0.35 : 1).setFill()
             color.setFill()
             let by1 = cy - bh2
             let bx2 = x1 + badgeW
@@ -185,16 +191,16 @@ final class TimelineView: NSView {
 // MARK: - Reminder Window
 
 final class ReminderWindow: NSWindow {
-    private let event: CalEvent
+    private let event: CalEvent?
     private let todayEvents: [CalEvent]
 
-    init(event: CalEvent, todayEvents: [CalEvent]) {
+    init(event: CalEvent?, todayEvents: [CalEvent]) {
         self.event = event
         self.todayEvents = todayEvents
 
-        let (_, accent) = urgency(event)
-        let timelineH   = axisH + CGFloat(todayEvents.count) * rowH + 10
-        let winH        = min(500, max(230, timelineH + 54) + 4)
+        let accent: NSColor = event.map { urgency($0).1 } ?? .tertiaryLabelColor
+        let timelineH = axisH + CGFloat(max(todayEvents.count, 1)) * rowH + 10
+        let winH      = min(500, max(230, timelineH + 54) + 4)
         let winW: CGFloat = 720
         let screen = NSScreen.main!.frame
         let origin = NSPoint(x: (screen.width - winW) / 2, y: (screen.height - winH) / 2)
@@ -206,31 +212,29 @@ final class ReminderWindow: NSWindow {
             defer: false
         )
 
-        title = "Meeting Reminder"
+        title = event != nil ? "Meeting Reminder" : "Calendar"
         isReleasedWhenClosed = false
         level = .floating
         isMovableByWindowBackground = true
 
         buildUI(accent: accent, timelineH: timelineH)
-        NSSound.playSystemSound("Glass")
+        if event != nil { NSSound.playSystemSound("Glass") }
     }
 
     // MARK: - UI
 
     private func buildUI(accent: NSColor, timelineH: CGFloat) {
-        let (badgeText, _) = urgency(event)
-
         let root = NSView()
         root.wantsLayer = true
         contentView = root
         root.frame = contentView?.bounds ?? .zero
         root.autoresizingMask = [.width, .height]
 
-        // Urgency accent stripe at top
+        // Urgency accent stripe at top (hidden when no active event)
         let bar = NSView()
         bar.translatesAutoresizingMaskIntoConstraints = false
         bar.wantsLayer = true
-        bar.layer?.backgroundColor = accent.cgColor
+        bar.layer?.backgroundColor = event != nil ? accent.cgColor : NSColor.clear.cgColor
         root.addSubview(bar)
 
         // Left column — opaque, matches window background
@@ -279,11 +283,16 @@ final class ReminderWindow: NSWindow {
             right.bottomAnchor.constraint(equalTo: root.bottomAnchor),
         ])
 
-        buildLeft(in: left, accent: accent, badgeText: badgeText)
+        if let event = event {
+            buildLeftEvent(in: left, accent: accent, event: event)
+        } else {
+            buildLeftPlaceholder(in: left)
+        }
         buildRight(in: right, timelineH: timelineH, accent: accent)
     }
 
-    private func buildLeft(in left: NSView, accent: NSColor, badgeText: String) {
+    private func buildLeftEvent(in left: NSView, accent: NSColor, event: CalEvent) {
+        let (badgeText, _) = urgency(event)
         let pad: CGFloat = 18
 
         // Urgency pill
@@ -303,8 +312,8 @@ final class ReminderWindow: NSWindow {
         // Event title
         let titleField = NSTextField(wrappingLabelWithString: event.title)
         titleField.translatesAutoresizingMaskIntoConstraints = false
-        titleField.font                   = NSFont.boldSystemFont(ofSize: 16)
-        titleField.textColor              = .labelColor
+        titleField.font                    = NSFont.boldSystemFont(ofSize: 16)
+        titleField.textColor               = .labelColor
         titleField.preferredMaxLayoutWidth = 210 - pad * 2
         left.addSubview(titleField)
 
@@ -345,10 +354,50 @@ final class ReminderWindow: NSWindow {
         ])
     }
 
+    private func buildLeftPlaceholder(in left: NSView) {
+        let pad: CGFloat = 18
+
+        let heading = NSTextField(labelWithString: "No imminent meetings")
+        heading.translatesAutoresizingMaskIntoConstraints = false
+        heading.font      = NSFont.boldSystemFont(ofSize: 14)
+        heading.textColor = .labelColor
+        heading.lineBreakMode = .byWordWrapping
+        heading.preferredMaxLayoutWidth = 210 - pad * 2
+        left.addSubview(heading)
+
+        let count = todayEvents.count
+        let sub = NSTextField(labelWithString: count == 0
+            ? "Nothing scheduled today"
+            : "\(count) event\(count == 1 ? "" : "s") today")
+        sub.translatesAutoresizingMaskIntoConstraints = false
+        sub.font      = NSFont.systemFont(ofSize: 11)
+        sub.textColor = .secondaryLabelColor
+        left.addSubview(sub)
+
+        let btn = NSButton(title: "Dismiss", target: self, action: #selector(dismiss))
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.bezelStyle    = .rounded
+        btn.keyEquivalent = "\r"
+        left.addSubview(btn)
+
+        NSLayoutConstraint.activate([
+            heading.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
+            heading.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
+            heading.topAnchor.constraint(equalTo: left.topAnchor, constant: 24),
+
+            sub.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
+            sub.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
+            sub.topAnchor.constraint(equalTo: heading.bottomAnchor, constant: 6),
+
+            btn.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
+            btn.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -16),
+        ])
+    }
+
     private func buildRight(in right: NSView, timelineH: CGFloat, accent: NSColor) {
         // Date header
         let fmt       = DateFormatter(); fmt.dateFormat = "EEEE, MMM d"
-        let dateField = NSTextField(labelWithString: fmt.string(from: Date()))
+        let dateField = NSTextField(labelWithString: fmt.string(from: Config.now))
         dateField.translatesAutoresizingMaskIntoConstraints = false
         dateField.font      = NSFont.boldSystemFont(ofSize: 11)
         dateField.textColor = .secondaryLabelColor
@@ -370,8 +419,9 @@ final class ReminderWindow: NSWindow {
         right.addSubview(timeline)
 
         // Remaining event count — subtle footer
-        let remaining = todayEvents.filter {
-            $0.start > Date() && !($0.title == event.title && $0.start == event.start)
+        let remaining = todayEvents.filter { ev in
+            let isFocused = event.map { e in e.title == ev.title && e.start == ev.start } ?? false
+            return ev.start > Config.now && !isFocused
         }.count
         let countLbl = NSTextField(labelWithString:
             remaining > 0 ? "\(remaining) more event\(remaining == 1 ? "" : "s") today" : "")

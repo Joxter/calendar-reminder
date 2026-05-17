@@ -5,7 +5,7 @@ struct CalEvent {
     let start: Date
     let end: Date
 
-    var startsInSeconds: TimeInterval { start.timeIntervalSinceNow }
+    var startsInSeconds: TimeInterval { start.timeIntervalSince(Config.now) }
     var duration: TimeInterval { end.timeIntervalSince(start) }
 }
 

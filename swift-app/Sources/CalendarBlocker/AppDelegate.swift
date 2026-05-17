@@ -27,9 +27,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 let result = try CalendarChecker.fetch()
 
                 if startup {
-                    if let next = result.next {
-                        DispatchQueue.main.async { self.showReminder(event: next, today: result.today) }
-                    }
+                    let ev = result.next, td = result.today
+                    DispatchQueue.main.async { self.showReminder(event: ev, today: td) }
                     startup = false
                 } else {
                     for event in result.upcoming {
@@ -64,7 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Main thread
 
     @MainActor
-    private func showReminder(event: CalEvent, today: [CalEvent]) {
+    private func showReminder(event: CalEvent?, today: [CalEvent]) {
         let win = ReminderWindow(event: event, todayEvents: today)
         windows.removeAll { !$0.isVisible }
         windows.append(win)

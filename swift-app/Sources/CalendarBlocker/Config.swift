@@ -27,4 +27,11 @@ enum Config {
 
     static let pollInterval: TimeInterval = 30
     static let warningThreshold: TimeInterval = 10 * 60
+
+    // Set to true to freeze "now" at 13:00 today for UI testing
+    static let mockNowEnabled = true
+    static var now: Date {
+        guard mockNowEnabled else { return Date() }
+        return Calendar.current.date(bySettingHour: 13, minute: 0, second: 0, of: Date())!
+    }
 }

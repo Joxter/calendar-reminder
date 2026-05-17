@@ -15,7 +15,7 @@ enum CalendarChecker {
         }
 
         let all = ICalParser.parse(text)
-        let now = Date()
+        let now = Config.now
 
         let cal = Calendar.current
         let todayStart = cal.startOfDay(for: now)
