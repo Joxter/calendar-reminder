@@ -1,9 +1,9 @@
 import AppKit
 
-// MARK: - Urgency accent colors (intentionally opaque — convey alertness state)
-private let accentInProgress = NSColor(hex: "#ef4444")
-private let accentImminent   = NSColor(hex: "#f97316")
-private let accentSoon       = NSColor(hex: "#f59e0b")
+// MARK: - Urgency accent colors
+private let accentInProgress = NSColor(hex: "#dc2626")  // red
+private let accentImminent   = NSColor(hex: "#7c3aed")  // purple
+private let accentSoon       = NSColor(hex: "#2563eb")  // blue
 
 // MARK: - Layout constants
 private let axisH: CGFloat  = 20
@@ -14,6 +14,11 @@ private let rPad: CGFloat   = 10
 // MARK: - Right-column font size — single knob that scales all timeline text
 private let timelineFontSize: CGFloat = 13
 private var rowH: CGFloat { timelineFontSize + 10 }  // row height tracks font size
+
+// MARK: - Left panel spacing
+// -8 and -17 are for font compensation
+private let gapNextToTitle: CGFloat  = -8 + 8   // between "NEXT" label and event title
+private let gapTitleToTimer: CGFloat = -17 + 16   // between event title and countdown timer
 
 // MARK: - L-shape style
 private let shapeStrokeW: CGFloat  = 2   // thickness of the L stroke
@@ -236,7 +241,7 @@ final class ReminderWindow: NSWindow {
         self.event = event
         self.todayEvents = todayEvents
 
-        let accent: NSColor = event.map { urgency($0).1 } ?? .tertiaryLabelColor
+        let accent: NSColor = event.map { urgency($0).1 } ?? NSColor(hex: "#475569")
         let timelineH = axisH + CGFloat(max(todayEvents.count, 1)) * rowH + axisH
         let winH      = min(500, max(230, timelineH + 54) + 4)
         let winW: CGFloat = 720
@@ -268,29 +273,14 @@ final class ReminderWindow: NSWindow {
         root.frame = contentView?.bounds ?? .zero
         root.autoresizingMask = [.width, .height]
 
-        // Urgency accent stripe at top (hidden when no active event)
-        let bar = NSView()
-        bar.translatesAutoresizingMaskIntoConstraints = false
-        bar.wantsLayer = true
-        bar.layer?.backgroundColor = event != nil ? accent.cgColor : NSColor.clear.cgColor
-        root.addSubview(bar)
-
-        // Left column — opaque, matches window background
-        let left = NSVisualEffectView()
+        // Left column — solid accent color
+        let left = NSView()
         left.translatesAutoresizingMaskIntoConstraints = false
-        left.material      = .contentBackground
-        left.blendingMode  = .withinWindow
-        left.state         = .active
+        left.wantsLayer = true
+        left.layer?.backgroundColor = accent.cgColor
         root.addSubview(left)
 
-        // Vertical separator
-        let sepV = NSView()
-        sepV.translatesAutoresizingMaskIntoConstraints = false
-        sepV.wantsLayer = true
-        sepV.layer?.backgroundColor = NSColor.separatorColor.cgColor
-        root.addSubview(sepV)
-
-        // Right column — solid white background
+        // Right column — solid white
         let right = NSView()
         right.translatesAutoresizingMaskIntoConstraints = false
         right.wantsLayer = true
@@ -299,23 +289,13 @@ final class ReminderWindow: NSWindow {
 
         let leftW: CGFloat = 210
         NSLayoutConstraint.activate([
-            bar.topAnchor.constraint(equalTo: root.topAnchor),
-            bar.leadingAnchor.constraint(equalTo: root.leadingAnchor),
-            bar.trailingAnchor.constraint(equalTo: root.trailingAnchor),
-            bar.heightAnchor.constraint(equalToConstant: 4),
-
-            left.topAnchor.constraint(equalTo: bar.bottomAnchor),
+            left.topAnchor.constraint(equalTo: root.topAnchor),
             left.leadingAnchor.constraint(equalTo: root.leadingAnchor),
             left.bottomAnchor.constraint(equalTo: root.bottomAnchor),
             left.widthAnchor.constraint(equalToConstant: leftW),
 
-            sepV.topAnchor.constraint(equalTo: bar.bottomAnchor),
-            sepV.leadingAnchor.constraint(equalTo: left.trailingAnchor),
-            sepV.bottomAnchor.constraint(equalTo: root.bottomAnchor),
-            sepV.widthAnchor.constraint(equalToConstant: 1),
-
-            right.topAnchor.constraint(equalTo: bar.bottomAnchor),
-            right.leadingAnchor.constraint(equalTo: sepV.trailingAnchor),
+            right.topAnchor.constraint(equalTo: root.topAnchor),
+            right.leadingAnchor.constraint(equalTo: left.trailingAnchor),
             right.trailingAnchor.constraint(equalTo: root.trailingAnchor),
             right.bottomAnchor.constraint(equalTo: root.bottomAnchor),
         ])
@@ -329,75 +309,61 @@ final class ReminderWindow: NSWindow {
     }
 
     private func buildLeftEvent(in left: NSView, accent: NSColor, event: CalEvent) {
-        let (badgeText, _) = urgency(event)
-        let pad: CGFloat = 18
+        let pad: CGFloat = 16
+        let white = NSColor.white
 
-        // Urgency pill
-        let pill = NSView()
-        pill.translatesAutoresizingMaskIntoConstraints = false
-        pill.wantsLayer = true
-        pill.layer?.backgroundColor = accent.cgColor
-        pill.layer?.cornerRadius    = 4
-        left.addSubview(pill)
-
-        let pillLbl = NSTextField(labelWithString: badgeText)
-        pillLbl.translatesAutoresizingMaskIntoConstraints = false
-        pillLbl.font      = NSFont.boldSystemFont(ofSize: 9)
-        pillLbl.textColor = .white
-        pill.addSubview(pillLbl)
+        // "NEXT" label
+        let nextLbl = NSTextField(labelWithString: "NEXT")
+        nextLbl.translatesAutoresizingMaskIntoConstraints = false
+        nextLbl.font      = NSFont.boldSystemFont(ofSize: 9)
+        nextLbl.textColor = white.withAlphaComponent(0.9)
+        left.addSubview(nextLbl)
 
         // Event title
         let titleField = NSTextField(wrappingLabelWithString: event.title)
         titleField.translatesAutoresizingMaskIntoConstraints = false
-        titleField.font                    = NSFont.boldSystemFont(ofSize: 16)
-        titleField.textColor               = .labelColor
+        titleField.font                    = NSFont.boldSystemFont(ofSize: 15)
+        titleField.textColor               = white.withAlphaComponent(0.9)
         titleField.preferredMaxLayoutWidth = 210 - pad * 2
         left.addSubview(titleField)
 
-        // Duration
-        let dur      = durString(event)
-        let durField = NSTextField(labelWithString: dur)
-        durField.translatesAutoresizingMaskIntoConstraints = false
-        durField.font      = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .regular)
-        durField.textColor = .secondaryLabelColor
-        durField.isHidden  = dur.isEmpty
-        left.addSubview(durField)
+        // Big countdown timer — the main focus
+        let secs = event.startsInSeconds
+        let timerText: String
+        if secs <= 0 {
+            timerText = "NOW"
+        } else {
+            let m = Int(secs) / 60, s = Int(secs) % 60
+            timerText = String(format: "%d:%02d", m, s)
+        }
+        let timerField = NSTextField(labelWithString: timerText)
+        timerField.translatesAutoresizingMaskIntoConstraints = false
+        timerField.font      = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
+        timerField.textColor = white
+        left.addSubview(timerField)
 
-        // Dismiss — native default button (system accent color, activated by Return)
-        let btn = NSButton(title: "Dismiss", target: self, action: #selector(dismiss))
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.bezelStyle    = .rounded
-        btn.keyEquivalent = "\r"
-        left.addSubview(btn)
-
+        // Everything pinned to the bottom, gaps controlled by gapNextToTitle / gapTitleToTimer
         NSLayoutConstraint.activate([
-            pillLbl.leadingAnchor.constraint(equalTo: pill.leadingAnchor, constant: 8),
-            pillLbl.trailingAnchor.constraint(equalTo: pill.trailingAnchor, constant: -8),
-            pillLbl.topAnchor.constraint(equalTo: pill.topAnchor, constant: 2),
-            pillLbl.bottomAnchor.constraint(equalTo: pill.bottomAnchor, constant: -2),
-
-            pill.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            pill.topAnchor.constraint(equalTo: left.topAnchor, constant: 16),
+            timerField.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad - 4),
+            timerField.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
+            timerField.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -pad),
 
             titleField.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
             titleField.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            titleField.topAnchor.constraint(equalTo: pill.bottomAnchor, constant: 10),
+            titleField.bottomAnchor.constraint(equalTo: timerField.topAnchor, constant: -gapTitleToTimer),
 
-            durField.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            durField.topAnchor.constraint(equalTo: titleField.bottomAnchor, constant: 4),
-
-            btn.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            btn.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -16),
+            nextLbl.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
+            nextLbl.bottomAnchor.constraint(equalTo: titleField.topAnchor, constant: -gapNextToTitle),
         ])
     }
 
     private func buildLeftPlaceholder(in left: NSView) {
         let pad: CGFloat = 18
 
-        let heading = NSTextField(labelWithString: "No imminent meetings")
+        let heading = NSTextField(labelWithString: "All clear")
         heading.translatesAutoresizingMaskIntoConstraints = false
-        heading.font      = NSFont.boldSystemFont(ofSize: 14)
-        heading.textColor = .labelColor
+        heading.font      = NSFont.boldSystemFont(ofSize: 15)
+        heading.textColor = NSColor.white
         heading.lineBreakMode = .byWordWrapping
         heading.preferredMaxLayoutWidth = 210 - pad * 2
         left.addSubview(heading)
@@ -407,15 +373,9 @@ final class ReminderWindow: NSWindow {
             ? "Nothing scheduled today"
             : "\(count) event\(count == 1 ? "" : "s") today")
         sub.translatesAutoresizingMaskIntoConstraints = false
-        sub.font      = NSFont.systemFont(ofSize: 11)
-        sub.textColor = .secondaryLabelColor
+        sub.font      = NSFont.systemFont(ofSize: 12)
+        sub.textColor = NSColor.white.withAlphaComponent(0.7)
         left.addSubview(sub)
-
-        let btn = NSButton(title: "Dismiss", target: self, action: #selector(dismiss))
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.bezelStyle    = .rounded
-        btn.keyEquivalent = "\r"
-        left.addSubview(btn)
 
         NSLayoutConstraint.activate([
             heading.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
@@ -425,9 +385,6 @@ final class ReminderWindow: NSWindow {
             sub.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
             sub.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
             sub.topAnchor.constraint(equalTo: heading.bottomAnchor, constant: 6),
-
-            btn.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            btn.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -16),
         ])
     }
 
