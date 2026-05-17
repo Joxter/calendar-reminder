@@ -32,6 +32,6 @@ enum Config {
     static let mockNowEnabled = true
     static var now: Date {
         guard mockNowEnabled else { return Date() }
-        return Calendar.current.date(bySettingHour: 13, minute: 0, second: 0, of: Date())!
+        return Calendar.current.date(bySettingHour: 13, minute: 8, second: 0, of: Date())!
     }
 }

@@ -83,101 +83,140 @@ final class TimelineView: NSView {
 
         let rowsH = CGFloat(todayEvents.count) * rowH + 6
 
-        // Hour gridlines + axis labels
+        // Hour gridlines + axis labels (labels at bottom)
         var cur = rs
         let hourFmt = DateFormatter(); hourFmt.dateFormat = "H"
+        let lblAttrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium),
+            .foregroundColor: NSColor.secondaryLabelColor,
+        ]
+        let bottomY = axisH + rowsH  // top of bottom label area
         while cur <= re {
             let x = t2x(cur)
             NSColor.separatorColor.setStroke()
             let grid = NSBezierPath()
-            grid.move(to: NSPoint(x: x, y: axisH))
-            grid.line(to: NSPoint(x: x, y: axisH + rowsH))
+            grid.move(to: NSPoint(x: x, y: axisH))   // start below the top strip
+            grid.line(to: NSPoint(x: x, y: bottomY))
             grid.lineWidth = 0.5
             grid.stroke()
 
-            let lbl      = hourFmt.string(from: cur) as NSString
-            let lblAttrs: [NSAttributedString.Key: Any] = [
-                .font: NSFont.systemFont(ofSize: 8),
-                .foregroundColor: NSColor.tertiaryLabelColor,
-            ]
+            let lbl   = hourFmt.string(from: cur) as NSString
             let lblSz = lbl.size(withAttributes: lblAttrs)
-            lbl.draw(at: NSPoint(x: x - lblSz.width / 2, y: (axisH - lblSz.height) / 2),
+            lbl.draw(at: NSPoint(x: x - lblSz.width / 2, y: bottomY + (axisH - lblSz.height) / 2),
                      withAttributes: lblAttrs)
             cur = cal.date(byAdding: .hour, value: 1, to: cur)!
         }
 
-        // "Now" marker — subtle dashed line
+        // "Now" marker — dot + time label at top, solid line through rows
         if now >= rs && now <= re {
-            NSColor.systemRed.withAlphaComponent(0.4).setStroke()
-            let nx     = t2x(now)
-            let marker = NSBezierPath()
-            marker.setLineDash([2, 4], count: 2, phase: 0)
-            marker.move(to: NSPoint(x: nx, y: 0))
-            marker.line(to: NSPoint(x: nx, y: axisH + rowsH))
-            marker.stroke()
+            let nx       = t2x(now)
+            let dotR: CGFloat = 3
+            let nowColor = NSColor.systemRed
+
+            // Solid line from dot centre down through the rows
+            nowColor.withAlphaComponent(0.5).setStroke()
+            let line = NSBezierPath()
+            line.move(to: NSPoint(x: nx, y: axisH / 2))
+            line.line(to: NSPoint(x: nx, y: bottomY))
+            line.lineWidth = 1
+            line.stroke()
+
+            // Filled dot
+            nowColor.setFill()
+            NSBezierPath(ovalIn: NSRect(x: nx - dotR, y: (axisH - dotR * 2) / 2,
+                                        width: dotR * 2, height: dotR * 2)).fill()
+
+            // Current time label — right of dot, vertically centred in top strip
+            let nowFmt = DateFormatter(); nowFmt.dateFormat = "HH:mm"
+            let nowStr = nowFmt.string(from: now) as NSString
+            let nowAttrs: [NSAttributedString.Key: Any] = [
+                .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold),
+                .foregroundColor: nowColor,
+            ]
+            let nowSz = nowStr.size(withAttributes: nowAttrs)
+            nowStr.draw(at: NSPoint(x: nx + dotR + 3, y: (axisH - nowSz.height) / 2),
+                        withAttributes: nowAttrs)
         }
 
         let overlaps = overlappingIndices(todayEvents)
         let timeFmt  = DateFormatter(); timeFmt.dateFormat = "HH:mm"
 
+        // Precompute per-event layout so we can use it across passes
+        struct EvLayout {
+            let cy: CGFloat, x1: CGFloat, x2: CGFloat
+            let color: NSColor, alpha: CGFloat
+            let timeStr: NSString, timeAttrs: [NSAttributedString.Key: Any]
+            let timeSz: NSSize, timeOrigin: NSPoint
+            let titleStr: NSString, titleAttrs: [NSAttributedString.Key: Any]
+            let titleSz: NSSize, titleOrigin: NSPoint
+        }
+        var layouts: [EvLayout] = []
         for (i, ev) in todayEvents.enumerated() {
-            // isFlipped=true: row 0 just below axis, same math as Python
             let cy = axisH + CGFloat(i) * rowH + rowH / 2
-            let x1 = t2x(ev.start)
-            let x2 = t2x(ev.end)
-
+            let x1 = t2x(ev.start), x2 = t2x(ev.end)
             let done      = ev.end   <= now
-            let active    = ev.start <= now && now < ev.end
             let isFocused = focused.map { $0.title == ev.title && $0.start == ev.start } ?? false
-
             let color: NSColor
-            if done                      { color = .tertiaryLabelColor }
-            else if isFocused            { color = accent }
-            else if active               { color = .systemGreen }
-            else if overlaps.contains(i) { color = .systemOrange }
-            else                         { color = .systemBlue }
-
-            let bh2: CGFloat   = badgeH / 2
+            if done                                  { color = .tertiaryLabelColor }
+            else if isFocused                        { color = accent }
+            else if ev.start <= now && now < ev.end  { color = .systemGreen }
+            else if overlaps.contains(i)             { color = .systemOrange }
+            else                                     { color = .systemBlue }
             let alpha: CGFloat = done ? 0.35 : 1
-            let r              = min(shapeCornerR, bh2)   // clamp so arc fits in stem height
-            let botY           = cy + bh2                 // y of the bar centre-line
 
-            // L-shape: explicit arc at the corner so curviness is independently controllable
-            let path = NSBezierPath()
-            path.move(to: NSPoint(x: x1, y: cy - bh2))         // top of stem
-            path.line(to: NSPoint(x: x1, y: botY - r))         // straight down to arc start
-            // Quarter-circle corner: centre at (x1+r, botY-r), 180°→90° clockwise in default coords
-            // = visually left→down in the flipped view
-            path.appendArc(withCenter: NSPoint(x: x1 + r, y: botY - r),
-                           radius: r, startAngle: 180, endAngle: 90, clockwise: true)
-            path.line(to: NSPoint(x: x2, y: botY))             // right to end of bar
-            path.lineWidth    = shapeStrokeW
-            path.lineCapStyle = .round
-            color.withAlphaComponent(alpha).setStroke()
-            path.stroke()
-
-            // Time label — tucked just right of the stem
-            let timeStr  = timeFmt.string(from: ev.start) as NSString
+            let timeStr   = timeFmt.string(from: ev.start) as NSString
             let timeAttrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.boldSystemFont(ofSize: fontSize),
                 .foregroundColor: color.withAlphaComponent(alpha),
             ]
-            let timeSz = timeStr.size(withAttributes: timeAttrs)
-            timeStr.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 2, y: cy - timeSz.height / 2),
-                         withAttributes: timeAttrs)
+            let timeSz     = timeStr.size(withAttributes: timeAttrs)
+            let timeOrigin = NSPoint(x: x1 + shapeStrokeW / 2 + 2, y: cy - timeSz.height / 2)
 
-            // Title — after time label, left for events >= 13:00
-            let txtColor = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
-            let font     = isFocused ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize)
-            let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: txtColor]
-            let ns = ev.title as NSString
-            let sz = ns.size(withAttributes: attrs)
+            let txtColor   = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
+            let font       = isFocused ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize)
+            let titleAttrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: txtColor]
+            let titleStr   = ev.title as NSString
+            let titleSz    = titleStr.size(withAttributes: titleAttrs)
+            let titleX: CGFloat = Calendar.current.component(.hour, from: ev.start) >= 13
+                ? x1 - 6 - titleSz.width
+                : x1 + shapeStrokeW / 2 + 4 + timeSz.width + 6
+            let titleOrigin = NSPoint(x: titleX, y: cy - titleSz.height / 2)
 
-            if Calendar.current.component(.hour, from: ev.start) >= 13 {
-                ns.draw(at: NSPoint(x: x1 - 6 - sz.width, y: cy - sz.height / 2), withAttributes: attrs)
-            } else {
-                ns.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 4 + timeSz.width + 6, y: cy - sz.height / 2), withAttributes: attrs)
-            }
+            layouts.append(EvLayout(cy: cy, x1: x1, x2: x2, color: color, alpha: alpha,
+                                    timeStr: timeStr, timeAttrs: timeAttrs,
+                                    timeSz: timeSz, timeOrigin: timeOrigin,
+                                    titleStr: titleStr, titleAttrs: titleAttrs,
+                                    titleSz: titleSz, titleOrigin: titleOrigin))
+        }
+
+        // Pass 1: white backgrounds behind text
+        NSColor.white.setFill()
+        for l in layouts {
+            NSBezierPath(rect: NSRect(origin: l.timeOrigin,  size: l.timeSz).insetBy(dx: -2, dy: 0)).fill()
+            NSBezierPath(rect: NSRect(origin: l.titleOrigin, size: l.titleSz).insetBy(dx: -2, dy: 0)).fill()
+        }
+
+        // Pass 2: L-shapes on top of white backgrounds
+        for l in layouts {
+            let bh2  = badgeH / 2
+            let r    = min(shapeCornerR, bh2)
+            let botY = l.cy + bh2
+            let path = NSBezierPath()
+            path.move(to: NSPoint(x: l.x1, y: l.cy - bh2))
+            path.line(to: NSPoint(x: l.x1, y: botY - r))
+            path.appendArc(withCenter: NSPoint(x: l.x1 + r, y: botY - r),
+                           radius: r, startAngle: 180, endAngle: 90, clockwise: true)
+            path.line(to: NSPoint(x: l.x2, y: botY))
+            path.lineWidth    = shapeStrokeW
+            path.lineCapStyle = .round
+            l.color.withAlphaComponent(l.alpha).setStroke()
+            path.stroke()
+        }
+
+        // Pass 3: text on top of everything
+        for l in layouts {
+            l.timeStr.draw(at:  l.timeOrigin,  withAttributes: l.timeAttrs)
+            l.titleStr.draw(at: l.titleOrigin, withAttributes: l.titleAttrs)
         }
     }
 }
@@ -193,7 +232,7 @@ final class ReminderWindow: NSWindow {
         self.todayEvents = todayEvents
 
         let accent: NSColor = event.map { urgency($0).1 } ?? .tertiaryLabelColor
-        let timelineH = axisH + CGFloat(max(todayEvents.count, 1)) * rowH + 10
+        let timelineH = axisH + CGFloat(max(todayEvents.count, 1)) * rowH + axisH
         let winH      = min(500, max(230, timelineH + 54) + 4)
         let winW: CGFloat = 720
         let screen = NSScreen.main!.frame
@@ -246,12 +285,11 @@ final class ReminderWindow: NSWindow {
         sepV.layer?.backgroundColor = NSColor.separatorColor.cgColor
         root.addSubview(sepV)
 
-        // Right column — frosted sidebar (like Finder sidebar, Notes)
-        let right = NSVisualEffectView()
+        // Right column — solid white background
+        let right = NSView()
         right.translatesAutoresizingMaskIntoConstraints = false
-        right.material     = .sidebar
-        right.blendingMode = .behindWindow
-        right.state        = .active
+        right.wantsLayer = true
+        right.layer?.backgroundColor = NSColor.white.cgColor
         root.addSubview(right)
 
         let leftW: CGFloat = 210
@@ -393,18 +431,11 @@ final class ReminderWindow: NSWindow {
         let fmt       = DateFormatter(); fmt.dateFormat = "EEEE, MMM d"
         let dateField = NSTextField(labelWithString: fmt.string(from: Config.now))
         dateField.translatesAutoresizingMaskIntoConstraints = false
-        dateField.font      = NSFont.boldSystemFont(ofSize: 11)
-        dateField.textColor = .secondaryLabelColor
+        dateField.font      = NSFont.boldSystemFont(ofSize: 13)
+        dateField.textColor = .labelColor
         right.addSubview(dateField)
 
-        // Separator below date
-        let hSep = NSView()
-        hSep.translatesAutoresizingMaskIntoConstraints = false
-        hSep.wantsLayer = true
-        hSep.layer?.backgroundColor = NSColor.separatorColor.cgColor
-        right.addSubview(hSep)
-
-        // Timeline — transparent background, sidebar vibrancy shows through
+        // Timeline
         let timeline = TimelineView()
         timeline.translatesAutoresizingMaskIntoConstraints = false
         timeline.todayEvents = todayEvents
@@ -412,35 +443,14 @@ final class ReminderWindow: NSWindow {
         timeline.accent      = accent
         right.addSubview(timeline)
 
-        // Remaining event count — subtle footer
-        let remaining = todayEvents.filter { ev in
-            let isFocused = event.map { e in e.title == ev.title && e.start == ev.start } ?? false
-            return ev.start > Config.now && !isFocused
-        }.count
-        let countLbl = NSTextField(labelWithString:
-            remaining > 0 ? "\(remaining) more event\(remaining == 1 ? "" : "s") today" : "")
-        countLbl.translatesAutoresizingMaskIntoConstraints = false
-        countLbl.font      = NSFont.systemFont(ofSize: 10)
-        countLbl.textColor = .tertiaryLabelColor
-        countLbl.isHidden  = remaining == 0
-        right.addSubview(countLbl)
-
         NSLayoutConstraint.activate([
             dateField.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 12),
             dateField.topAnchor.constraint(equalTo: right.topAnchor, constant: 9),
 
-            hSep.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 12),
-            hSep.trailingAnchor.constraint(equalTo: right.trailingAnchor, constant: -12),
-            hSep.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 1),
-            hSep.heightAnchor.constraint(equalToConstant: 1),
-
             timeline.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 4),
             timeline.trailingAnchor.constraint(equalTo: right.trailingAnchor, constant: -4),
-            timeline.topAnchor.constraint(equalTo: hSep.bottomAnchor, constant: 4),
+            timeline.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 6),
             timeline.heightAnchor.constraint(equalToConstant: timelineH),
-
-            countLbl.trailingAnchor.constraint(equalTo: right.trailingAnchor, constant: -12),
-            countLbl.bottomAnchor.constraint(equalTo: right.bottomAnchor, constant: -10),
         ])
     }
 
