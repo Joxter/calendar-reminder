@@ -156,23 +156,21 @@ final class TimelineView: NSView {
             color.withAlphaComponent(alpha).setStroke()
             path.stroke()
 
-            // Time label — right of stem, in event color
+            // Time label — tucked just right of the stem
             let timeStr  = timeFmt.string(from: ev.start) as NSString
             let timeAttrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.boldSystemFont(ofSize: fontSize),
                 .foregroundColor: color.withAlphaComponent(alpha),
             ]
             let timeSz = timeStr.size(withAttributes: timeAttrs)
-            timeStr.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 4, y: cy - timeSz.height / 2),
+            timeStr.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 2, y: cy - timeSz.height / 2),
                          withAttributes: timeAttrs)
 
-            // Title + duration — after time label, left for events >= 13:00
-            let dur      = durString(ev)
-            let label    = dur.isEmpty ? ev.title : "\(ev.title)  \(dur)"
+            // Title — after time label, left for events >= 13:00
             let txtColor = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
             let font     = isFocused ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize)
             let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: txtColor]
-            let ns = label as NSString
+            let ns = ev.title as NSString
             let sz = ns.size(withAttributes: attrs)
 
             if Calendar.current.component(.hour, from: ev.start) >= 13 {
