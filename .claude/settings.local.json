@@ -3,7 +3,8 @@
     "allow": [
       "Bash(uv --version)",
       "Bash(uv init *)",
-      "Bash(uv add *)"
+      "Bash(uv add *)",
+      "Bash(uv run *)"
     ]
   }
 }

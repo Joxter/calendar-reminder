@@ -7,10 +7,9 @@ import logging
 import threading
 import time
 import tkinter as tk
-from datetime import datetime, timezone, timedelta
 
 import config
-from calendar_checker import Event, fetch_upcoming_events, fetch_next_event
+from calendar_checker import fetch_calendar_data
 from reminder_window import show_reminder
 
 logging.basicConfig(
@@ -22,27 +21,25 @@ logger = logging.getLogger(__name__)
 
 
 def _poll_loop(root: tk.Tk, shown: set[str]) -> None:
-    """Runs in a background thread. Schedules reminders onto the main thread via after()."""
+    """Background thread: fetch calendar once per cycle, schedule reminders on main thread."""
     lock = threading.Lock()
 
     while True:
         logger.info("Checking calendar…")
-        events = fetch_upcoming_events()
+        upcoming, today, next_event = fetch_calendar_data()
 
-        for event in events:
+        for event in upcoming:
             key = f"{event.title}|{event.start.isoformat()}"
             with lock:
                 if key in shown:
                     continue
                 shown.add(key)
             logger.info("Reminding: %s at %s", event.title, event.start.strftime("%H:%M"))
-            # Must create tkinter windows on the main thread
-            root.after(0, lambda e=event: show_reminder(root, e))
+            root.after(0, lambda e=event, td=today: show_reminder(root, e, td))
 
         if len(shown) > 200:
             shown.clear()
 
-        next_event = fetch_next_event()
         if next_event:
             secs = next_event.starts_in_seconds
             h, rem = divmod(int(secs), 3600)
@@ -70,23 +67,19 @@ def main() -> None:
         config.WARNING_THRESHOLD,
     )
 
-    # Persistent hidden root — owns the event loop for the entire app lifetime.
-    # Polling and sleeping happen in a daemon thread; reminders are Toplevels.
     root = tk.Tk()
     root.withdraw()
 
     shown: set[str] = set()
 
-    # Test reminder shown immediately on startup
-    now = datetime.now(timezone.utc)
-    test_event = Event(
-        title="Design Review",
-        start=now + timedelta(minutes=7),
-        end=now + timedelta(minutes=37),
-    )
-    root.after(200, lambda: show_reminder(root, test_event))
+    # Show the next real upcoming event immediately on startup
+    def _show_startup() -> None:
+        _, today, next_event = fetch_calendar_data()
+        if next_event:
+            root.after(0, lambda: show_reminder(root, next_event, today))
 
-    # Polling runs in background so the main thread never blocks
+    threading.Thread(target=_show_startup, daemon=True).start()
+
     t = threading.Thread(target=_poll_loop, args=(root, shown), daemon=True)
     t.start()
 
