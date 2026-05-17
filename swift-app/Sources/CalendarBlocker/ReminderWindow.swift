@@ -5,13 +5,15 @@ private let accentInProgress = NSColor(hex: "#ef4444")
 private let accentImminent   = NSColor(hex: "#f97316")
 private let accentSoon       = NSColor(hex: "#f59e0b")
 
-// MARK: - Layout constants (match Python version)
-private let axisH: CGFloat    = 20
-private let rowH: CGFloat     = 22
-private let badgeH: CGFloat   = 16
-private let lPad: CGFloat     = 10
-private let rPad: CGFloat     = 10
-private let fontSize: CGFloat = 11
+// MARK: - Layout constants
+private let axisH: CGFloat  = 20
+private let badgeH: CGFloat = 16
+private let lPad: CGFloat   = 10
+private let rPad: CGFloat   = 10
+
+// MARK: - Right-column font size — single knob that scales all timeline text
+private let timelineFontSize: CGFloat = 13
+private var rowH: CGFloat { timelineFontSize + 10 }  // row height tracks font size
 
 // MARK: - L-shape style
 private let shapeStrokeW: CGFloat  = 2   // thickness of the L stroke
@@ -87,7 +89,7 @@ final class TimelineView: NSView {
         var cur = rs
         let hourFmt = DateFormatter(); hourFmt.dateFormat = "H"
         let lblAttrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium),
+            .font: NSFont.monospacedDigitSystemFont(ofSize: timelineFontSize - 2, weight: .medium),
             .foregroundColor: NSColor.secondaryLabelColor,
         ]
         let bottomY = axisH + rowsH  // top of bottom label area
@@ -130,7 +132,7 @@ final class TimelineView: NSView {
             let nowFmt = DateFormatter(); nowFmt.dateFormat = "HH:mm"
             let nowStr = nowFmt.string(from: now) as NSString
             let nowAttrs: [NSAttributedString.Key: Any] = [
-                .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold),
+                .font: NSFont.monospacedDigitSystemFont(ofSize: timelineFontSize - 2, weight: .semibold),
                 .foregroundColor: nowColor,
             ]
             let nowSz = nowStr.size(withAttributes: nowAttrs)
@@ -166,14 +168,14 @@ final class TimelineView: NSView {
 
             let timeStr   = timeFmt.string(from: ev.start) as NSString
             let timeAttrs: [NSAttributedString.Key: Any] = [
-                .font: NSFont.boldSystemFont(ofSize: fontSize),
+                .font: NSFont.boldSystemFont(ofSize: timelineFontSize),
                 .foregroundColor: color.withAlphaComponent(alpha),
             ]
             let timeSz     = timeStr.size(withAttributes: timeAttrs)
             let timeOrigin = NSPoint(x: x1 + shapeStrokeW / 2 + 2, y: cy - timeSz.height / 2)
 
             let txtColor   = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
-            let font       = isFocused ? NSFont.boldSystemFont(ofSize: fontSize) : NSFont.systemFont(ofSize: fontSize)
+            let font       = isFocused ? NSFont.boldSystemFont(ofSize: timelineFontSize) : NSFont.systemFont(ofSize: timelineFontSize)
             let titleAttrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: txtColor]
             let titleStr   = ev.title as NSString
             let titleSz    = titleStr.size(withAttributes: titleAttrs)
@@ -200,13 +202,16 @@ final class TimelineView: NSView {
         for l in layouts {
             let bh2  = badgeH / 2
             let r    = min(shapeCornerR, bh2)
-            let botY = l.cy + bh2
+            let ox: CGFloat = -1   // nudge left
+            let oy: CGFloat =  1   // nudge down
+            let x1   = l.x1 + ox
+            let botY = l.cy + bh2 + oy
             let path = NSBezierPath()
-            path.move(to: NSPoint(x: l.x1, y: l.cy - bh2))
-            path.line(to: NSPoint(x: l.x1, y: botY - r))
-            path.appendArc(withCenter: NSPoint(x: l.x1 + r, y: botY - r),
+            path.move(to: NSPoint(x: x1, y: l.cy - bh2 + oy))
+            path.line(to: NSPoint(x: x1, y: botY - r))
+            path.appendArc(withCenter: NSPoint(x: x1 + r, y: botY - r),
                            radius: r, startAngle: 180, endAngle: 90, clockwise: true)
-            path.line(to: NSPoint(x: l.x2, y: botY))
+            path.line(to: NSPoint(x: l.x2 + ox, y: botY))
             path.lineWidth    = shapeStrokeW
             path.lineCapStyle = .round
             l.color.withAlphaComponent(l.alpha).setStroke()
@@ -431,7 +436,7 @@ final class ReminderWindow: NSWindow {
         let fmt       = DateFormatter(); fmt.dateFormat = "EEEE, MMM d"
         let dateField = NSTextField(labelWithString: fmt.string(from: Config.now))
         dateField.translatesAutoresizingMaskIntoConstraints = false
-        dateField.font      = NSFont.boldSystemFont(ofSize: 13)
+        dateField.font      = NSFont.boldSystemFont(ofSize: timelineFontSize + 2)
         dateField.textColor = .labelColor
         right.addSubview(dateField)
 
