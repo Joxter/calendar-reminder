@@ -8,6 +8,7 @@ import time
 
 import config
 from calendar_checker import Event, fetch_upcoming_events, fetch_next_event
+from datetime import datetime, timezone, timedelta
 from reminder_window import show_reminder
 
 logging.basicConfig(
@@ -31,6 +32,16 @@ def main() -> None:
         config.POLL_INTERVAL,
         config.WARNING_THRESHOLD,
     )
+
+    # Show a fake event immediately so the window can be tested without waiting
+    now = datetime.now(timezone.utc)
+    test_event = Event(
+        title="Design Review",
+        start=now + timedelta(minutes=7),
+        end=now + timedelta(minutes=37),
+    )
+    logger.info("Showing test reminder window…")
+    show_reminder(test_event)
 
     # Track which events we've already shown a reminder for (by start timestamp)
     shown: set[str] = set()

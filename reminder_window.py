@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import subprocess
 import tkinter as tk
-from datetime import timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,7 +9,6 @@ if TYPE_CHECKING:
 
 
 def _play_sound() -> None:
-    """Play the macOS system alert sound non-blocking."""
     try:
         subprocess.Popen(
             ["afplay", "/System/Library/Sounds/Glass.aiff"],
@@ -18,107 +16,101 @@ def _play_sound() -> None:
             stderr=subprocess.DEVNULL,
         )
     except FileNotFoundError:
-        pass  # non-macOS or afplay missing — silent degradation
+        pass
 
 
-def _format_time(event: "Event") -> str:
-    local_start = event.start.astimezone().strftime("%H:%M")
-    local_end = event.end.astimezone().strftime("%H:%M")
-    return f"{local_start} – {local_end}"
+def _urgency(event: "Event") -> tuple[str, str]:
+    secs = event.starts_in_seconds
+    if secs <= 0:
+        return "IN PROGRESS", "#ef4444"
+    if secs <= 120:
+        m, s = int(secs) // 60, int(secs) % 60
+        return f"STARTING IN {m}m {s}s", "#f97316"
+    return f"STARTING IN {int(secs) // 60} MIN", "#f59e0b"
 
 
 def show_reminder(event: "Event") -> None:
-    """
-    Block until the user dismisses the fullscreen reminder for *event*.
-    Safe to call from the main thread.
-    """
     _play_sound()
 
     root = tk.Tk()
-    root.title("Upcoming Meeting")
+    root.withdraw()
 
-    # --- Fullscreen, always-on-top, focus-stealing ---
-    root.attributes("-fullscreen", True)
-    root.attributes("-topmost", True)
-    root.attributes("-alpha", 0.97)
-    root.configure(bg="#1a1a2e")
+    sw = root.winfo_screenwidth()
+    sh = root.winfo_screenheight()
 
-    # Force focus once the window is mapped
-    root.after(100, root.focus_force)
-    root.after(150, lambda: root.lift())
+    badge_text, accent = _urgency(event)
 
-    screen_w = root.winfo_screenwidth()
-    screen_h = root.winfo_screenheight()
+    def dismiss(*_):
+        root.destroy()
 
-    # Outer frame centres content vertically
-    frame = tk.Frame(root, bg="#1a1a2e")
-    frame.place(relx=0.5, rely=0.5, anchor="center")
+    # ── Semi-transparent backdrop ────────────────────────────────────────────
+    backdrop = tk.Toplevel(root)
+    backdrop.overrideredirect(True)
+    backdrop.geometry(f"{sw}x{sh}+0+0")
+    backdrop.configure(bg="#000000")
+    backdrop.attributes("-alpha", 0.55)
+    backdrop.attributes("-topmost", True)
+    backdrop.bind("<Button-1>", dismiss)
 
-    seconds_until = event.starts_in_seconds
-    if seconds_until <= 0:
-        urgency_text = "MEETING IN PROGRESS"
-        urgency_color = "#ff4757"
-    elif seconds_until <= 120:
-        urgency_text = f"STARTING IN {int(seconds_until // 60)}m {int(seconds_until % 60)}s"
-        urgency_color = "#ff6b35"
-    else:
-        mins = int(seconds_until // 60)
-        urgency_text = f"STARTING IN {mins} MINUTES"
-        urgency_color = "#ffa502"
+    # ── Card ────────────────────────────────────────────────────────────────
+    cw, ch = 560, 320
+    cx, cy = (sw - cw) // 2, (sh - ch) // 2
 
-    tk.Label(
-        frame,
-        text=urgency_text,
-        font=("SF Pro Display", 28, "bold"),
-        fg=urgency_color,
-        bg="#1a1a2e",
-        pady=10,
-    ).pack()
+    card = tk.Toplevel(root)
+    card.overrideredirect(True)
+    card.geometry(f"{cw}x{ch}+{cx}+{cy}")
+    card.attributes("-topmost", True)
+    card.configure(bg="#ffffff")
 
-    tk.Label(
-        frame,
-        text=event.title,
-        font=("SF Pro Display", 52, "bold"),
-        fg="#ffffff",
-        bg="#1a1a2e",
-        wraplength=int(screen_w * 0.8),
-        justify="center",
-        pady=20,
-    ).pack()
+    # Accent stripe
+    tk.Frame(card, bg=accent, height=4).pack(fill="x")
 
-    tk.Label(
-        frame,
-        text=_format_time(event),
-        font=("SF Pro Display", 32),
-        fg="#a4b0be",
-        bg="#1a1a2e",
-        pady=8,
-    ).pack()
+    # Body padding
+    body = tk.Frame(card, bg="#ffffff", padx=32, pady=24)
+    body.pack(fill="both", expand=True)
 
-    # Pulsing red border hint — a thin coloured bar at top and bottom
-    for rely in (0.0, 1.0):
-        anchor = "nw" if rely == 0.0 else "sw"
-        bar = tk.Frame(root, bg=urgency_color, height=8)
-        bar.place(relx=0, rely=rely, relwidth=1.0, anchor=anchor)
+    # Urgency badge pill
+    pill = tk.Frame(body, bg=accent, padx=9, pady=3)
+    pill.pack(anchor="w")
+    tk.Label(pill, text=badge_text,
+             font=("SF Pro Text", 10, "bold"),
+             fg="#ffffff", bg=accent).pack()
 
-    dismiss_btn = tk.Button(
-        frame,
-        text="Dismiss",
-        font=("SF Pro Display", 20),
-        fg="#ffffff",
-        bg="#2f3542",
-        activebackground="#57606f",
-        activeforeground="#ffffff",
-        relief="flat",
-        padx=40,
-        pady=14,
+    # Event title
+    tk.Label(body, text=event.title,
+             font=("SF Pro Display", 22, "bold"),
+             fg="#111827", bg="#ffffff",
+             wraplength=480, justify="left").pack(anchor="w", pady=(12, 0))
+
+    # Hairline divider
+    tk.Frame(body, bg="#e5e7eb", height=1).pack(fill="x", pady=(14, 10))
+
+    # Time row
+    local_start = event.start.astimezone().strftime("%H:%M")
+    local_end = event.end.astimezone().strftime("%H:%M")
+    tk.Label(body, text=f"{local_start}  –  {local_end}",
+             font=("SF Pro Text", 14), fg="#6b7280", bg="#ffffff").pack(anchor="w")
+
+    # Footer: hint text + dismiss button
+    footer = tk.Frame(body, bg="#ffffff")
+    footer.pack(side="bottom", fill="x")
+
+    tk.Label(footer, text="Press Esc or click outside to dismiss",
+             font=("SF Pro Text", 10), fg="#d1d5db", bg="#ffffff").pack(side="left")
+
+    tk.Button(
+        footer, text="Dismiss",
+        font=("SF Pro Text", 12, "bold"),
+        fg="#ffffff", bg=accent,
+        activebackground=accent, activeforeground="#ffffff",
+        relief="flat", bd=0,
+        padx=18, pady=8,
         cursor="hand2",
-        command=root.destroy,
-    )
-    dismiss_btn.pack(pady=40)
+        command=dismiss,
+    ).pack(side="right")
 
-    # Keyboard shortcut: Escape or Enter also dismisses
-    root.bind("<Escape>", lambda _e: root.destroy())
-    root.bind("<Return>", lambda _e: root.destroy())
+    card.after(80, card.focus_force)
+    card.bind("<Escape>", dismiss)
+    card.bind("<Return>", dismiss)
 
     root.mainloop()
