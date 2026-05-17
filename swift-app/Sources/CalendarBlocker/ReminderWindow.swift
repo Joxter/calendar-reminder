@@ -8,13 +8,14 @@ private let accentSoon       = NSColor(hex: "#f59e0b")
 // MARK: - Layout constants (match Python version)
 private let axisH: CGFloat    = 20
 private let rowH: CGFloat     = 22
-private let badgeW: CGFloat   = 40
 private let badgeH: CGFloat   = 16
-private let badgeR: CGFloat   = 3
-private let lineH: CGFloat    = 2
 private let lPad: CGFloat     = 10
 private let rPad: CGFloat     = 10
 private let fontSize: CGFloat = 11
+
+// MARK: - L-shape style
+private let shapeStrokeW: CGFloat  = 2   // thickness of the L stroke
+private let shapeCornerR: CGFloat  = 4   // corner curviness (0 = sharp, max = badgeH/2 = 8)
 
 // MARK: - Urgency
 
@@ -136,41 +137,36 @@ final class TimelineView: NSView {
             else if overlaps.contains(i) { color = .systemOrange }
             else                         { color = .systemBlue }
 
-            let bh2   = badgeH / 2
-            let lineY = cy + bh2   // bottom of badge = top of underline
+            let bh2: CGFloat   = badgeH / 2
+            let alpha: CGFloat = done ? 0.35 : 1
+            let r              = min(shapeCornerR, bh2)   // clamp so arc fits in stem height
+            let botY           = cy + bh2                 // y of the bar centre-line
 
-            // Duration underline (slightly transparent for done events)
-            color.withAlphaComponent(done ? 0.35 : 1).setFill()
-            NSBezierPath(rect: NSRect(
-                x: x1,
-                y: lineY - lineH,
-                width: x2 - x1,
-                height: lineH
-            )).fill()
+            // L-shape: explicit arc at the corner so curviness is independently controllable
+            let path = NSBezierPath()
+            path.move(to: NSPoint(x: x1, y: cy - bh2))         // top of stem
+            path.line(to: NSPoint(x: x1, y: botY - r))         // straight down to arc start
+            // Quarter-circle corner: centre at (x1+r, botY-r), 180°→90° clockwise in default coords
+            // = visually left→down in the flipped view
+            path.appendArc(withCenter: NSPoint(x: x1 + r, y: botY - r),
+                           radius: r, startAngle: 180, endAngle: 90, clockwise: true)
+            path.line(to: NSPoint(x: x2, y: botY))             // right to end of bar
+            path.lineWidth    = shapeStrokeW
+            path.lineCapStyle = .round
+            color.withAlphaComponent(alpha).setStroke()
+            path.stroke()
 
-            // Badge: TL, TR, BL rounded; BR square (where underline connects)
-            color.withAlphaComponent(done ? 0.35 : 1).setFill()
-            color.setFill()
-            let by1 = cy - bh2
-            let bx2 = x1 + badgeW
-            NSBezierPath(roundedRect: NSRect(x: x1, y: by1, width: badgeW, height: badgeH),
-                         xRadius: badgeR, yRadius: badgeR).fill()
-            // Fill BR rounded curve to make it a square corner
-            NSBezierPath(rect: NSRect(x: bx2 - badgeR, y: lineY - badgeR,
-                                      width: badgeR, height: badgeR)).fill()
-
-            // Badge time label — centered in badge
+            // Time label — right of stem, in event color
             let timeStr  = timeFmt.string(from: ev.start) as NSString
             let timeAttrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.boldSystemFont(ofSize: fontSize),
-                .foregroundColor: NSColor.white,
+                .foregroundColor: color.withAlphaComponent(alpha),
             ]
             let timeSz = timeStr.size(withAttributes: timeAttrs)
-            timeStr.draw(at: NSPoint(x: x1 + (badgeW - timeSz.width) / 2,
-                                     y: cy - timeSz.height / 2),
+            timeStr.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 4, y: cy - timeSz.height / 2),
                          withAttributes: timeAttrs)
 
-            // Title + duration — right of badge, left for events >= 13:00
+            // Title + duration — after time label, left for events >= 13:00
             let dur      = durString(ev)
             let label    = dur.isEmpty ? ev.title : "\(ev.title)  \(dur)"
             let txtColor = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
@@ -182,7 +178,7 @@ final class TimelineView: NSView {
             if Calendar.current.component(.hour, from: ev.start) >= 13 {
                 ns.draw(at: NSPoint(x: x1 - 6 - sz.width, y: cy - sz.height / 2), withAttributes: attrs)
             } else {
-                ns.draw(at: NSPoint(x: x1 + badgeW + 6, y: cy - sz.height / 2), withAttributes: attrs)
+                ns.draw(at: NSPoint(x: x1 + shapeStrokeW / 2 + 4 + timeSz.width + 6, y: cy - sz.height / 2), withAttributes: attrs)
             }
         }
     }
