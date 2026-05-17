@@ -56,6 +56,22 @@ uv run python main.py
 
 On startup a reminder window is shown immediately for the next real upcoming event (if any), so you can verify the UI without waiting for the first poll cycle.
 
+### Development (auto-restart on save)
+
+Install `watchexec` once:
+
+```bash
+brew install watchexec
+```
+
+Then run:
+
+```bash
+uv run dev
+```
+
+The app restarts automatically whenever any `.py` file is saved.
+
 ---
 
 ## Reminder window

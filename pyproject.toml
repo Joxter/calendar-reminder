@@ -12,6 +12,9 @@ dependencies = [
 [project.scripts]
 calendar-blocker = "main:main"
 
+[tool.uv.scripts]
+dev = "watchexec -e py -r -- uv run python main.py"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
