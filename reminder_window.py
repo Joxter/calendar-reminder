@@ -29,47 +29,36 @@ def _urgency(event: "Event") -> tuple[str, str]:
     return f"STARTING IN {int(secs) // 60} MIN", "#f59e0b"
 
 
-def show_reminder(event: "Event") -> None:
+def show_reminder(root: tk.Tk, event: "Event") -> None:
+    """Create a Toplevel reminder window. Non-blocking — returns immediately."""
     _play_sound()
 
-    root = tk.Tk()
-    root.withdraw()
+    win = tk.Toplevel(root)
+    win.title("Meeting Reminder")
 
-    sw = root.winfo_screenwidth()
-    sh = root.winfo_screenheight()
+    cw, ch = 560, 300
+    sw = win.winfo_screenwidth()
+    sh = win.winfo_screenheight()
+    win.geometry(f"{cw}x{ch}+{(sw - cw) // 2}+{(sh - ch) // 2}")
+    win.resizable(False, False)
+    win.configure(bg="#ffffff")
+    win.attributes("-topmost", True)
+    win.lift()
+    win.after(50, win.focus_force)
 
     badge_text, accent = _urgency(event)
 
     def dismiss(*_):
-        root.destroy()
-
-    # ── Semi-transparent backdrop ────────────────────────────────────────────
-    backdrop = tk.Toplevel(root)
-    backdrop.overrideredirect(True)
-    backdrop.geometry(f"{sw}x{sh}+0+0")
-    backdrop.configure(bg="#000000")
-    backdrop.attributes("-alpha", 0.55)
-    backdrop.attributes("-topmost", True)
-    backdrop.bind("<Button-1>", dismiss)
-
-    # ── Card ────────────────────────────────────────────────────────────────
-    cw, ch = 560, 320
-    cx, cy = (sw - cw) // 2, (sh - ch) // 2
-
-    card = tk.Toplevel(root)
-    card.overrideredirect(True)
-    card.geometry(f"{cw}x{ch}+{cx}+{cy}")
-    card.attributes("-topmost", True)
-    card.configure(bg="#ffffff")
+        win.destroy()
 
     # Accent stripe
-    tk.Frame(card, bg=accent, height=4).pack(fill="x")
+    tk.Frame(win, bg=accent, height=4).pack(fill="x")
 
-    # Body padding
-    body = tk.Frame(card, bg="#ffffff", padx=32, pady=24)
+    # Body
+    body = tk.Frame(win, bg="#ffffff", padx=32, pady=24)
     body.pack(fill="both", expand=True)
 
-    # Urgency badge pill
+    # Urgency badge
     pill = tk.Frame(body, bg=accent, padx=9, pady=3)
     pill.pack(anchor="w")
     tk.Label(pill, text=badge_text,
@@ -85,17 +74,17 @@ def show_reminder(event: "Event") -> None:
     # Hairline divider
     tk.Frame(body, bg="#e5e7eb", height=1).pack(fill="x", pady=(14, 10))
 
-    # Time row
+    # Time
     local_start = event.start.astimezone().strftime("%H:%M")
     local_end = event.end.astimezone().strftime("%H:%M")
     tk.Label(body, text=f"{local_start}  –  {local_end}",
              font=("SF Pro Text", 14), fg="#6b7280", bg="#ffffff").pack(anchor="w")
 
-    # Footer: hint text + dismiss button
+    # Footer
     footer = tk.Frame(body, bg="#ffffff")
     footer.pack(side="bottom", fill="x")
 
-    tk.Label(footer, text="Press Esc or click outside to dismiss",
+    tk.Label(footer, text="Press Esc to dismiss",
              font=("SF Pro Text", 10), fg="#d1d5db", bg="#ffffff").pack(side="left")
 
     tk.Button(
@@ -109,8 +98,6 @@ def show_reminder(event: "Event") -> None:
         command=dismiss,
     ).pack(side="right")
 
-    card.after(80, card.focus_force)
-    card.bind("<Escape>", dismiss)
-    card.bind("<Return>", dismiss)
-
-    root.mainloop()
+    win.protocol("WM_DELETE_WINDOW", dismiss)
+    win.bind("<Escape>", dismiss)
+    win.bind("<Return>", dismiss)
