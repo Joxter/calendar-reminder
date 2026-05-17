@@ -237,6 +237,11 @@ final class ReminderWindow: NSWindow {
     private let event: CalEvent?
     private let todayEvents: [CalEvent]
 
+    private var countdownField: NSTextField?
+    private var countdownColor = NSColor.white
+    private var colonVisible   = true
+    private var tickTimer: Timer?
+
     init(event: CalEvent?, todayEvents: [CalEvent]) {
         self.event = event
         self.todayEvents = todayEvents
@@ -261,7 +266,10 @@ final class ReminderWindow: NSWindow {
         isMovableByWindowBackground = true
 
         buildUI(accent: accent, timelineH: timelineH)
-        if event != nil { NSSound.playSystemSound("Glass") }
+        if event != nil {
+            NSSound.playSystemSound("Glass")
+            startTickTimer()
+        }
     }
 
     // MARK: - UI
@@ -334,13 +342,15 @@ final class ReminderWindow: NSWindow {
             timerText = "NOW"
         } else {
             let m = Int(secs) / 60, s = Int(secs) % 60
-            timerText = String(format: "%d:%02d", m, s)
+            timerText = String(format: "%02d:%02d", m, s)
         }
         let timerField = NSTextField(labelWithString: timerText)
         timerField.translatesAutoresizingMaskIntoConstraints = false
         timerField.font      = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
         timerField.textColor = white
         left.addSubview(timerField)
+        countdownColor = white
+        self.countdownField = timerField
 
         // Everything pinned to the bottom, gaps controlled by gapNextToTitle / gapTitleToTimer
         NSLayoutConstraint.activate([
@@ -414,6 +424,41 @@ final class ReminderWindow: NSWindow {
             timeline.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 6),
             timeline.heightAnchor.constraint(equalToConstant: timelineH),
         ])
+    }
+
+    private func startTickTimer() {
+        tickTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.tick()
+        }
+    }
+
+    private func tick() {
+        guard let event = event, let field = countdownField else { return }
+        colonVisible.toggle()
+        let secs = max(0, event.startsInSeconds)
+        let text: String
+        if secs <= 0 {
+            text = "NOW"
+        } else {
+            let m = Int(secs) / 60, s = Int(secs) % 60
+            text = String(format: "%02d:%02d", m, s)
+        }
+        let font = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: countdownColor]
+        let attributed = NSMutableAttributedString(string: text, attributes: attrs)
+        if let colonRange = text.range(of: ":") {
+            let nsRange = NSRange(colonRange, in: text)
+            attributed.addAttribute(.foregroundColor,
+                                    value: countdownColor.withAlphaComponent(colonVisible ? 1 : 0),
+                                    range: nsRange)
+        }
+        field.attributedStringValue = attributed
+    }
+
+    override func close() {
+        tickTimer?.invalidate()
+        tickTimer = nil
+        super.close()
     }
 
     @objc private func dismiss() { close() }
