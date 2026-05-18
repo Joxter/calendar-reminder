@@ -21,7 +21,7 @@ enum Config {
                 if let url = URL(string: raw) { return url }
             }
         }
-
+        
         fatalError("ICAL_URL not set. Export it or add to .env in the repo root.")
     }()
 
@@ -29,7 +29,7 @@ enum Config {
     static let warningThreshold: TimeInterval = 10 * 60
 
     // Set to true to freeze "now" at 13:00 today for UI testing
-    static let mockNowEnabled = true
+    static let mockNowEnabled = false
     static var now: Date {
         guard mockNowEnabled else { return Date() }
         return Calendar.current.date(bySettingHour: 13, minute: 8, second: 0, of: Date())!

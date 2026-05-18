@@ -1,9 +1,4 @@
 .env
 
-# Python
-.venv/
-__pycache__/
-*.pyc
-
 # Swift
-swift-app/.build/
+.build/
