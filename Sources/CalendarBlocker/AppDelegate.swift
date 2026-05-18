@@ -4,8 +4,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var shown = Set<String>()
     private var windows: [ReminderWindow] = []
     private var pollThread: Thread?
+    private var statusBar: StatusBarController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        statusBar = StatusBarController()
         print("Calendar Blocker started. Polling every \(Int(Config.pollInterval))s, warning \(Int(Config.warningThreshold / 60))min before events.")
         let t = Thread { self.pollLoop(isStartup: true) }
         t.name = "CalendarPoller"
@@ -43,6 +45,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                     if shown.count > 200 { shown.removeAll() }
                 }
+
+                statusBar?.update(next: result.next)
 
                 if let next = result.next {
                     let secs = next.startsInSeconds

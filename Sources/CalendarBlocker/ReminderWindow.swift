@@ -341,8 +341,14 @@ final class ReminderWindow: NSWindow {
         if secs <= 0 {
             timerText = "NOW"
         } else {
-            let m = Int(secs) / 60, s = Int(secs) % 60
-            timerText = String(format: "%02d:%02d", m, s)
+            let totalMin = Int(secs) / 60
+            if totalMin >= 60 {
+                let h = totalMin / 60, m = totalMin % 60
+                timerText = String(format: "%d:%02d", h, m)
+            } else {
+                let m = totalMin, s = Int(secs) % 60
+                timerText = String(format: "%02d:%02d", m, s)
+            }
         }
         let timerField = NSTextField(labelWithString: timerText)
         timerField.translatesAutoresizingMaskIntoConstraints = false
@@ -440,8 +446,14 @@ final class ReminderWindow: NSWindow {
         if secs <= 0 {
             text = "NOW"
         } else {
-            let m = Int(secs) / 60, s = Int(secs) % 60
-            text = String(format: "%02d:%02d", m, s)
+            let totalMin = Int(secs) / 60
+            if totalMin >= 60 {
+                let h = totalMin / 60, m = totalMin % 60
+                text = String(format: "%d:%02d", h, m)
+            } else {
+                let m = totalMin, s = Int(secs) % 60
+                text = String(format: "%02d:%02d", m, s)
+            }
         }
         let font = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
         let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: countdownColor]
