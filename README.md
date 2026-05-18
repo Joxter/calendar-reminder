@@ -1,6 +1,6 @@
 # Calendar Blocker
 
-A native macOS app (Swift + AppKit) that shows an aggressive reminder window when a Google Calendar event is about to start. No OAuth, no Google API SDK — just a private iCal feed URL.
+A native macOS app (Swift + AppKit) that shows an aggressive reminder window when a Google Calendar event is about to start. No OAuth, no Google API SDK — just a private iCal feed URL. Includes a menu bar icon with a live countdown to your next event.
 
 ---
 
@@ -10,6 +10,8 @@ A native macOS app (Swift + AppKit) that shows an aggressive reminder window whe
 2. When an event falls within the warning window (default 10 min before start), a reminder window appears on top of all other windows and steals focus.
 3. The same event is never shown twice in the same session (dedup by title + start time).
 4. Events that started up to a few minutes ago are still shown if a poll cycle missed them.
+5. Recurring events (RRULE) are fully expanded — daily, weekly, monthly, and yearly patterns are supported.
+6. A menu bar icon shows the next event title and an animated live countdown; clicking it opens a menu with a link to Google Calendar and a Quit option.
 
 ---
 
@@ -53,6 +55,21 @@ Watches `Sources/` for `.swift` changes and hot-reloads the app automatically.
 
 ---
 
+## Menu bar icon
+
+The status bar item shows a calendar SF Symbol and a live countdown label that updates every 30 seconds (between polls).
+
+| State | Symbol | Colour |
+|---|---|---|
+| Event in progress or just started | `calendar.badge.clock` | Red |
+| < 5 min away | `calendar.badge.clock` | Orange |
+| Further away | `calendar` | Secondary grey |
+| No events today | `calendar` | Secondary grey, no label |
+
+Clicking the icon shows a dropdown with the next event's title and start time, an **Open Google Calendar** link, and **Quit**.
+
+---
+
 ## Reminder window
 
 The window is 720 × (dynamic height) px, always on top, steals keyboard focus.  
@@ -63,6 +80,7 @@ It is split into two columns separated by a 1 px hairline.
 | Element | Detail |
 |---|---|
 | Urgency badge | Coloured pill: amber / orange / red depending on time to start |
+| Animated timer | Live countdown (updates every second) showing time until event starts |
 | Event title | SF Pro Display bold, wraps to multiple lines |
 | Duration | `h:mm` format (e.g. `0:30`, `1:00`) |
 | Dismiss button | Accent colour; hover darkens. Also responds to **Esc**, **Return**, and window close. |
@@ -114,10 +132,12 @@ calendar-blocker/
 ├── .env                                  — local config (git-ignored)
 └── Sources/CalendarBlocker/
     ├── main.swift                        — entry point; NSApplication setup
-    ├── AppDelegate.swift                 — app lifecycle, polling timer
+    ├── AppDelegate.swift                 — app lifecycle, polling timer, status bar wiring
     ├── CalendarChecker.swift             — iCal fetch/parse; upcoming + today events
     ├── ICalParser.swift                  — raw iCal text → Event structs
+    ├── RRuleExpander.swift               — RFC 5545 RRULE → concrete occurrence dates
     ├── ReminderWindow.swift              — two-column NSWindow with Gantt timeline
+    ├── StatusBarController.swift         — menu bar icon with live countdown
     └── Config.swift                      — reads ICAL_URL from env / .env file
 ```
 
