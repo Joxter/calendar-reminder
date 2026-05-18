@@ -76,7 +76,7 @@ final class StatusBarController: NSObject {
 
         menu.addItem(.separator())
 
-        let urlItem = NSMenuItem(title: "Set Calendar URL…", action: #selector(setCalendarURL), keyEquivalent: ",")
+        let urlItem = NSMenuItem(title: "Set Calendar URLs…", action: #selector(setCalendarURL), keyEquivalent: ",")
         urlItem.target = self
         menu.addItem(urlItem)
 
@@ -168,22 +168,37 @@ final class StatusBarController: NSObject {
 
     @objc private func setCalendarURL() {
         let alert = NSAlert()
-        alert.messageText = "Set Calendar URL"
-        alert.informativeText = "Paste your Google Calendar private iCal URL (Settings → Secret address in iCal format):"
+        alert.messageText = "Set Calendar URLs"
+        alert.informativeText = "Paste iCal URLs, one per line (Google Calendar → Settings → Secret address in iCal format):"
         alert.addButton(withTitle: "Save")
         alert.addButton(withTitle: "Cancel")
 
-        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 440, height: 22))
-        field.stringValue = UserDefaults.standard.string(forKey: "icalURL") ?? ""
-        field.placeholderString = "https://calendar.google.com/calendar/ical/…/basic.ics"
-        alert.accessoryView = field
-        alert.window.initialFirstResponder = field
+        let scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 440, height: 90))
+        scrollView.hasVerticalScroller = true
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .bezelBorder
+
+        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: 440, height: 90))
+        textView.minSize = NSSize(width: 0, height: 90)
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.textContainer?.containerSize = NSSize(width: 440, height: CGFloat.greatestFiniteMagnitude)
+        textView.textContainer?.widthTracksTextView = true
+        textView.isEditable = true
+        textView.isRichText = false
+        textView.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .regular)
+        textView.string = Config.icalURLsText
+        scrollView.documentView = textView
+
+        alert.accessoryView = scrollView
+        alert.window.initialFirstResponder = textView
 
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        let raw = field.stringValue.trimmingCharacters(in: .whitespaces)
-        guard !raw.isEmpty, URL(string: raw) != nil else { return }
-        Config.saveIcalURL(raw)
+        let raw = textView.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return }
+        Config.saveIcalURLs(raw)
         onURLChanged?()
     }
 

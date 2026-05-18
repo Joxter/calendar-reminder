@@ -1,0 +1,1832 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:amsterjoxter@gmail.com
+X-WR-TIMEZONE:Europe/Amsterdam
+BEGIN:VEVENT
+DTSTART:20240409T080000Z
+DTEND:20240409T090000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=organizer@ubeeo.nl:mailto:organizer@ubeeo.nl
+UID:660ffb2ac05b650252e80c2b+9808ef4f607d9906671e@invite-de.cronofy.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CLASS:PRIVATE
+CREATED:20240405T132250Z
+LAST-MODIFIED:20240405T133151Z
+LOCATION:Bolderweg 2\, 1332AT Almere
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Uitnodiging vervolggesprek voor de functie van Senior Mobile APP En
+ gineer 
+TRANSP:OPAQUE
+ATTACH;FILENAME=inventory_form_working_conditions_en.docx:https://mail.goog
+ le.com/?view=att&th=18eae6d983aabf36&attid=0.2&disp=attd&zw
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20260124
+DTEND;VALUE=DATE:20260125
+DTSTAMP:20260518T184205Z
+UID:6hhjgo9m6sqjcb9k6ph32b9k6dh32b9p68qm8b9n6di68cpg6lgm8c326k@google.com
+CREATED:20251212T161256Z
+LAST-MODIFIED:20251212T161256Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Арчери
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240405T070000Z
+DTEND:20240405T073000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=maarten.faessen@alfen.com:mailto:maarten.faessen@alfen.com
+UID:040000008200E00074C5B7101A82E0080000000010F95350C281DA01000000000000000
+ 010000000E59302C383AFE340B7935C82E1672D66
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Kl
+ aas Hoek;X-NUM-GUESTS=0:mailto:k.hoek@alfen.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Maarte
+ n Faessen;X-NUM-GUESTS=0:mailto:maarten.faessen@alfen.com
+CREATED:20240403T125612Z
+DESCRIPTION:Gentlemen\,\n\nHereby the invite!\n\nSide note: I will not part
+ icipate this interview.\n\nGood luck!\n\n\n[cid:image001.png@01DA85D6.CF295
+ 920]<https://alfen.com/>\n\nMaarten Faessen\nRecruiter\n+31629312649<tel:+3
+ 1651661741>\nMaarten.faessen@alfen.com<mailto:Maarten.faessen@alfen.com>\nA
+ lfen B.V | KvK/CoC: 39037364\n\n[cid:image002.png@01DA85D6.CF295920]<https:
+ //www.facebook.com/AlfenNV/>\n\n[cid:image003.png@01DA85D6.CF295920]<https:
+ //nl.linkedin.com/company/alfen-nv>\n\n[cid:image004.png@01DA85D6.CF295920]
+ <https://www.youtube.com/channel/UCsTcShgB8aHWkrJs4gSJZdA/videos>\n\n\n\n\n
+ ___________________________________________________________________________
+ _____\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-U
+ S>\nJoin the meeting now<https://teams.microsoft.com/l/meetup-join/19%3amee
+ ting_ZDMzZGVmOTctMjg4Ny00MGJmLWIwYmQtMjcwNmM4YjNiZjc3%40thread.v2/0?context
+ =%7b%22Tid%22%3a%2254d36b47-3315-494b-b7f3-91a49dfa9df3%22%2c%22Oid%22%3a%2
+ 2cfa4bc3e-911c-4e54-98e3-52e64645ef94%22%7d>\nMeeting ID: 387 097 049 313\n
+ Passcode: H7RBSw\n________________________________\nFor organizers: Meeting
+  options<https://teams.microsoft.com/meetingOptions/?organizerId=cfa4bc3e-9
+ 11c-4e54-98e3-52e64645ef94&tenantId=54d36b47-3315-494b-b7f3-91a49dfa9df3&th
+ readId=19_meeting_ZDMzZGVmOTctMjg4Ny00MGJmLWIwYmQtMjcwNmM4YjNiZjc3@thread.v
+ 2&messageId=0&language=en-US> | Reset dial-in PIN<https://dialin.teams.micr
+ osoft.com/usp/pstnconferencing>\n__________________________________________
+ ______________________________________\n\n
+LAST-MODIFIED:20240403T125937Z
+LOCATION:Microsoft Teams Meeting
+SEQUENCE:4
+STATUS:CONFIRMED
+SUMMARY:1st interview Nikolai / Alfen x Klaas  
+TRANSP:OPAQUE
+ATTACH;FILENAME=image001.png:https://mail.google.com/?view=att&th=18ea40821
+ 0dc84a0&attid=0.1&disp=attd&zw
+ATTACH;FILENAME=image002.png:https://mail.google.com/?view=att&th=18ea40821
+ 0dc84a0&attid=0.2&disp=attd&zw
+ATTACH;FILENAME=image003.png:https://mail.google.com/?view=att&th=18ea40821
+ 0dc84a0&attid=0.3&disp=attd&zw
+ATTACH;FILENAME=image004.png:https://mail.google.com/?view=att&th=18ea40821
+ 0dc84a0&attid=0.4&disp=attd&zw
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_ZDMzZGVmOTctMjg4Ny00MGJ
+ mLWIwYmQtMjcwNmM4YjNiZjc3@thread.v2"\,"private":true\,"type":0\,"mid":0\,"r
+ id":0\,"uid":null}
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:-513984536
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/54d36b47-3315-494b-b7f3-91a49dfa9df3/cfa4bc3e-911c-4e54-98e3-52
+ e64645ef94/19_meeting_ZDMzZGVmOTctMjg4Ny00MGJmLWIwYmQtMjcwNmM4YjNiZjc3@thre
+ ad.v2/0
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:4
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Locat
+ ionUri" : "" } ]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_ZDMzZGVmOTctMjg4Ny00MGJmLWIwYmQtMjcwNmM4YjNiZjc3%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%2254d36b47-3315-494b-b7f3-91a49dfa9df3%22%2c%22Oid
+ %22%3a%22cfa4bc3e-911c-4e54-98e3-52e64645ef94%22%7d
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230726T080000Z
+DTEND:20230726T083000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=iryna.solomonenko@fastnedcharging.com:mailto:iryna.solomonenko
+ @fastnedcharging.com
+UID:4crq7bp9991v66t23ge3jonn24@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=iryna.
+ solomonenko@fastnedcharging.com;X-NUM-GUESTS=0:mailto:iryna.solomonenko@fas
+ tnedcharging.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=de
+ lal@orange-quarter.com;X-NUM-GUESTS=0:mailto:delal@orange-quarter.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/fyk-ixha-mkq
+CREATED:20230724T105759Z
+DESCRIPTION:Hi Nikolai! \n\nMy name's Iryna and I am a recruiter at Fastned
+  - nice to e-meet you! \nFollowing your conversation with Delal\, I'd like 
+ to invite you for a 30 min online informal chat to learn more about you and
+  tell you more about Fastned. \n\nPlease accept the invite if the time work
+  well for you or suggest another slot. \n\nLooking forward to speaking soon
+ \,\nIryna\n\nDeelnemen via Google Meet: https://meet.google.com/fyk-ixha-mk
+ q\nOf bel: (NL) +31 20 257 5053 Pincode: 572635910#\nMeer telefoonnummers: 
+ https://tel.meet/fyk-ixha-mkq?pin=6169982368235&hs=7\n\nGa voor meer inform
+ atie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20230724T105855Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Call invite - Fastned - Sr React Native App Engineer 
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240403T103000Z
+DTEND:20240403T111500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=cansu@crobox.com:mailto:cansu@crobox.com
+UID:nnkb18nm4njtnd6h6ji8e7n96g@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=cansu@
+ crobox.com;X-NUM-GUESTS=0:mailto:cansu@crobox.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/ybh-qkwb-cpv
+CREATED:20240328T093329Z
+DESCRIPTION:<b>Booked by</b>\nNikolai Morozov\namsterjoxter@gmail.com\n\nDe
+ elnemen via Google Meet: https://meet.google.com/ybh-qkwb-cpv\nOf bel: (NL)
+  +31 20 257 3053 Pincode: 494516231#\nMeer telefoonnummers: https://tel.mee
+ t/ybh-qkwb-cpv?pin=7614759860015&hs=7\n\nGa voor meer informatie over Meet 
+ naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240403T082943Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview w Cansu (Nikolai Morozov)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240509T123000Z
+DTEND:20240509T130000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=c4e8a_xk-ixgx@events.workablemail.com:mailto:c4e8a_xk-ixgx@eve
+ nts.workablemail.com
+UID:m3w5enfu-8nij1tzxulkwdekhl9jotyj
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Andrei
+  Ifrim;X-NUM-GUESTS=0:mailto:andrei.ifrim@monite.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Anna S
+ torozhenko;X-NUM-GUESTS=0:mailto:anne.storozhenko@monite.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Liubov
+  Neporozhniaia;X-NUM-GUESTS=0:mailto:liubov.neporozhniaia@monite.com
+URL:http://www.workable.com/events/m3w5enfu-8nij1tzxulkwdekhl9jotyj
+CREATED:20240506T113215Z
+DESCRIPTION:<p>Hi Nikolai\, </p><p>Thanks for submitting your availability!
+  </p><p>You're confirmed for your interview for the Senior Frontend Enginee
+ r (React) role with Monite Team: This interview will take place over Google
+  Meet. </p><p>For the video interview\, please use a camera-enabled compute
+ r. </p><p>Please let me know if any of the details above are incorrect. If 
+ you have any additional questions\, please feel free to contact me. </p><p>
+ </p><p>Thanks\, </p><p>Anna </p>\nThis event has a video call.\nJoin: https
+ ://meet.google.com/trg-fhgx-oyy\n
+LAST-MODIFIED:20250515T172127Z
+LOCATION:https://meet.google.com/trg-fhgx-oyy
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview for Senior Frontend Engineer (React) job at Monite
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20240615
+DTEND;VALUE=DATE:20240616
+DTSTAMP:20260518T184205Z
+UID:coojgo9m61j3gb9k68s32b9kccsm4bb2c4q32bb5cgomaophchj66opmc8@google.com
+CREATED:20240517T112232Z
+LAST-MODIFIED:20240517T112232Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Отменить ютуб
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240429T101500Z
+DTEND:20240429T103000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=c.tjin@relay42.com:mailto:c.tjin@relay42.com
+UID:2eaa0a5l7510rb7ftkjc7o2m6n@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=c.tjin
+ @relay42.com;X-NUM-GUESTS=0:mailto:c.tjin@relay42.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/ibo-ntex-ijh
+CREATED:20240429T074104Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/ibo-ntex-ijh
+ \nOf bel: (NL) +31 20 257 2992 Pincode: 574371001#\nMeer telefoonnummers: h
+ ttps://tel.meet/ibo-ntex-ijh?pin=6187754804961&hs=7\n\nGa voor meer informa
+ tie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240429T075829Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Intro Char/Nikolai\, FE
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240510T091500Z
+DTEND:20240510T094500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=guida.cusso@elementsinteractive.es:mailto:guida.cusso@elements
+ interactive.es
+UID:pbr60rirj5e087gjj1ko2oudu8@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=guida.
+ cusso@elementsinteractive.es;X-NUM-GUESTS=0:mailto:guida.cusso@elementsinte
+ ractive.es
+X-GOOGLE-CONFERENCE:https://meet.google.com/rhi-cjey-ykg
+CREATED:20240506T115903Z
+DESCRIPTION:<b>Booked by</b>\nNikolai Morozov\namsterjoxter@gmail.com\n\nDe
+ elnemen via Google Meet: https://meet.google.com/rhi-cjey-ykg\nOf bel: (ES)
+  +34 876 50 66 02 Pincode: 101746815#\nMeer telefoonnummers: https://tel.me
+ et/rhi-cjey-ykg?pin=9897960965016&hs=7\n\nGa voor meer informatie over Meet
+  naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240506T115920Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Screening call with Guida (Nikolai Morozov)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230330T061000Z
+DTEND:20230330T064500Z
+DTSTAMP:20260518T184205Z
+UID:57kifjj8injlemkt305831dpml@google.com
+CREATED:20230209T082449Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20230209T082449Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak N. Vaandrager
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240920T153000Z
+DTEND:20240920T160000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=noreply@calendly.com:mailto:noreply@calendly.com
+UID:calendly-1073575751
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20240909T093726Z
+DESCRIPTION:Event Name: 30 Minute Meeting\nDate & Time: 17:30 - 18:00 (Cent
+ ral European Time) on Friday\, September 20\, 2024\nLocation: This is a Goo
+ gle Meet web conference.\nYou can join this meeting from your computer\, ta
+ blet\, or smartphone.\nhttps://calendly.com/events/2728e0cc-17eb-46fa-85aa-
+ ad7f058b5451/google_meet\n\nNeed to make changes to this event?\nCancel: ht
+ tps://calendly.com/cancellations/c1e8f51e-0c92-489b-b56f-9c8c0f7bb1a3\nResc
+ hedule: https://calendly.com/reschedulings/c1e8f51e-0c92-489b-b56f-9c8c0f7b
+ b1a3\n
+LAST-MODIFIED:20240909T094107Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:30 Minute Meeting with Artur Bordeniuc
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230727T150500Z
+DTEND:20230727T153500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=bruce.lam@coursehero.com:mailto:bruce.lam@coursehero.com
+UID:agqaqf9gs5ldd03kto66hgb840@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=bruce
+ .lam@coursehero.com;X-NUM-GUESTS=0:mailto:bruce.lam@coursehero.com
+CREATED:20230725T091447Z
+DESCRIPTION:Event Name: Scribbr: Introductory Interview with Bruce Lam\n\nT
+ hanks for taking the time to schedule a meeting with me. I am the recruiter
+  for Scribbr and I am based in the United States. I look forward to speakin
+ g with you about Scribbr and to learning about your career journey.\n\n\nFo
+ r this initial call\, specifically I want to learn about your background in
+ :\n\n1. Fullstack software engineering\n2. Performing autonomously on techn
+ ical projects\n3. Optimizing applications to handle scaling\n4. Motivations
+  for seeking a new role\n5. Interpersonal abilities (ie soft skills) in tea
+ m settings\n\n\nFor this appointment\, you can choose to meet via a Zoom me
+ eting or a Google Meeting. You can keep the camera on or off.\n\n\nLet me k
+ now if you have any questions.\n\n\nSincerely\,\n\n\nBruce Lam\n\nSenior Re
+ cruiter at Course Hero and Scribbr\n\nLocation: This is a Zoom web conferen
+ ce.\n\nYou can join this meeting from your computer\, tablet\, or smartphon
+ e.\nhttps://coursehero.zoom.us/j/92032933646\n\nOne tap mobile:\n+1 646 876
+  9923\,\,92032933646#\n+1 646 931 3860\,\,92032933646#\n\nYou can also dial
+  in using your phone.\nUS: +1 646 876 9923\, +1 646 931 3860\, +1 301 715 8
+ 592\, +1 305 224 1968\, +1 309 205 3325\, +1 312 626 6799\, +1 564 217 2000
+ \, +1 669 444 9171\, +1 669 900 6833\, +16892781000\, +1 719 359 4580\, +1 
+ 253 205 0468\, +1 253 215 8782\, +1 346 248 7799\, +1 360 209 5623\, +1 386
+  347 5053\, +1 507 473 4847\, +1 877 853 5247\, +1 888 788 0099\, +1 833 54
+ 8 0276\, +1 833 548 0282\nMeeting ID: 920-329-33646\n\nFind your local numb
+ er: https://coursehero.zoom.us/u/aBy6Fw1Hi\n\nI understand and agree that p
+ ersonal data provided in my CV and interview may be used solely for recruit
+ ment purposes by Scribbr and will be kept on record for the duration of my 
+ employment (if hired) or for a maximum period of 3 months. : I consent\n\nC
+ hoose one (or more) of the boxes that accurately describes you. This will h
+ elp me understand your priorities and needs as a job candidate. : I am not 
+ in a hurry to start a new job but open to a new change\n\nNeed to make chan
+ ges to this event?\nCancel: https://calendly.com/cancellations/f73d353f-d9c
+ 7-4913-9ab1-ca08277bae95\nReschedule: https://calendly.com/reschedulings/f7
+ 3d353f-d9c7-4913-9ab1-ca08277bae95\n\nPowered by Calendly.com\n
+LAST-MODIFIED:20230727T145943Z
+LOCATION:https://coursehero.zoom.us/j/92032933646
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:Course Hero: Intro Call for Nikolai and Bruce Lam
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240513T110000Z
+DTEND:20240513T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=c_c4e4492901f1c9a9c4a2132880c13ae1ddad7b93ef8233465bb93ab56cf0
+ db44@group.calendar.google.com:mailto:c_c4e4492901f1c9a9c4a2132880c13ae1dda
+ d7b93ef8233465bb93ab56cf0db44@group.calendar.google.com
+UID:rbhr2dqj80d9es3dvs6n2a75og@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/ceg-iyzz-cqx
+CREATED:20240502T124958Z
+DESCRIPTION:To cancel or reschedule\, use this link: https://you.ashbyhq.co
+ m/meeting/42b7c27b-6aeb-4a4c-85b7-25bb6019b4b0/ <p>Hi <span>Nikolai</span>\
+ , </p><p>Great that you are taking the time to get to know each other bette
+ r.</p><p>During this chat\, we will get deeper into your expectations regar
+ ding your expertise and the future challenges you're looking for as well as
+  delve into the current challenges we have at Kramp to discover whether the
+ re's a match.</p><p>Take your time to also look at our<a target="_blank" re
+ l="noopener noreferrer nofollow" href="https://instagram.com/lifeatkramputr
+ echt/"> Instagram page</a>\, so you could get a feeling of our culture and 
+ people. </p><p></p><p>Talk to you soon!</p>\n\nDeelnemen via Google Meet: h
+ ttps://meet.google.com/ceg-iyzz-cqx\nOf bel: (NL) +31 20 257 2941 Pincode: 
+ 538373807#\nMeer telefoonnummers: https://tel.meet/ceg-iyzz-cqx?pin=5563283
+ 474076&hs=7\n\nGa voor meer informatie over Meet naar https://support.googl
+ e.com/a/users/answer/9282720
+LAST-MODIFIED:20240508T130746Z
+LOCATION:See attached Google Meet link
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Chat with Kramp 🚜
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20260518T090000Z
+DTEND:20260518T100000Z
+DTSTAMP:20260518T184205Z
+UID:4csquudpt15bo88ns5rphmcq3q@google.com
+CREATED:20260517T094307Z
+LAST-MODIFIED:20260518T183354Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:overlap 1235 overlap 1235 overlap 1235
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240906T153000Z
+DTEND:20240906T160000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=noreply@calendly.com:mailto:noreply@calendly.com
+UID:calendly-1070287599
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20240904T163208Z
+DESCRIPTION:Event Name: 30 Minute Meeting\nDate & Time: 17:30 - 18:00 (Cent
+ ral European Time) on Friday\, September 6\, 2024\nLocation: This is a Goog
+ le Meet web conference.\nYou can join this meeting from your computer\, tab
+ let\, or smartphone.\nhttps://calendly.com/events/29312436-ad00-4c4f-b4be-a
+ 75e87095dd8/google_meet\n\nNeed to make changes to this event?\nCancel: htt
+ ps://calendly.com/cancellations/ef0dce96-033a-4a4f-9bd4-f99ffaf6ba8e\nResch
+ edule: https://calendly.com/reschedulings/ef0dce96-033a-4a4f-9bd4-f99ffaf6b
+ a8e\n
+LAST-MODIFIED:20240904T164351Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:30 Minute Meeting with Artur Bordeniuc
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231022T093000Z
+DTEND:20231022T094500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=no-reply@whyline.com:mailto:no-reply@whyline.com
+UID:AM-pGiamAtoCE@whyline.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20231018T220429Z
+LAST-MODIFIED:20231019T051916Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Appointment at Amsterdam Airport Schiphol for Gates D 1 D 57 E F G 
+ H Departures Vertrek 2
+TRANSP:OPAQUE
+ATTACH;FILENAME=qrcode.png:https://mail.google.com/?view=att&th=18b44d35afe
+ 68dd6&attid=0.1&disp=attd&realattid=18b44d30bfd9908bfb1&zw
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240312T160000Z
+DTEND:20240312T170000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=worrkhardplayharderr@gmail.com:mailto:worrkhardplayharderr@gma
+ il.com
+UID:4gden0larhk4ane3dnluf2scfo@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=worrkh
+ ardplayharderr@gmail.com;X-NUM-GUESTS=0:mailto:worrkhardplayharderr@gmail.c
+ om
+X-GOOGLE-CONFERENCE:https://meet.google.com/rrt-cvdg-hfp
+CREATED:20240311T215449Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/rrt-cvdg-hfp
+ \n\nGa voor meer informatie over Meet naar https://support.google.com/a/use
+ rs/answer/9282720
+LAST-MODIFIED:20240311T220527Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolay and Aleksandra
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240904T173000Z
+DTEND:20240904T180000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=noreply@calendly.com:mailto:noreply@calendly.com
+UID:calendly-1068067760
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=am
+ sterjoxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20241007T170736Z
+DESCRIPTION:Event Name: 30 Minute Meeting\nDate & Time: 19:30 - 20:00 (Cent
+ ral European Time) on Wednesday\, September 4\, 2024\nLocation: This is a G
+ oogle Meet web conference.\nYou can join this meeting from your computer\, 
+ tablet\, or smartphone.\nhttps://calendly.com/events/1ec1775d-5ab1-46d1-a30
+ 6-7028c5c1162f/google_meet\n\nNeed to make changes to this event?\nCancel: 
+ https://calendly.com/cancellations/c370f48c-bf0f-4fa9-b098-4b3aabb132f2\nRe
+ schedule: https://calendly.com/reschedulings/c370f48c-bf0f-4fa9-b098-4b3aab
+ b132f2\n
+LAST-MODIFIED:20241007T170736Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:30 Minute Meeting with Artur Bordeniuc
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230209T070000Z
+DTEND:20230209T073000Z
+DTSTAMP:20260518T184205Z
+UID:75jqst20rojggbbft7u4no4mee@google.com
+CREATED:20230103T080111Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20230103T080111Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak N. Vaandrager
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231113T110000Z
+DTEND:20231113T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=lilien@levelupventures.nl:mailto:lilien@levelupventures.nl
+UID:784t5hu7uu62s3uvsg05h1o5qm@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=lilien
+ @levelupventures.nl;X-NUM-GUESTS=0:mailto:lilien@levelupventures.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=no
+ tes@metaview.ai;X-NUM-GUESTS=0:mailto:notes@metaview.ai
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=lili@c
+ vmaker.com;X-NUM-GUESTS=0:mailto:lili@cvmaker.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/abp-jgvk-jab
+CREATED:20231113T092211Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/abp-jgvk-jab
+ \nOf bel: (NL) +31 20 257 5141 Pincode: 382214051#\nMeer opties voor deelne
+ men: https://tel.meet/abp-jgvk-jab?pin=8430269685972&hs=7\n\nGa voor meer i
+ nformatie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20231114T143331Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai x Lili for CVMaker
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230223T140000Z
+DTEND:20230223T142000Z
+DTSTAMP:20260518T184205Z
+UID:62ajt2c26780it1n36ma9f5ii0@google.com
+CREATED:20230222T105005Z
+DESCRIPTION:Phone interview for Senior Front-end Developer (React)\nCandida
+ te: Nikolai Morozov\nInterviewers: Szabina Miholics\nEvent: https://jobs.ch
+ annelengine.com/v/events/vc4oll9fuda5
+LAST-MODIFIED:20230222T105005Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov - Phone interview for Senior Front-end Developer (R
+ eact)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240503T111500Z
+DTEND:20240503T120000Z
+DTSTAMP:20260518T184205Z
+UID:5jmeeq3927qc7kgahu48hahaei@google.com
+CREATED:20240501T084157Z
+DESCRIPTION:Hi Nikolai\,\n\nThanks for choosing a time for us to chat about
+  the Senior Frontend Engineer (React) position. There's seems to be a syste
+ m issue on our side so I re-sending the confirmation invite. The only chang
+ e is the google meet link.\n\nYou're confirmed for your interview on:\n\nDa
+ te/Time: May 3\, 2024 1:15pm-2:00pm CEST\nInterviewers: Jo-Ann Lim\n\nGoogl
+ e Meet: https://meet.google.com/ubk-tfvf-owp\n\nDon't forget to add it to y
+ our personal calendar.\nPlease note that we use BrightHire to record our in
+ terviews. This allows us to focus more on the conversation and less on taki
+ ng notes. If you do not want us to use BrightHire\, please reach out to you
+ r recruiter.\n\nLet us know if you have any questions before your interview
+ .\n\nKind Regards\,\nJo-Ann\n\nTalent Acquisition @ Creative Fabrica
+LAST-MODIFIED:20240501T084157Z
+LOCATION:Westerhuis-1-Decal (2)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview with Creative Fabrica
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230119T070000Z
+DTEND:20230119T074000Z
+DTSTAMP:20260518T184205Z
+UID:62h0j3hgl01qlt9e0o3fglgroq@google.com
+CREATED:20230103T080054Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20230103T080054Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak M. Bos
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240313T150000Z
+DTEND:20240313T160000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=robin.disma@odido.nl:mailto:robin.disma@odido.nl
+UID:040000008200E00074C5B7101A82E0080000000030B96FF43C71DA01000000000000000
+ 010000000006709D0CD6D924599BD29ADE1D032ED
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Dm
+ ytro Shapovalov;X-NUM-GUESTS=0:mailto:dmytro.shapovalov@odido.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Robin 
+ Disma;X-NUM-GUESTS=0:mailto:robin.disma@odido.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Ru
+ pert McKay;X-NUM-GUESTS=0:mailto:rupert.mckay@odido.nl
+CREATED:20240308T093946Z
+DESCRIPTION:Dear Nikolai\,\n\nAs discussed it is our pleasure to invite you
+  for the deepdive into the code\, for the role of Software Engineer at Odid
+ o!\n\nYou will have the deepdive with Rupert McKay (Principal Engineer Fron
+ t-end) and Dmytro Shapovalov (Senior Software Engineer)\nYou can ask for Ru
+ pert at the reception desk! You will also get a QR code sent to enter the b
+ uilding!\n\n\nHere are some tips:\n\n  *   Talk out loud as you think. We w
+ ill ask questions to prompt this\, but it is easier if we can hear your tho
+ ughts and how you create your code.\n  *   Don't pretend to know something 
+ you don't. It is ok not to know things. We are more likely to be impressed 
+ if you ask for a hint\, and incorporate that hint well\, than if we get the
+  sense that you are trying to bluff your way through.\n  *   Start simple. 
+ We don't expect a perfectly formed answer right away. It is sensible to app
+ roach any problem with a naive solution\, and to discuss its weaknesses\, b
+ efore gradually working towards more advanced solutions.\n\n\nGood luck\, e
+ njoy your weekend and again\, don’t forget to smile while coding!!\;-)\n\nR
+ obin\n\n\n\n\nKind regards / Vriendelijke groet\,\n\nRobin Disma\nTalent Ac
+ quisition Manager IT & Network\n+31 (0)6 18 07 4000\nE-mail robin.disma@odi
+ do.nl<mailto:robin.disma@odido.nl>\n\n[cid:image001.gif@01DA713E.E1470550]\
+ n\n\n\nOdido Netherlands bv\nWaldorpstraat 60 ● 2521 CC ● Den Haag\n\n[Afbe
+ elding met symbool\, cirkel\, logo\, Lettertype  Automatisch gegenereerde b
+ eschrijving]<http://www.x.com/odidonederland>  [A black and white logo  Des
+ cription automatically generated with low confidence] <https://www.linkedin
+ .com/company/odidonederland/>   [A white letter f in a circle  Description 
+ automatically generated with medium confidence] <https://www.facebook.com/o
+ didonederland/>   [A black and white logo  Description automatically genera
+ ted with low confidence] <https://www.instagram.com/OdidoNederland/>\n\n\n\
+ n\n\n\n\n__________________________________________________________________
+ ______________\nMicrosoft Teams-vergadering\nNeem deel vanaf uw computer\, 
+ mobiele app of apparaat voor vergaderruimte\nKlik hier om deel te nemen aan
+  de vergadering<https://teams.microsoft.com/l/meetup-join/19%3ameeting_Mzc5
+ YjFlNTYtOTIwMS00ZDU5LTg4Y2UtNmQ4OTkzODg2OTAw%40thread.v2/0?context=%7b%22Ti
+ d%22%3a%2263a8df83-063c-4312-a508-dc01b7508661%22%2c%22Oid%22%3a%22e2d4f3d3
+ -2667-4f45-a42e-011f9c751dfb%22%7d>\nVergadering-id: 314 272 043 648\nWacht
+ woordcode: MqTcCK\nTeams downloaden<https://www.microsoft.com/en-us/microso
+ ft-teams/download-app> | Deelnemen op het web<https://www.microsoft.com/mic
+ rosoft-teams/join-a-meeting>\n[https://prddata001.blob.core.windows.net/cdn
+ container/o-teams_image.png]\nMeer informatie<https://aka.ms/JoinTeamsMeeti
+ ng> | Opties voor vergadering<https://teams.microsoft.com/meetingOptions/?o
+ rganizerId=e2d4f3d3-2667-4f45-a42e-011f9c751dfb&tenantId=63a8df83-063c-4312
+ -a508-dc01b7508661&threadId=19_meeting_Mzc5YjFlNTYtOTIwMS00ZDU5LTg4Y2UtNmQ4
+ OTkzODg2OTAw@thread.v2&messageId=0&language=nl-NL>\n_______________________
+ _________________________________________________________\n\n
+LAST-MODIFIED:20240308T110039Z
+LOCATION:Microsoft Teams-vergadering\; D4.26\; Room D.4.26 (5p\, VC)
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:Second interview Nikolai Morozov - Software Engineer Front-end - De
+ epdive code @ Odido
+TRANSP:OPAQUE
+ATTACH;FILENAME=image001.gif:https://mail.google.com/?view=att&th=18e1d6f00
+ 705f9e4&attid=0.1&disp=attd&zw
+ATTACH;FILENAME=image002.png:https://mail.google.com/?view=att&th=18e1d6f00
+ 705f9e4&attid=0.2&disp=attd&zw
+ATTACH;FILENAME=image003.png:https://mail.google.com/?view=att&th=18e1d6f00
+ 705f9e4&attid=0.3&disp=attd&zw
+ATTACH;FILENAME=image004.png:https://mail.google.com/?view=att&th=18e1d6f00
+ 705f9e4&attid=0.4&disp=attd&zw
+ATTACH;FILENAME=image005.png:https://mail.google.com/?view=att&th=18e1d6f00
+ 705f9e4&attid=0.5&disp=attd&zw
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_Mzc5YjFlNTYtOTIwMS00ZDU
+ 5LTg4Y2UtNmQ4OTkzODg2OTAw@thread.v2"\,"private":true\,"type":0\,"mid":0\,"r
+ id":0\,"uid":null}
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:445134824
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/63a8df83-063c-4312-a508-dc01b7508661/e2d4f3d3-2667-4f45-a42e-01
+ 1f9c751dfb/19_meeting_Mzc5YjFlNTYtOTIwMS00ZDU5LTg4Y2UtNmQ4OTkzODg2OTAw@thre
+ ad.v2/0
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:2
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams-vergadering"\, "
+ LocationAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "L
+ ocationUri" : "" }\, { "DisplayName" : "D4.26"\, "LocationAnnotation" : ""\
+ , "LocationSource" : 0\, "Unresolved" : false\, "LocationUri" : "" }\, { "D
+ isplayName" : "Room D.4.26 (5p\, VC)"\, "LocationAnnotation" : ""\, "Locati
+ onSource" : 5\, "Unresolved" : false\, "LocationUri" : "_meetingroomD.4.26@
+ odido.nl" } ]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_Mzc5YjFlNTYtOTIwMS00ZDU5LTg4Y2UtNmQ4OTkzODg2OTAw%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%2263a8df83-063c-4312-a508-dc01b7508661%22%2c%22Oid
+ %22%3a%22e2d4f3d3-2667-4f45-a42e-011f9c751dfb%22%7d
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240422T080000Z
+DTEND:20240422T100000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=w.morana@ampowr.com:mailto:w.morana@ampowr.com
+UID:6uo5nrfbj5h3r2qjqeat5aos4s@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=j.weid
+ ner@ampowr.com;X-NUM-GUESTS=0:mailto:j.weidner@ampowr.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=l.
+ uitdewilligen@ampowr.com;X-NUM-GUESTS=0:mailto:l.uitdewilligen@ampowr.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=a.
+ arakelov@ampowr.com;X-NUM-GUESTS=0:mailto:a.arakelov@ampowr.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/egh-wuek-tsf
+CREATED:20240418T135045Z
+DESCRIPTION:Hi Nikolai\, <br><br>Thanks for making yourself available for a
+  live tech talks at our office! <br><br>The interviews will mainly consist 
+ of a <b>System Design Interview</b> with a whiteboard.<br><br>These session
+ s will be held at our Headquarter (<b>Rijnzathe 16\, 7th floor\, 3454 PV Ut
+ recht</b>) with Aleksandr Arakelov (Head of Software Engineering)\, Luc Uit
+ dewilligen (Product Development Lead) and Jonas Weidner (Lead Software Engi
+ neer).<br>Our office is reachable with busses 24 and 28 from Utrecht Centra
+ l Station. <br><br>This is also an opportunity to get to know better our en
+ vironment and product\, so feel free to share your questions\, attitude and
+  overall personality\, we'll really appreciate it!<br><br>Should you need a
+ ny further assistance\, please feel free to give me a call at:<table><tbody
+ ><tr><td><a><u>+31 (0)614216288</u></a></td></tr></tbody></table><br>Or sen
+ d me an email at <a href="mailto:w.morana@ampowr.com" target="_blank"><u><u
+ ><u><u><u><u><u><u>w.morana@ampowr.com</u></u></u></u></u></u></u></u></a>.
+ <br><br>I hope that's all for now! Thanks Nikolai and see you then!<br><br>
+ <br>Have a great week.<br><br><br>Best\, <br>Walter Morana\n\nDeelnemen via
+  Google Meet: https://meet.google.com/egh-wuek-tsf\nOf bel: (NL) +31 20 257
+  3213 Pincode: 294550768#\nMeer telefoonnummers: https://tel.meet/egh-wuek-
+ tsf?pin=7908925408342&hs=7\n\nGa voor meer informatie over Meet naar https:
+ //support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240418T151535Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov | Tech Interview @ Ampowr | Full-Stack Engineer
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230103T071000Z
+DTEND:20230103T074000Z
+DTSTAMP:20260518T184205Z
+UID:62ao4a1ag8vueqs8b1kln0rpt2@google.com
+CREATED:20221122T103814Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20221122T103814Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak N. Vaandrager
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240502T160000Z
+DTEND:20240502T193000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=no-reply@guild.host:mailto:no-reply@guild.host
+UID:b0ef8a62-975e-495c-a8f1-3a83335a0a4e@guild.host
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+URL:https://guild.host/events/amsterdamjs-meetup-navigating-h01wgg
+CREATED:20240502T150016Z
+DESCRIPTION:AmsterdamJS Meetup: Navigating the Next Generation Web & more\n
+ https://guild.host/events/amsterdamjs-meetup-navigating-h01wgg
+LAST-MODIFIED:20240502T150020Z
+LOCATION:CREA centre\, Nieuwe Achtergracht 170\, 1018 WV\, Amsterdam\, -\, 
+ The Netherlands
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:AmsterdamJS Meetup: Navigating the Next Generation Web & more
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240508T090000Z
+DTEND:20240508T093000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=daan@legionelladossier.com:mailto:daan@legionelladossier.com
+UID:ormn51kt93tnf0gr242qkmtvpg@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daan@l
+ egionelladossier.com;X-NUM-GUESTS=0:mailto:daan@legionelladossier.com
+CREATED:20240503T105639Z
+DESCRIPTION:Event Name: Quick call\n\nLocation: +31 6 27871935\n\nNeed to m
+ ake changes to this event?\nCancel: https://calendly.com/cancellations/ced0
+ 3725-53a3-41e8-b01e-2c6e92613e12\nReschedule: https://calendly.com/reschedu
+ lings/ced03725-53a3-41e8-b01e-2c6e92613e12\n\nPowered by Calendly.com\n
+LAST-MODIFIED:20240503T105657Z
+LOCATION:+31 6 27871935
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov and Daan Gehrels
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250512T110000Z
+DTSTAMP:20260518T184205Z
+UID:2ef9tdjb6loj80v5pr5nq5ar5t@google.com
+CREATED:20250408T193850Z
+DESCRIPTION:Dhr. N. Morozov (03-07-1991)
+LAST-MODIFIED:20250408T193850Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak Tandent Haarlem
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230728T083000Z
+DTEND:20230728T084500Z
+DTSTAMP:20260518T184205Z
+UID:1eldbptk7i4tqfmqatsi6hnvej@google.com
+CREATED:20230727T082532Z
+LAST-MODIFIED:20230727T082532Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:позвонить Левису
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20241011T153000Z
+DTEND:20241011T160000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=noreply@calendly.com:mailto:noreply@calendly.com
+UID:calendly-1095547606
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20241004T055109Z
+DESCRIPTION:Event Name: 30 Minute Meeting\nDate & Time: 17:30 - 18:00 (Cent
+ ral European Time) on Friday\, October 11\, 2024\nLocation: This is a Googl
+ e Meet web conference.\nYou can join this meeting from your computer\, tabl
+ et\, or smartphone.\nhttps://calendly.com/events/81959dc0-d564-4970-9d84-ce
+ 3740878639/google_meet\n\nNeed to make changes to this event?\nCancel: http
+ s://calendly.com/cancellations/db91f3a6-5689-4727-ad34-063c3ae66696\nResche
+ dule: https://calendly.com/reschedulings/db91f3a6-5689-4727-ad34-063c3ae666
+ 96\n
+LAST-MODIFIED:20241004T055134Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:30 Minute Meeting with Artur Bordeniuc
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240426T113000Z
+DTEND:20240426T123000Z
+DTSTAMP:20260518T184205Z
+UID:6op34dhmc4ojibb46hhjeb9kckrjab9p68pjcbb665h34d1i6dhj2chj64@google.com
+CREATED:20240415T074851Z
+LAST-MODIFIED:20240415T074851Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:13:30 терапевт
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240410T090000Z
+DTEND:20240410T093000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=w.morana@ampowr.com:mailto:w.morana@ampowr.com
+UID:j2pr7tmgn09uib95f3jo6vb9po@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=w.mora
+ na@ampowr.com;X-NUM-GUESTS=0:mailto:w.morana@ampowr.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/jqj-hrmb-qvf
+CREATED:20240405T111724Z
+DESCRIPTION:Event Name: 30 Minute Meeting\n\nHi\, and welcome to the first 
+ step of Ampowr's recruitment process!\n\n\nPlease book your slot here and y
+ ou will receive a confirmation within 24 hours.\n\n\nSpeak to you soon!\n\n
+ \nAmpowr recruitment\n\nNeed to make changes to this event?\nCancel: https:
+ //calendly.com/cancellations/f854d0d6-6ddb-40ab-b5a8-c64294a482e5\nReschedu
+ le: https://calendly.com/reschedulings/f854d0d6-6ddb-40ab-b5a8-c64294a482e5
+ \n\nPowered by Calendly.com\n\n\nDeelnemen via Google Meet: https://meet.go
+ ogle.com/jqj-hrmb-qvf\nOf bel: (NL) +31 20 257 6761 Pincode: 362721803#\nMe
+ er telefoonnummers: https://tel.meet/jqj-hrmb-qvf?pin=1218163338375&hs=7\n\
+ nGa voor meer informatie over Meet naar https://support.google.com/a/users/
+ answer/9282720
+LAST-MODIFIED:20240410T085850Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai and Walter Morana
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240412T110000Z
+DTEND:20240412T120000Z
+DTSTAMP:20260518T184205Z
+UID:768utmm1j87kilfvieq04d8lpa@google.com
+CREATED:20240410T140621Z
+DESCRIPTION:Hi again Nikolai\,\n\nThanks a lot for sending us your intervie
+ w availability for the Senior Mobile Engineer position. We are very excited
+  to speak with you!\n\nAlso as a reminder I will kindly ask you to share wi
+ th us your Github account and make sure that you have Xcode and Simulator i
+ nstalled and ready to go for the interview.\n\nWe would like to confirm you
+ rTechnical Interview as follows:\n\nDate/Time: Apr 12\, 2024 1:00pm-2:00pm 
+ CEST\nInterviewers: Lucas Bento\, Marco Caldera\n\nGoogle Meet: https://mee
+ t.google.com/twc-hyss-yzi\n\nIf you have any other questions before your in
+ terview\, please don’t hesitate to reach out to us.\n\nWe hope you have the
+  best interview experience with us!\n\nHarry
+LAST-MODIFIED:20240410T140621Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview with Bitvavo
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20260518T190000Z
+DTEND:20260518T191500Z
+DTSTAMP:20260518T184205Z
+UID:47gaktlrvsgcvfil9j6enc5tpv@google.com
+CREATED:20260517T182327Z
+LAST-MODIFIED:20260518T183025Z
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:quick
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240510T110000Z
+DTEND:20240510T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=guida.cusso@elementsinteractive.es:mailto:guida.cusso@elements
+ interactive.es
+UID:4rjclsh6hm4o37gq5md2bl1tbt@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=guida.
+ cusso@elementsinteractive.es;X-NUM-GUESTS=0:mailto:guida.cusso@elementsinte
+ ractive.es
+X-GOOGLE-CONFERENCE:https://meet.google.com/gfc-rhtq-hch
+CREATED:20240510T095448Z
+DESCRIPTION:Hi Nikolai\,\n\nNo worries\, let's try again at 1pm :)\n\nDeeln
+ emen via Google Meet: https://meet.google.com/gfc-rhtq-hch\nOf bel: (ES) +3
+ 4 960 46 22 84 Pincode: 778681378#\nMeer telefoonnummers: https://tel.meet/
+ gfc-rhtq-hch?pin=3324925253496&hs=7\n\nGa voor meer informatie over Meet na
+ ar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240510T095519Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Screening call with Guida
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240902T110000Z
+DTEND:20240902T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=amsterjoxter@gmail.com:mailto:amsterjoxter@gmail.com
+UID:7j0ou560ff55ic41t13p6rpccp@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=starte
+ leport@yandex.ru;X-NUM-GUESTS=0:mailto:starteleport@yandex.ru
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/mtc-ggdh-nty
+CREATED:20240901T182601Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/mtc-ggdh-nty
+ \n\nGa voor meer informatie over Meet naar https://support.google.com/a/use
+ rs/answer/9282720
+LAST-MODIFIED:20240902T063500Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Менторинг
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240123T092500Z
+DTEND:20240123T100500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=unknownorganizer@calendar.google.com:mailto:unknownorganizer@c
+ alendar.google.com
+UID:88e6f482-27e5-4fc8-b118-952f40c3fe6b
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20230720T072305Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20230721T065440Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak M. Bos
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240522T110000Z
+DTEND:20240522T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=dan.bersagui@valueblue.com:mailto:dan.bersagui@valueblue.com
+UID:040000008200E00074C5B7101A82E0080000000007D2503C81A4DA01000000000000000
+ 01000000095A15825646B624CA976B69FC1047042
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=am
+ sterjoxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Dan Be
+ rsagui;X-NUM-GUESTS=0:mailto:dan.bersagui@valueblue.com
+CREATED:20250524T053444Z
+DESCRIPTION:Event Name: Chat with Dan | Meeting ValueBlue 🐬\n\nHello! I'm 
+ glad you're here.\n\n\nThis is the first step to becoming an Architect of C
+ hange at ValueBlue! 🐬\n\n\nYou can expect questions about your career mome
+ nt and your past experiences as well as a deep dive into your career motiva
+ tions and what engages you on a daily basis.\n\n\nOf course\, this is a two
+ -sided conversation\, so I'll expect to be questioned by you as well. Here 
+ you can check more about us<https://valueblue.com/> and our way of working<
+ https://careers.valueblue.com/>\,\n\n\nSee you soon\,\n\nDan Bersagui\n\nLo
+ cation: This is a Microsoft Teams web conference.\n\nYou can join this meet
+ ing from your computer\, tablet\, or smartphone.\nhttps://teams.microsoft.c
+ om/l/meetup-join/19%3ameeting_MWFiZGJlZDctNzk4Yi00ODJkLWEwNzEtM2JiYjViZDcxM
+ DQ4%40thread.v2/0?context=%7b%22Tid%22%3a%226b4016e1-2dfe-4fd0-a217-078b808
+ a6574%22%2c%22Oid%22%3a%2281227555-14b8-4c86-9b12-eb789b41384d%22%7d\n\nFin
+ d your local number: https://dialin.teams.microsoft.com/usp/pstnconferencin
+ g\n\nCancellation Reason: I have already accepted the offer in another comp
+ any\n\nPowered by Calendly https://calendly.com/\n
+LAST-MODIFIED:20250524T053445Z
+LOCATION:https://calendly.com/events/19f3b23b-180c-4532-a05f-bee8dd005a27/m
+ icrosoft_teams
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Canceled: Nikolai Morozov and Dan Bersagui
+TRANSP:TRANSPARENT
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_MWFiZGJlZDctNzk4Yi00ODJ
+ kLWEwNzEtM2JiYjViZDcxMDQ4@thread.v2"\,"rid":0\,"mid":0\,"uid":null\,"privat
+ e":true\,"type":0}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:2122671879
+X-MICROSOFT-CDO-INTENDEDSTATUS:FREE
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-CDO-BUSYSTATUS:FREE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/6b4016e1-2dfe-4fd0-a217-078b808a6574/81227555-14b8-4c86-9b12-eb
+ 789b41384d/19_meeting_MWFiZGJlZDctNzk4Yi00ODJkLWEwNzEtM2JiYjViZDcxMDQ4@thre
+ ad.v2/0
+X-MICROSOFT-LOCATIONDISPLAYNAME:https://calendly.com/events/19f3b23b-180c-4
+ 532-a05f-bee8dd005a27/microsoft_teams
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:1
+X-MICROSOFT-LOCATIONS:[{"DisplayName":"https://calendly.com/events/19f3b23b
+ -180c-4532-a05f-bee8dd005a27/microsoft_teams"\,"LocationAnnotation":""\,"Lo
+ cationUri":""\,"LocationStreet":""\,"LocationCity":""\,"LocationState":""\,
+ "LocationCountry":""\,"LocationPostalCode":""\,"LocationFullAddress":""}]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_MWFiZGJlZDctNzk4Yi00ODJkLWEwNzEtM2JiYjViZDcxMDQ4%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%226b4016e1-2dfe-4fd0-a217-078b808a6574%22%2c%22Oid
+ %22%3a%2281227555-14b8-4c86-9b12-eb789b41384d%22%7d
+X-MICROSOFT-LOCATIONSOURCE:None
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20260518T094500Z
+DTEND:20260518T104500Z
+DTSTAMP:20260518T184205Z
+UID:455dshfnafes91593n7evb519p@google.com
+CREATED:20260517T094258Z
+LAST-MODIFIED:20260518T173909Z
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:mornging
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240306T100000Z
+DTEND:20240306T103000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=ana.gancearuc@odido.nl:mailto:ana.gancearuc@odido.nl
+UID:040000008200E00074C5B7101A82E00800000000A362D96D4766DA01000000000000000
+ 010000000441F254E525D1444BF5B3159EABD78B3
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=am
+ sterjoxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Ana ga
+ ncearuc;X-NUM-GUESTS=0:mailto:ana.gancearuc@odido.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Gr
+ egory Bohncke;X-NUM-GUESTS=0:mailto:gregory.bohncke@odido.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=OPT-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Ro
+ bin Disma;X-NUM-GUESTS=0:mailto:robin.disma@odido.nl
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=Ru
+ pert McKay;X-NUM-GUESTS=0:mailto:rupert.mckay@odido.nl
+CREATED:20240228T082929Z
+DESCRIPTION:Hi Nikolai\,\n\nAs discussed\, it is our pleasure to invite you
+  for the first tech screening for the role of Software Engineer Front-end w
+ ithin Odido NL!\n\nYou will have the screening with Rupert McKay (Principal
+  Engineer).\n\nThis screening will be a quick scan on code. Here are some t
+ ips:\n\n* Talk out loud as you think. We will ask questions to prompt this\
+ , but it is easier if we can hear your thoughts and how you create your cod
+ e.\n* Don't pretend to know something you don't. It is ok not to know thing
+ s. We are more likely to be impressed if you ask for a hint\, and incorpora
+ te that hint well\, than if we get the sense that you are trying to bluff y
+ our way through.\n* Start simple. We don't expect a perfectly formed answer
+  right away. It is sensible to approach any problem with a naive solution\,
+  and to discuss its weaknesses\, before gradually working towards more adva
+ nced solutions.\n\nGood luck and don’t forget to smile while coding! 🙂\n\n
+ Ana\n\nKind regards / Vriendelijke groet\,\n\nAna Gancearuc\n\nTalent Acqui
+ sition Sourcer\n\n+373 69 19 71 81\n\nE-mail ana.gancearuc@odido.nl<mailto:
+ ana.gancearuc@odido.nl>\n\n\n[https://res.cdn.office.net/assets/mail/file-i
+ con/png/pdf_16x16.png]Software Engineer Front 4.pdf<https://tmnlso-my.share
+ point.com/:b:/g/personal/ana_gancearuc_odido_nl/EdD-5FfULK5PlYu2QDqU2kYBopb
+ 7HfC_aLnzfl6TzqNFzg>\n\n\n_________________________________________________
+ _______________________________\nMicrosoft Teams meeting\nJoin on your comp
+ uter\, mobile app or room device\nClick here to join the meeting<https://te
+ ams.microsoft.com/l/meetup-join/19%3ameeting_NmVhMTdjZDctMzllMy00NmIwLTgzZT
+ gtMjdmNzE3NTZlZDQ3%40thread.v2/0?context=%7b%22Tid%22%3a%2263a8df83-063c-43
+ 12-a508-dc01b7508661%22%2c%22Oid%22%3a%22255e2f9c-3830-42a7-8564-1e284b58b9
+ a6%22%7d>\nMeeting ID: 327 527 025 136\nPasscode: mzBruW\nDownload Teams<ht
+ tps://www.microsoft.com/en-us/microsoft-teams/download-app> | Join on the w
+ eb<https://www.microsoft.com/microsoft-teams/join-a-meeting>\n[https://prdd
+ ata001.blob.core.windows.net/cdncontainer/o-teams_image.png]\nLearn More<ht
+ tps://aka.ms/JoinTeamsMeeting> | Meeting options<https://teams.microsoft.co
+ m/meetingOptions/?organizerId=255e2f9c-3830-42a7-8564-1e284b58b9a6&tenantId
+ =63a8df83-063c-4312-a508-dc01b7508661&threadId=19_meeting_NmVhMTdjZDctMzllM
+ y00NmIwLTgzZTgtMjdmNzE3NTZlZDQ3@thread.v2&messageId=0&language=en-US>\n____
+ ___________________________________________________________________________
+ _\n
+LAST-MODIFIED:20240228T082934Z
+LOCATION:Microsoft Teams Meeting
+SEQUENCE:6
+STATUS:CONFIRMED
+SUMMARY:First Code Screening Nikolai Morozov - Software Engineer Front-end 
+ @ Odido!
+TRANSP:TRANSPARENT
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_NmVhMTdjZDctMzllMy00NmI
+ wLTgzZTgtMjdmNzE3NTZlZDQ3@thread.v2"\,"rid":0\,"mid":0\,"uid":null\,"privat
+ e":true\,"type":0}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:2122497955
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/63a8df83-063c-4312-a508-dc01b7508661/255e2f9c-3830-42a7-8564-1e
+ 284b58b9a6/19_meeting_NmVhMTdjZDctMzllMy00NmIwLTgzZTgtMjdmNzE3NTZlZDQ3@thre
+ ad.v2/0
+X-MICROSOFT-LOCATIONDISPLAYNAME:Microsoft Teams Meeting
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:6
+X-MICROSOFT-LOCATIONS:[{"DisplayName":"Microsoft Teams Meeting"\,"LocationA
+ nnotation":""\,"LocationUri":""\,"LocationStreet":""\,"LocationCity":""\,"L
+ ocationState":""\,"LocationCountry":""\,"LocationPostalCode":""\,"LocationF
+ ullAddress":""}]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_NmVhMTdjZDctMzllMy00NmIwLTgzZTgtMjdmNzE3NTZlZDQ3%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%2263a8df83-063c-4312-a508-dc01b7508661%22%2c%22Oid
+ %22%3a%22255e2f9c-3830-42a7-8564-1e284b58b9a6%22%7d
+X-MICROSOFT-LOCATIONSOURCE:None
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20241031T150000Z
+DTEND:20241031T153000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=noreply@calendly.com:mailto:noreply@calendly.com
+UID:calendly-1112848143
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=am
+ sterjoxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20241202T064250Z
+DESCRIPTION:Event Name: 30 Minute Meeting\nDate & Time: 16:00 - 16:30 (Cent
+ ral European Time) on Thursday\, October 31\, 2024\nLocation: This is a Goo
+ gle Meet web conference.\nYou can join this meeting from your computer\, ta
+ blet\, or smartphone.\nhttps://calendly.com/events/445bcc1a-e22c-45cb-8a02-
+ 48ebcac1cd4d/google_meet\n\nNeed to make changes to this event?\nCancel: ht
+ tps://calendly.com/cancellations/cb7f29a8-356b-4018-b484-92063cdd7e29\nResc
+ hedule: https://calendly.com/reschedulings/cb7f29a8-356b-4018-b484-92063cdd
+ 7e29\n
+LAST-MODIFIED:20241202T064250Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:30 Minute Meeting with Artur Bordeniuc
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240322T093000Z
+DTEND:20240322T100000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=sebastian.shelton@teampicnic.com:mailto:sebastian.shelton@team
+ picnic.com
+UID:iebakn1dta36lqs9st73mifeps@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=sebast
+ ian.shelton@teampicnic.com;X-NUM-GUESTS=0:mailto:sebastian.shelton@teampicn
+ ic.com
+ATTENDEE;CUTYPE=RESOURCE;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=AMS-MK15
+ -1st-Room 2.8 - Bunny love (4) [Zoom];X-NUM-GUESTS=0:mailto:c_18875f9e8c0l8
+ jarhqnq1m1n88bue@resource.calendar.google.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/wem-emnk-swy
+CREATED:20240315T173729Z
+DESCRIPTION:Event Name: (Senior) React Native Engineer - Picnic Intro\n\nHe
+ llo\,\n\n\nThank you for using this link for scheduling our 30min Google Me
+ et call! I am looking forward to chatting with you. In the meantime\, you c
+ an check out these links to discover what Picnic is all about:\n\n\nPicnic 
+ Blog - https://blog.picnic.nl/\n\nYouTube - https://www.youtube.com/channel
+ /UCa8wSbVGmRM3PZCMQOvwsvA\n\nInstagram - https://www.instagram.com/picnicca
+ reers/?hl=en\n\n\nPlease note that all of our tech roles are currently hybr
+ id and based in The Netherlands. Please feel free to reach out if you have 
+ any questions about that. Talk to you soon!\n\n\nCheers\,\n\nSebastian Shel
+ ton\n\nTech Recruitment @ Picnic\n\nLocation: This is a Google Meet web con
+ ference.\nYou can join this meeting from your computer\, tablet\, or smartp
+ hone.\nhttps://calendly.com/events/b3afc87f-8541-42dc-a543-ae1bb2e1ee75/goo
+ gle_meet\n\nNeed to make changes to this event?\nCancel: https://calendly.c
+ om/cancellations/d5298240-491a-44c4-bef9-c07cfd95caed\nReschedule: https://
+ calendly.com/reschedulings/d5298240-491a-44c4-bef9-c07cfd95caed\n\nPowered 
+ by Calendly.com\n\n\nDeelnemen via Google Meet: https://meet.google.com/wem
+ -emnk-swy\nOf bel: (NL) +31 20 257 2934 Pincode: 779645563#\nMeer telefoonn
+ ummers: https://tel.meet/wem-emnk-swy?pin=5846814470330&hs=7\n\nGa voor mee
+ r informatie over Meet naar https://support.google.com/a/users/answer/92827
+ 20
+LAST-MODIFIED:20260404T151115Z
+LOCATION:Google Meet (instructions in description)\, AMS-MK15-1st-Room 2.8 
+ - Bunny love (4) [Zoom]
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai and Sebastian Shelton
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240517T113000Z
+DTEND:20240517T123000Z
+DTSTAMP:20260518T184205Z
+UID:3tvdldink7ub760hs7npl1u416@google.com
+CREATED:20240515T124020Z
+LAST-MODIFIED:20240515T124020Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:терапия
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240514T110000Z
+DTEND:20240514T120000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=w.morana@ampowr.com:mailto:w.morana@ampowr.com
+UID:6gu13r30injfo12hhfr0vblroo@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=j.weid
+ ner@ampowr.com;X-NUM-GUESTS=0:mailto:j.weidner@ampowr.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=a.
+ arakelov@ampowr.com;X-NUM-GUESTS=0:mailto:a.arakelov@ampowr.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/fxc-mopn-gym
+CREATED:20240508T112005Z
+DESCRIPTION:Hi Nikolai\,\n\nPlease refer to my previous email in terms of c
+ ontent and timing of the assignment that will be discussed during this meet
+ ing.\n\nHave a great day.\n\nWalter\n\nDeelnemen via Google Meet: https://m
+ eet.google.com/fxc-mopn-gym\nOf bel: (NL) +31 20 257 6921 Pincode: 36161468
+ 3#\nMeer telefoonnummers: https://tel.meet/fxc-mopn-gym?pin=3761504516814&h
+ s=7\n\nGa voor meer informatie over Meet naar https://support.google.com/a/
+ users/answer/9282720
+LAST-MODIFIED:20240513T113158Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov | Discussion of tech assignment | Full Stack Engine
+ er
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231017T090000Z
+DTEND:20231017T094500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=oles@sowiso.com:mailto:oles@sowiso.com
+UID:6vcsqa8vfqlm2h3nq627dbvmag@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=lorenz
+ o@sowiso.com;X-NUM-GUESTS=0:mailto:lorenzo@sowiso.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=DECLINED;CN=Max Co
+ hen;X-NUM-GUESTS=0:mailto:max@sowiso.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/zfw-dwdt-iyk
+CREATED:20231010T180030Z
+DESCRIPTION:<b>Geboekt door</b>\nNikolai Morozov\namsterjoxter@gmail.com\n<
+ br>Thanks for your interest in our Senior Frontend Developer position. Plea
+ se feel free to book something in my agenda when it suits you best so we ca
+ n have a first introductory chat. Talk to you soon!\n\nDeelnemen via Google
+  Meet: https://meet.google.com/zfw-dwdt-iyk\nOf bel: (DE) +49 40 8081618988
+  Pincode: 878619762#\nMeer telefoonnummers: https://tel.meet/zfw-dwdt-iyk?p
+ in=5150924840731&hs=7\n\nGa voor meer informatie over Meet naar https://sup
+ port.google.com/a/users/answer/9282720
+LAST-MODIFIED:20231017T091149Z
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Senior Frontend Developer Interview (Nikolai Morozov)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240417T140000Z
+DTEND:20240417T150000Z
+DTSTAMP:20260518T184205Z
+UID:70o62e1p70rm2b9l6gpjeb9kcdijabb16oq3ab9m60pjap1k64p6aphic8@google.com
+CREATED:20240412T104831Z
+LAST-MODIFIED:20240412T104831Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview with Bitvavo
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230524T140000Z
+DTEND:20230524T143000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=lewis.bell@foxtekrs.com:mailto:lewis.bell@foxtekrs.com
+UID:040000008200E00074C5B7101A82E00800000000305C0367AB8CD901000000000000000
+ 0100000003CD46046C82CA542BA08114BBCF3CBF1
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20230522T105619Z
+DESCRIPTION:\n
+LAST-MODIFIED:20230522T182523Z
+LOCATION:+31 6 27 87 19 35
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Call: Nikolai Morozov & Lewis @ Foxtek
+TRANSP:OPAQUE
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "+31 6 27 87 19 35"\, "LocationAn
+ notation" : ""\, "LocationSource" : 0\, "Unresolved" : true\, "LocationUri"
+  : "" } ]
+X-MICROSOFT-CDO-OWNERAPPTID:-1793697817
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240430T120000Z
+DTEND:20240430T123000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=jeroen@searchxrecruitment.com:mailto:jeroen@searchxrecruitment
+ .com
+UID:9djp915sa1gfvsjdrmrernuqpg@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=jeroen
+ @searchxrecruitment.com;X-NUM-GUESTS=0:mailto:jeroen@searchxrecruitment.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/cvs-wocx-srn
+CREATED:20240429T114120Z
+DESCRIPTION:<p>Hi Nikolai\,</p><p></p><p>Thank you for scheduling a meeting
+  with me. I'll talk to you soon!</p><p></p><p>Best regards\,</p><p>Jeroen B
+ reedijk</p>\nJoin link for Google Meet : https://meet.google.com/cvs-wocx-s
+ rn\n\nDeelnemen via Google Meet: https://meet.google.com/cvs-wocx-srn\n\nGa
+  voor meer informatie over Meet naar https://support.google.com/a/users/ans
+ wer/9282720
+LAST-MODIFIED:20240429T115016Z
+LOCATION:https://meet.google.com/cvs-wocx-srn
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Jeroen & Nikolai
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240502T130000Z
+DTEND:20240502T140000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=c.tjin@relay42.com:mailto:c.tjin@relay42.com
+UID:3rv9bochjh7dci92o1fkvupu0b@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=c.tjin
+ @relay42.com;X-NUM-GUESTS=0:mailto:c.tjin@relay42.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=f.solc
+ i@relay42.com;X-NUM-GUESTS=0:mailto:f.solci@relay42.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=p.behn
+ am@relay42.com;X-NUM-GUESTS=0:mailto:p.behnam@relay42.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/num-dgts-zui
+CREATED:20240429T103606Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/num-dgts-zui
+ \nOf bel: (NL) +31 20 257 6590 Pincode: 714383532#\nMeer telefoonnummers: h
+ ttps://tel.meet/num-dgts-zui?pin=2472440281563&hs=7\n\nGa voor meer informa
+ tie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240501T120556Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:First interview Nikolai 
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240408T093000Z
+DTEND:20240408T100000Z
+DTSTAMP:20260518T184205Z
+UID:ckr64cb369ij6bb6c5gj2b9k74o30bb16gq62bb460p64oj6coq3iphock@google.com
+CREATED:20240404T105542Z
+LAST-MODIFIED:20240404T105542Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Interview with Bitvavo
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240516T130000Z
+DTEND:20240516T133000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=w.morana@ampowr.com:mailto:w.morana@ampowr.com
+UID:7jifii3m5leo6jrv10gurfphfn@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Andy E
+ lwell;X-NUM-GUESTS=0:mailto:a.elwell@ampowr.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/mfz-mxfu-euw
+CREATED:20240515T130454Z
+DESCRIPTION:Hi Nikolai\,  \n\nMany thanks again for making yourself availab
+ le for this chat!  \n\nOur CEO Andy Elwell would like to meet you in a vide
+ o call to get to know you personally.  \n\nI'll reach out to you afterwards
+ .  \n\nHave a great day!  \n\nBest\, \nWalter\n\nDeelnemen via Google Meet:
+  https://meet.google.com/mfz-mxfu-euw\nOf bel: (NL) +31 20 257 4759 Pincode
+ : 783910649#\nMeer telefoonnummers: https://tel.meet/mfz-mxfu-euw?pin=88296
+ 68954075&hs=7\n\nGa voor meer informatie over Meet naar https://support.goo
+ gle.com/a/users/answer/9282720
+LAST-MODIFIED:20240515T132757Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov | Founder Interview @ Ampowr | Full-stack Engineer
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20260518T111500Z
+DTEND:20260518T133000Z
+DTSTAMP:20260518T184205Z
+UID:4vb92jg7md43bc38p8vcposab7@google.com
+CREATED:20260517T085148Z
+LAST-MODIFIED:20260518T173907Z
+SEQUENCE:6
+STATUS:CONFIRMED
+SUMMARY:Current
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240222T102546Z
+DTEND:20240222T112546Z
+DTSTAMP:20260518T184205Z
+UID:6hijeopg75gmcbb561i34b9k6lh3ib9p70qjgb9nc5hj0d3560rjgpj46s@google.com
+CREATED:20240215T140611Z
+LAST-MODIFIED:20240215T140611Z
+SEQUENCE:1
+STATUS:TENTATIVE
+SUMMARY:Терапия
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240425T121500Z
+DTEND:20240425T130000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=marton.szabo@iseeq.hu:mailto:marton.szabo@iseeq.hu
+UID:apnepfsp78fhoc2td96toveovk@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=marton
+ .szabo@iseeq.hu;X-NUM-GUESTS=0:mailto:marton.szabo@iseeq.hu
+X-GOOGLE-CONFERENCE:https://meet.google.com/ehq-qfjt-igo
+CREATED:20240425T073748Z
+DESCRIPTION:<b>Booked by</b>\nNikolai Morozov\namsterjoxter@gmail.com\n\nDe
+ elnemen via Google Meet: https://meet.google.com/ehq-qfjt-igo\nOf bel: (HU)
+  +36 21 262 4396 Pincode: 505329531#\nMeer telefoonnummers: https://tel.mee
+ t/ehq-qfjt-igo?pin=9125096824522&hs=7\n\nGa voor meer informatie over Meet 
+ naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240425T121241Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Gradle - Quick call (Nikolai Morozov)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230620T123000Z
+DTEND:20230620T130000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=maianh@agap2.nl:mailto:maianh@agap2.nl
+UID:040000008200E00074C5B7101A82E00800000000C045BAA764A3D901000000000000000
+ 010000000C3DBB59DBB914A4B8DC8E7C3BE470AFF
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=am
+ sterjoxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20230620T084937Z
+DESCRIPTION:Hi Nikolai\,\nThank you for your interest in our position.\nWe 
+ would like to invite you to the first interview on Tuesday\, 20 Jun 2023 at
+  14:30 (CET) via MS Teams.\nThe interview will be an opportunity for us to 
+ discuss your background\, interests\, and career goals\, as well as answer 
+ any questions you may have about the position and our company.\nWe look for
+ ward to meeting you.\nBest regards\,\n\nAnnie mAiaNh\ntran\nIT Recruiter| T
+ he Netherlands\n[cid:image001.jpg@01D9A364.E85CC030]\n\n\n+31 6 25 172 806\
+ n\n[a2]<https://www.agap2.nl/>\n\n[cid:image003.png@01D9A364.E85CC030]<http
+ s://www.linkedin.com/company/agap2netherlands/>   [cid:image004.png@01D9A36
+ 4.E85CC030] <https://www.instagram.com/agap2netherlands/>\nmaianh@agap2.nl<
+ mailto:maianh@agap2.nl>\nJoan Muyskenweg 22\,\n1th floor\, 1096 CJ\, Amster
+ dam\nThe Netherlands\n+31 (0) 20 280 18 51\nNL    .    PT    .    ES    .  
+   FR    .    CH     .     DE     .     IT     .     SE     .     BE     .  
+    DK\n\n\n________________________________________________________________
+ ________________\nMicrosoft Teams meeting\nJoin on your computer\, mobile a
+ pp or room device\nClick here to join the meeting<https://teams.microsoft.c
+ om/l/meetup-join/19%3ameeting_OWU2NTdkMjEtMDc3Ny00YTI4LTljMGEtNTIwYmRiY2Q0O
+ WVk%40thread.v2/0?context=%7b%22Tid%22%3a%22a32c1457-70fc-4a2d-a1ef-f203a22
+ 72d29%22%2c%22Oid%22%3a%2272a764db-f98c-4aa8-b14b-bd331d30bffd%22%7d>\nMeet
+ ing ID: 316 876 285 285\nPasscode: 95WADx\nDownload Teams<https://www.micro
+ soft.com/en-us/microsoft-teams/download-app> | Join on the web<https://www.
+ microsoft.com/microsoft-teams/join-a-meeting>\nLearn More<https://aka.ms/Jo
+ inTeamsMeeting> | Meeting options<https://teams.microsoft.com/meetingOption
+ s/?organizerId=72a764db-f98c-4aa8-b14b-bd331d30bffd&tenantId=a32c1457-70fc-
+ 4a2d-a1ef-f203a2272d29&threadId=19_meeting_OWU2NTdkMjEtMDc3Ny00YTI4LTljMGEt
+ NTIwYmRiY2Q0OWVk@thread.v2&messageId=0&language=en-US>\n___________________
+ _____________________________________________________________\n\n
+LAST-MODIFIED:20230620T123133Z
+LOCATION:Microsoft Teams Meeting
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:1st interview - Nikolai Morozov - Frontend developer - Agap2
+TRANSP:OPAQUE
+ATTACH;FILENAME=image001.jpg:https://mail.google.com/?view=att&th=188d7fea4
+ 69af769&attid=0.1&disp=attd&zw
+ATTACH;FILENAME=image002.png:https://mail.google.com/?view=att&th=188d7fea4
+ 69af769&attid=0.2&disp=attd&zw
+ATTACH;FILENAME=image003.png:https://mail.google.com/?view=att&th=188d7fea4
+ 69af769&attid=0.3&disp=attd&zw
+ATTACH;FILENAME=image004.png:https://mail.google.com/?view=att&th=188d7fea4
+ 69af769&attid=0.4&disp=attd&zw
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_OWU2NTdkMjEtMDc3Ny00YTI
+ 4LTljMGEtNTIwYmRiY2Q0OWVk@thread.v2"\,"private":true\,"type":0\,"mid":0\,"r
+ id":0\,"uid":null}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:-382441497
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/a32c1457-70fc-4a2d-a1ef-f203a2272d29/72a764db-f98c-4aa8-b14b-bd
+ 331d30bffd/19_meeting_OWU2NTdkMjEtMDc3Ny00YTI4LTljMGEtNTIwYmRiY2Q0OWVk@thre
+ ad.v2/0
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Locat
+ ionUri" : "" } ]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_OWU2NTdkMjEtMDc3Ny00YTI4LTljMGEtNTIwYmRiY2Q0OWVk%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%22a32c1457-70fc-4a2d-a1ef-f203a2272d29%22%2c%22Oid
+ %22%3a%2272a764db-f98c-4aa8-b14b-bd331d30bffd%22%7d
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240326T103000Z
+DTEND:20240326T110000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=marthe.blokker@code.nl:mailto:marthe.blokker@code.nl
+UID:4ktsisra9tq6i7jgcb5erc5ruk@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=marthe
+ .blokker@code.nl;X-NUM-GUESTS=0:mailto:marthe.blokker@code.nl
+X-GOOGLE-CONFERENCE:https://meet.google.com/hga-uidw-gon
+CREATED:20240318T120637Z
+DESCRIPTION:Event Name: Let's e-meet!\n\nLocation: This is a Google Meet we
+ b conference.\nYou can join this meeting from your computer\, tablet\, or s
+ martphone.\nhttps://calendly.com/events/ffa6a928-e528-4915-8592-77a00dba9ee
+ b/google_meet\n\nNeed to make changes to this event?\nCancel: https://calen
+ dly.com/cancellations/c9e0b727-e4fa-4499-a0ee-f01866a5a51a\nReschedule: htt
+ ps://calendly.com/reschedulings/c9e0b727-e4fa-4499-a0ee-f01866a5a51a\n\nPow
+ ered by Calendly.com\n\n\nDeelnemen via Google Meet: https://meet.google.co
+ m/hga-uidw-gon\nOf bel: (NL) +31 20 257 6046 Pincode: 705309067#\nMeer tele
+ foonnummers: https://tel.meet/hga-uidw-gon?pin=1000938345020&hs=7\n\nGa voo
+ r meer informatie over Meet naar https://support.google.com/a/users/answer/
+ 9282720
+LAST-MODIFIED:20240321T095202Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Nikolai and Marthe Blokker
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20260518T193000Z
+DTEND:20260518T201500Z
+DTSTAMP:20260518T184205Z
+UID:6i1vjea9phn17n2s3g1il8pbpb@google.com
+CREATED:20260517T101253Z
+LAST-MODIFIED:20260518T183210Z
+SEQUENCE:3
+STATUS:CONFIRMED
+SUMMARY:Some next event after the current
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230526T110000Z
+DTEND:20230526T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=andrei.curtui@newglobe.education:mailto:andrei.curtui@newglobe
+ .education
+UID:dn1066g55iibmuc43u4nkk9heg@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=sc
+ hedule@lily.greenhouse.io;X-NUM-GUESTS=0:mailto:schedule@lily.greenhouse.io
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=andrei
+ .curtui@newglobe.education;X-NUM-GUESTS=0:mailto:andrei.curtui@newglobe.edu
+ cation
+X-GOOGLE-CONFERENCE:https://meet.google.com/ikq-iimz-ber
+CREATED:20230524T143918Z
+DESCRIPTION:Please interview Nikolai Morozov for the Front-End Engineer\, S
+ oftware Development role. Find below some of the key details of the intervi
+ ew: \n\nInterview type: Application Review\nInterview kit: https://app4.gre
+ enhouse.io/guides/7630122004/people/54719564004/interview?application_id=60
+ 480486004\nThis has the instructions and a scorecard for you to complete wi
+ thin 48hours of you conducting your interview.\n\nThanks and regards\,\nAnd
+ rei Curtui\n\nDeelnemen via Google Meet: https://meet.google.com/ikq-iimz-b
+ er\nOf bel: (US) +1 413-341-2967 Pincode: 647897989#\n\nGa voor meer inform
+ atie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20250319T171203Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Invitation to Interview Nikolai Morozov for Front-End Engineer\, So
+ ftware Development
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20230413
+DTEND;VALUE=DATE:20230414
+DTSTAMP:20260518T184205Z
+UID:5u4ht0ve8o319q6d2pr90nm4mh@google.com
+CREATED:20230412T110246Z
+LAST-MODIFIED:20230412T110246Z
+SEQUENCE:0
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240217T090000Z
+DTEND:20240217T100000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=worrkhardplayharderr@gmail.com:mailto:worrkhardplayharderr@gma
+ il.com
+UID:jk64ck3pj9h0evtpsa24rqvb8g@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=worrkh
+ ardplayharderr@gmail.com;X-NUM-GUESTS=0:mailto:worrkhardplayharderr@gmail.c
+ om
+X-GOOGLE-CONFERENCE:https://meet.google.com/dvg-bvvo-okr
+CREATED:20240214T114123Z
+DESCRIPTION:Event Name: meeting with Aleksandra\n\nLocation: This is a Goog
+ le Meet web conference.\nYou can join this meeting from your computer\, tab
+ let\, or smartphone.\nhttps://calendly.com/events/1c4cfc66-2783-4c37-83ac-6
+ 1a586ad8456/google_meet\n\nВаш телеграм:: @joxter\n\nNeed to make changes t
+ o this event?\nCancel: https://calendly.com/cancellations/43bb3bd2-9644-437
+ 7-8c27-64c4ea9e3e72\nReschedule: https://calendly.com/reschedulings/43bb3bd
+ 2-9644-4377-8c27-64c4ea9e3e72\n\nPowered by Calendly.com\n\n\nDeelnemen via
+  Google Meet: https://meet.google.com/dvg-bvvo-okr\n\nGa voor meer informat
+ ie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240215T112725Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Nikolai and Aleksandra Magaramova
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240123T100500Z
+DTEND:20240123T101500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=unknownorganizer@calendar.google.com:mailto:unknownorganizer@c
+ alendar.google.com
+UID:29b903e6-1748-441f-b6b9-3b2854618d57
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20230720T072305Z
+DESCRIPTION:Dhr. N.V. Morozov (03-07-1991)
+LAST-MODIFIED:20230721T065440Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Afspraak N. Vaandrager
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240506T110000Z
+DTEND:20240506T113000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=anne.storozhenko@gmail.com:mailto:anne.storozhenko@gmail.com
+UID:jfkpmv9sjvm2m8apvmn9tamv9o@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=anne.s
+ torozhenko@gmail.com;X-NUM-GUESTS=0:mailto:anne.storozhenko@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/ydn-snzp-gwg
+CREATED:20240501T085023Z
+DESCRIPTION:Event Name: Anya Storozhenko || 30 min meeting\n\n\nLocation: T
+ his is a Google Meet web conference.\nYou can join this meeting from your c
+ omputer\, tablet\, or smartphone.\nhttps://calendly.com/events/c13e1ee1-3dd
+ 7-4814-9fa5-5960e901fd4d/google_meet\n\nPlease share your CV (LinkedIn prof
+ ile) or our meeting agenda: https://www.linkedin.com/in/nikolay-morozov/\n\
+ nNeed to make changes to this event?\nCancel: https://calendly.com/cancella
+ tions/3645a683-0497-486e-b599-b370c5625c17\nReschedule: https://calendly.co
+ m/reschedulings/3645a683-0497-486e-b599-b370c5625c17\n\nPowered by Calendly
+ .com\n\n\nDeelnemen via Google Meet: https://meet.google.com/ydn-snzp-gwg\n
+ \nGa voor meer informatie over Meet naar https://support.google.com/a/users
+ /answer/9282720
+LAST-MODIFIED:20240501T085042Z
+LOCATION:Google Meet (instructions in description)
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov and Anna Storozhenko
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240501T100000Z
+DTEND:20240501T103000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=tom.de.groot@persgroep.net:mailto:tom.de.groot@persgroep.net
+UID:32dccapodnt986iksjq4is3a63@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=tom.de
+ .groot@persgroep.net;X-NUM-GUESTS=0:mailto:tom.de.groot@persgroep.net
+X-GOOGLE-CONFERENCE:https://meet.google.com/fgp-dkua-rkb
+CREATED:20240430T125007Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/fgp-dkua-rkb
+ \nOf bel: (NL) +31 20 257 2498 Pincode: 364372899#\nMeer telefoonnummers: h
+ ttps://tel.meet/fgp-dkua-rkb?pin=9127982651914&hs=7\n\nGa voor meer informa
+ tie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240430T125117Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Video call Nikolai - React position
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230808T140000Z
+DTEND:20230808T143000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=alex@agap2.nl:mailto:alex@agap2.nl
+UID:040000008200E00074C5B7101A82E0080000000010F2A3D449C9D901000000000000000
+ 01000000037383632D2ED8B48A2829C9F88F7C7A8
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+CREATED:20230807T141200Z
+DESCRIPTION:\n_____________________________________________________________
+ ___________________\nMicrosoft Teams meeting\nJoin on your computer\, mobil
+ e app or room device\nClick here to join the meeting<https://teams.microsof
+ t.com/l/meetup-join/19%3ameeting_ZjJmYTY2NmEtNDhmMS00YmQ1LWE0MDEtYzczOTYxNG
+ UzZDI3%40thread.v2/0?context=%7b%22Tid%22%3a%22a32c1457-70fc-4a2d-a1ef-f203
+ a2272d29%22%2c%22Oid%22%3a%22c3e4fb64-bf38-42b3-b005-e9f54876ce3e%22%7d>\nM
+ eeting ID: 381 332 321 625\nPasscode: StUQTi\nDownload Teams<https://www.mi
+ crosoft.com/en-us/microsoft-teams/download-app> | Join on the web<https://w
+ ww.microsoft.com/microsoft-teams/join-a-meeting>\nLearn More<https://aka.ms
+ /JoinTeamsMeeting> | Meeting options<https://teams.microsoft.com/meetingOpt
+ ions/?organizerId=c3e4fb64-bf38-42b3-b005-e9f54876ce3e&tenantId=a32c1457-70
+ fc-4a2d-a1ef-f203a2272d29&threadId=19_meeting_ZjJmYTY2NmEtNDhmMS00YmQ1LWE0M
+ DEtYzczOTYxNGUzZDI3@thread.v2&messageId=0&language=en-US>\n________________
+ ________________________________________________________________\n\n
+LAST-MODIFIED:20230807T222148Z
+LOCATION:Microsoft Teams Meeting
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Call Nikolai Morozov - Alex Arfaras (agap2)
+TRANSP:OPAQUE
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_ZjJmYTY2NmEtNDhmMS00YmQ
+ 1LWE0MDEtYzczOTYxNGUzZDI3@thread.v2"\,"private":true\,"type":0\,"mid":0\,"r
+ id":0\,"uid":null}
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-OWNERAPPTID:-779647001
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/a32c1457-70fc-4a2d-a1ef-f203a2272d29/c3e4fb64-bf38-42b3-b005-e9
+ f54876ce3e/19_meeting_ZjJmYTY2NmEtNDhmMS00YmQ1LWE0MDEtYzczOTYxNGUzZDI3@thre
+ ad.v2/0
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Locat
+ ionUri" : "" } ]
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_ZjJmYTY2NmEtNDhmMS00YmQ1LWE0MDEtYzczOTYxNGUzZDI3%40thread.v2/0
+ ?context=%7b%22Tid%22%3a%22a32c1457-70fc-4a2d-a1ef-f203a2272d29%22%2c%22Oid
+ %22%3a%22c3e4fb64-bf38-42b3-b005-e9f54876ce3e%22%7d
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240325T100000Z
+DTEND:20240325T103000Z
+DTSTAMP:20260518T184205Z
+UID:2o4b2t6446uvpcf7nv2abtkf40@google.com
+CREATED:20240321T113018Z
+DESCRIPTION:<a href="https://www.notion.so/ITR-Partners-d270ccf529d14943a89
+ 2cf45490e5bbf">https://www.notion.so/ITR-Partners-d270ccf529d14943a892cf454
+ 90e5bbf</a>
+LAST-MODIFIED:20240321T113018Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Интервью с Осло
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240416T120000Z
+DTEND:20240416T123000Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=w.morana@ampowr.com:mailto:w.morana@ampowr.com
+UID:66hv7qmb6c22f65u0ukj55ntr9@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=a.arak
+ elov@ampowr.com;X-NUM-GUESTS=0:mailto:a.arakelov@ampowr.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/owi-rkwp-bjt
+CREATED:20240412T080215Z
+DESCRIPTION:Hi Nikolai\,        \n\nThanks for making yourself available fo
+ r this second online interview!       \n\nThis will happen with our Head of
+  Software Engineering\, Aleksandr Arakelov.    \n\nBesides getting to know 
+ him\, you both will be more able to focus on the technical aspect of the pr
+ oduct and the role. Nothing really to prepare\, just your background and cu
+ riosity.      \n\nHave a great chat!  \n\nBest\,        \nWalter Morana\n\n
+ Deelnemen via Google Meet: https://meet.google.com/owi-rkwp-bjt\nOf bel: (N
+ L) +31 20 257 6130 Pincode: 496352709#\nMeer telefoonnummers: https://tel.m
+ eet/owi-rkwp-bjt?pin=2337964960147&hs=7\n\nGa voor meer informatie over Mee
+ t naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240412T081616Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai Morozov | 2nd interview @ Ampowr | Full-Stack Engineer
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240515T110000Z
+DTEND:20240515T114500Z
+DTSTAMP:20260518T184205Z
+ORGANIZER;CN=daan@legionelladossier.com:mailto:daan@legionelladossier.com
+UID:0ep0vgh93mmrjchie142gnmrsp@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=rogier
+ k@legionelladossier.com;X-NUM-GUESTS=0:mailto:rogierk@legionelladossier.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=halil@
+ legionelladossier.com;X-NUM-GUESTS=0:mailto:halil@legionelladossier.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=daan@l
+ egionelladossier.com;X-NUM-GUESTS=0:mailto:daan@legionelladossier.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=amster
+ joxter@gmail.com;X-NUM-GUESTS=0:mailto:amsterjoxter@gmail.com
+X-GOOGLE-CONFERENCE:https://meet.google.com/oie-ufkq-kva
+CREATED:20240508T142333Z
+DESCRIPTION:Deelnemen via Google Meet: https://meet.google.com/oie-ufkq-kva
+ \nOf bel: (NL) +31 20 257 3724 Pincode: 465335561#\nMeer telefoonnummers: h
+ ttps://tel.meet/oie-ufkq-kva?pin=2034700116386&hs=7\n\nGa voor meer informa
+ tie over Meet naar https://support.google.com/a/users/answer/9282720
+LAST-MODIFIED:20240508T154813Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Nikolai - Rogier/Halil 
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

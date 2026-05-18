@@ -5,6 +5,8 @@ struct CalEvent: Equatable {
     let start: Date
     let end: Date
     let uid: String?
+    let calendarName: String?
+    let calendarEmail: String?
 
     var startsInSeconds: TimeInterval { start.timeIntervalSince(Config.now) }
     var duration: TimeInterval { end.timeIntervalSince(start) }
@@ -27,22 +29,28 @@ enum ICalParser {
 
     // Parses iCal text and returns events whose start falls within `range`.
     // Recurring events (RRULE) are expanded; each occurrence becomes a CalEvent.
-    static func parse(_ text: String, expandingIn range: DateInterval) -> [CalEvent] {
+    static func parse(_ text: String, expandingIn range: DateInterval, calendarEmail: String? = nil) -> [CalEvent] {
         let unfolded = unfold(text)
         var result: [CalEvent] = []
         var raw = RawEvent()
         var inEvent = false
+        var calendarName: String?
 
         for line in unfolded.components(separatedBy: "\n") {
             let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
             if line.isEmpty { continue }
+
+            if !inEvent, line.hasPrefix("X-WR-CALNAME:") {
+                calendarName = String(line.dropFirst("X-WR-CALNAME:".count))
+                continue
+            }
 
             switch line {
             case "BEGIN:VEVENT":
                 inEvent = true
                 raw = RawEvent()
             case "END:VEVENT":
-                if inEvent { result += expand(raw, in: range) }
+                if inEvent { result += expand(raw, in: range, calendarName: calendarName, calendarEmail: calendarEmail) }
                 inEvent = false
             default:
                 guard inEvent else { continue }
@@ -65,7 +73,7 @@ enum ICalParser {
 
     // MARK: - Expansion
 
-    private static func expand(_ raw: RawEvent, in range: DateInterval) -> [CalEvent] {
+    private static func expand(_ raw: RawEvent, in range: DateInterval, calendarName: String?, calendarEmail: String?) -> [CalEvent] {
         guard let title = raw.title, let dtstart = raw.start else { return [] }
 
         let eventDuration: TimeInterval
@@ -78,7 +86,7 @@ enum ICalParser {
         }
 
         func makeEvent(_ s: Date) -> CalEvent {
-            CalEvent(title: title, start: s, end: s.addingTimeInterval(eventDuration), uid: raw.uid)
+            CalEvent(title: title, start: s, end: s.addingTimeInterval(eventDuration), uid: raw.uid, calendarName: calendarName, calendarEmail: calendarEmail)
         }
 
         func isExcluded(_ date: Date) -> Bool {

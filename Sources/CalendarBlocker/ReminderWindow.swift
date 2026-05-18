@@ -508,6 +508,25 @@ final class ReminderWindow: NSWindow {
             return h > 0 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h") : "\(m)m"
         }()
 
+        var topAnchor: NSLayoutYAxisAnchor = view.topAnchor
+        var topConstant: CGFloat = pad
+
+        if let name = event.calendarName {
+            let calLabel = NSTextField(labelWithString: name)
+            calLabel.translatesAutoresizingMaskIntoConstraints = false
+            calLabel.font          = NSFont.systemFont(ofSize: 10, weight: .medium)
+            calLabel.textColor     = white.withAlphaComponent(0.55)
+            calLabel.lineBreakMode = .byTruncatingTail
+            view.addSubview(calLabel)
+            NSLayoutConstraint.activate([
+                calLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: pad),
+                calLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
+                calLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
+            ])
+            topAnchor = calLabel.bottomAnchor
+            topConstant = 4
+        }
+
         let titleField = NSTextField(wrappingLabelWithString: event.title)
         titleField.translatesAutoresizingMaskIntoConstraints = false
         titleField.font                    = NSFont.boldSystemFont(ofSize: 15)
@@ -537,7 +556,7 @@ final class ReminderWindow: NSWindow {
         view.addSubview(linkBtn)
 
         NSLayoutConstraint.activate([
-            titleField.topAnchor.constraint(equalTo: view.topAnchor, constant: pad),
+            titleField.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
             titleField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
             titleField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
 
@@ -560,7 +579,7 @@ final class ReminderWindow: NSWindow {
     private func googleCalendarURL(for ev: CalEvent) -> URL {
         let comps = Calendar.current.dateComponents([.year, .month, .day], from: ev.start)
         let y = comps.year!, mo = comps.month!, d = comps.day!
-        let email = Config.calendarEmail ?? ""
+        let email = ev.calendarEmail ?? ""
 
         // Use UID to construct a direct event link (Google Calendar iCal UIDs end in @google.com)
         if let uid = ev.uid, uid.lowercased().hasSuffix("@google.com"), !email.isEmpty {

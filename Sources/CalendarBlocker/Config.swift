@@ -3,15 +3,24 @@ import Foundation
 enum Config {
     private static let d = UserDefaults.standard
 
-    static var icalURL: URL? {
-        guard let raw = d.string(forKey: "icalURL") else { return nil }
-        return URL(string: raw)
+    /// Raw textarea content as entered by the user (URLs separated by whitespace/newlines).
+    static var icalURLsText: String {
+        if let text = d.string(forKey: "icalURLs") { return text }
+        return d.string(forKey: "icalURL") ?? ""   // migrate from old single-URL key
     }
-    static func saveIcalURL(_ raw: String) { d.set(raw, forKey: "icalURL") }
 
-    /// Email extracted from the iCal URL path: .../ical/EMAIL_ENCODED/private-.../basic.ics
-    static var calendarEmail: String? {
-        guard let url = icalURL else { return nil }
+    static var icalURLs: [URL] {
+        icalURLsText
+            .components(separatedBy: .whitespacesAndNewlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+            .compactMap { URL(string: $0) }
+    }
+
+    static func saveIcalURLs(_ text: String) { d.set(text, forKey: "icalURLs") }
+
+    /// Email extracted from a Google Calendar iCal URL path: .../ical/EMAIL_ENCODED/private-.../basic.ics
+    static func calendarEmail(from url: URL) -> String? {
         let parts = url.pathComponents
         guard let idx = parts.firstIndex(of: "ical"), idx + 1 < parts.count else { return nil }
         return parts[idx + 1].removingPercentEncoding
