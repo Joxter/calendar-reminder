@@ -15,6 +15,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         pollThread?.cancel()
+        let lockURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("CalendarBlocker.pid")
+        try? FileManager.default.removeItem(at: lockURL)
     }
 
     // MARK: - Poll loop (runs on background thread)

@@ -14,16 +14,12 @@ enum CalendarChecker {
             throw URLError(.cannotDecodeContentData)
         }
 
-        let all = ICalParser.parse(text)
         let now = Config.now
-
         let cal = Calendar.current
         let todayStart = cal.startOfDay(for: now)
         let todayEnd   = cal.date(byAdding: .day, value: 1, to: todayStart)!
 
-        let today = all
-            .filter { $0.start >= todayStart && $0.start < todayEnd }
-            .sorted { $0.start < $1.start }
+        let today = ICalParser.parse(text, expandingIn: DateInterval(start: todayStart, end: todayEnd))
 
         let upcoming = today.filter { event in
             let secs = event.startsInSeconds
