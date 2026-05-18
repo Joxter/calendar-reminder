@@ -1,5 +1,7 @@
 import Foundation
 
+enum CalendarError: Error { case noURL }
+
 struct FetchResult {
     let upcoming: [CalEvent]
     let today: [CalEvent]
@@ -8,8 +10,9 @@ struct FetchResult {
 
 enum CalendarChecker {
     static func fetch() throws -> FetchResult {
+        guard let url = Config.icalURL else { throw CalendarError.noURL }
         // Data(contentsOf:) is synchronous — always call from a background thread.
-        let data = try Data(contentsOf: Config.icalURL)
+        let data = try Data(contentsOf: url)
         guard let text = String(data: data, encoding: .utf8) else {
             throw URLError(.cannotDecodeContentData)
         }

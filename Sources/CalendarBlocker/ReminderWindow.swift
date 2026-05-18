@@ -267,7 +267,7 @@ final class ReminderWindow: NSWindow {
 
         buildUI(accent: accent, timelineH: timelineH)
         if event != nil {
-            NSSound.playSystemSound("Glass")
+            if Config.soundEnabled { NSSound.playSystemSound("Glass") }
             startTickTimer()
         }
     }
