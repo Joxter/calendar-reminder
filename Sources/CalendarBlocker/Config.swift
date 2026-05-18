@@ -9,6 +9,14 @@ enum Config {
     }
     static func saveIcalURL(_ raw: String) { d.set(raw, forKey: "icalURL") }
 
+    /// Email extracted from the iCal URL path: .../ical/EMAIL_ENCODED/private-.../basic.ics
+    static var calendarEmail: String? {
+        guard let url = icalURL else { return nil }
+        let parts = url.pathComponents
+        guard let idx = parts.firstIndex(of: "ical"), idx + 1 < parts.count else { return nil }
+        return parts[idx + 1].removingPercentEncoding
+    }
+
     static var pollInterval: TimeInterval {
         let v = d.double(forKey: "pollInterval")
         return v > 0 ? v : 30

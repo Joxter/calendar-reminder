@@ -1,17 +1,23 @@
 import Foundation
 
-struct CalEvent {
+struct CalEvent: Equatable {
     let title: String
     let start: Date
     let end: Date
+    let uid: String?
 
     var startsInSeconds: TimeInterval { start.timeIntervalSince(Config.now) }
     var duration: TimeInterval { end.timeIntervalSince(start) }
+
+    static func == (lhs: CalEvent, rhs: CalEvent) -> Bool {
+        lhs.title == rhs.title && lhs.start == rhs.start
+    }
 }
 
 enum ICalParser {
     private struct RawEvent {
         var title: String?
+        var uid: String?
         var start: Date?
         var end: Date?
         var duration: TimeInterval?
@@ -44,6 +50,7 @@ enum ICalParser {
                 let key = String(line.prefix(while: { $0 != ":" && $0 != ";" }))
                 switch key {
                 case "SUMMARY":  raw.title    = afterColon(line)
+                case "UID":      raw.uid      = afterColon(line)
                 case "DTSTART":  raw.start    = parseDate(line)
                 case "DTEND":    raw.end      = parseDate(line)
                 case "DURATION": raw.duration = parseDuration(afterColon(line))
@@ -71,7 +78,7 @@ enum ICalParser {
         }
 
         func makeEvent(_ s: Date) -> CalEvent {
-            CalEvent(title: title, start: s, end: s.addingTimeInterval(eventDuration))
+            CalEvent(title: title, start: s, end: s.addingTimeInterval(eventDuration), uid: raw.uid)
         }
 
         func isExcluded(_ date: Date) -> Bool {

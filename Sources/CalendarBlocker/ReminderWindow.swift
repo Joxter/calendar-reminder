@@ -60,9 +60,24 @@ final class TimelineView: NSView {
     var todayEvents: [CalEvent] = []
     var focused: CalEvent?
     var accent: NSColor = .systemBlue
+    var onEventSelected: ((CalEvent) -> Void)?
 
     // y=0 at top, increasing downward — matches Python/tkinter exactly
     override var isFlipped: Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        let loc = convert(event.locationInWindow, from: nil)
+        let row = Int((loc.y - axisH) / rowH)
+        guard row >= 0, row < todayEvents.count else { return }
+        onEventSelected?(todayEvents[row])
+    }
+
+    override func resetCursorRects() {
+        for i in todayEvents.indices {
+            let y = axisH + CGFloat(i) * rowH
+            addCursorRect(NSRect(x: 0, y: y, width: bounds.width, height: rowH), cursor: .pointingHand)
+        }
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
@@ -242,6 +257,12 @@ final class ReminderWindow: NSWindow {
     private var colonVisible   = true
     private var tickTimer: Timer?
 
+    private var leftColumn: NSView?
+    private var timelineView: TimelineView?
+    private var detailContainer: NSView?
+    private var selectedEvent: CalEvent?
+    private var accentColor: NSColor = NSColor(hex: "#475569")
+
     init(event: CalEvent?, todayEvents: [CalEvent]) {
         self.event = event
         self.todayEvents = todayEvents
@@ -307,6 +328,9 @@ final class ReminderWindow: NSWindow {
             right.trailingAnchor.constraint(equalTo: root.trailingAnchor),
             right.bottomAnchor.constraint(equalTo: root.bottomAnchor),
         ])
+
+        self.leftColumn  = left
+        self.accentColor = accent
 
         if let event = event {
             buildLeftEvent(in: left, accent: accent, event: event)
@@ -419,7 +443,9 @@ final class ReminderWindow: NSWindow {
         timeline.todayEvents = todayEvents
         timeline.focused     = event
         timeline.accent      = accent
+        timeline.onEventSelected = { [weak self] ev in self?.handleTimelineEventSelected(ev) }
         right.addSubview(timeline)
+        self.timelineView = timeline
 
         NSLayoutConstraint.activate([
             dateField.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 12),
@@ -430,6 +456,131 @@ final class ReminderWindow: NSWindow {
             timeline.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 6),
             timeline.heightAnchor.constraint(equalToConstant: timelineH),
         ])
+    }
+
+    // MARK: - Timeline event selection
+
+    private func handleTimelineEventSelected(_ ev: CalEvent) {
+        guard let left = leftColumn else { return }
+
+        // Toggle: re-clicking the selected event deselects
+        if selectedEvent == ev {
+            selectedEvent = nil
+            timelineView?.focused = event
+            timelineView?.needsDisplay = true
+            detailContainer?.removeFromSuperview()
+            detailContainer = nil
+            if event == nil { buildLeftPlaceholder(in: left) }
+            return
+        }
+
+        selectedEvent = ev
+        timelineView?.focused = ev
+        timelineView?.needsDisplay = true
+
+        // Remove previous detail and, in browse mode, the placeholder (it's top-pinned)
+        detailContainer?.removeFromSuperview()
+        if event == nil { left.subviews.forEach { $0.removeFromSuperview() } }
+
+        let container = NSView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        left.addSubview(container)
+        NSLayoutConstraint.activate([
+            container.topAnchor.constraint(equalTo: left.topAnchor),
+            container.leadingAnchor.constraint(equalTo: left.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: left.trailingAnchor),
+        ])
+        buildDetailContent(in: container, event: ev)
+        detailContainer = container
+    }
+
+    private func buildDetailContent(in view: NSView, event: CalEvent) {
+        let pad: CGFloat = 16
+        let white = NSColor.white
+
+        let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
+        let timeStr = "\(timeFmt.string(from: event.start)) – \(timeFmt.string(from: event.end))"
+
+        let totalMin = Int(event.duration / 60)
+        let durStr: String = {
+            guard totalMin > 0 else { return "" }
+            let h = totalMin / 60, m = totalMin % 60
+            return h > 0 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h") : "\(m)m"
+        }()
+
+        let titleField = NSTextField(wrappingLabelWithString: event.title)
+        titleField.translatesAutoresizingMaskIntoConstraints = false
+        titleField.font                    = NSFont.boldSystemFont(ofSize: 15)
+        titleField.textColor               = white
+        titleField.preferredMaxLayoutWidth = 210 - pad * 2
+        view.addSubview(titleField)
+
+        let infoStr = durStr.isEmpty ? timeStr : "\(timeStr)  ·  \(durStr)"
+        let infoField = NSTextField(labelWithString: infoStr)
+        infoField.translatesAutoresizingMaskIntoConstraints = false
+        infoField.font          = NSFont.systemFont(ofSize: 11)
+        infoField.textColor     = white.withAlphaComponent(0.7)
+        infoField.lineBreakMode = .byTruncatingTail
+        view.addSubview(infoField)
+
+        let linkBtn = NSButton(frame: .zero)
+        linkBtn.translatesAutoresizingMaskIntoConstraints = false
+        linkBtn.isBordered = false
+        linkBtn.alignment  = .left
+        linkBtn.attributedTitle = NSAttributedString(string: "Open in Calendar →", attributes: [
+            .foregroundColor: white.withAlphaComponent(0.85),
+            .underlineStyle:  NSUnderlineStyle.single.rawValue,
+            .font:            NSFont.systemFont(ofSize: 11),
+        ])
+        linkBtn.target = self
+        linkBtn.action = #selector(openSelectedEventInCalendar)
+        view.addSubview(linkBtn)
+
+        NSLayoutConstraint.activate([
+            titleField.topAnchor.constraint(equalTo: view.topAnchor, constant: pad),
+            titleField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
+            titleField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
+
+            infoField.topAnchor.constraint(equalTo: titleField.bottomAnchor, constant: 6),
+            infoField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
+            infoField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+
+            linkBtn.topAnchor.constraint(equalTo: infoField.bottomAnchor, constant: 10),
+            linkBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
+
+            view.bottomAnchor.constraint(equalTo: linkBtn.bottomAnchor, constant: pad),
+        ])
+    }
+
+    @objc private func openSelectedEventInCalendar() {
+        guard let ev = selectedEvent else { return }
+        NSWorkspace.shared.open(googleCalendarURL(for: ev))
+    }
+
+    private func googleCalendarURL(for ev: CalEvent) -> URL {
+        let comps = Calendar.current.dateComponents([.year, .month, .day], from: ev.start)
+        let y = comps.year!, mo = comps.month!, d = comps.day!
+        let email = Config.calendarEmail ?? ""
+
+        // Use UID to construct a direct event link (Google Calendar iCal UIDs end in @google.com)
+        if let uid = ev.uid, uid.lowercased().hasSuffix("@google.com"), !email.isEmpty {
+            let eventId = String(uid.dropLast("@google.com".count)).lowercased()
+            if !eventId.isEmpty {
+                let combined = "\(eventId) \(email.lowercased())"
+                let eid = Data(combined.utf8).base64EncodedString()
+                    .replacingOccurrences(of: "+", with: "-")
+                    .replacingOccurrences(of: "/", with: "_")
+                    .replacingOccurrences(of: "=", with: "")
+                if let url = URL(string: "https://www.google.com/calendar/event?eid=\(eid)") {
+                    return url
+                }
+            }
+        }
+
+        // Fall back to day view with authuser hint so the right account is pre-selected
+        var str = "https://calendar.google.com/calendar/r/day/\(y)/\(mo)/\(d)"
+        if !email.isEmpty { str += "?authuser=\(email)" }
+        return URL(string: str)!
     }
 
     private func startTickTimer() {

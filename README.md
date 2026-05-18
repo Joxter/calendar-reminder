@@ -31,11 +31,7 @@ A native macOS app (Swift + AppKit) that shows an aggressive reminder window whe
 
 ### Configure
 
-Create a `.env` file in the repo root:
-
-```bash
-ICAL_URL=https://calendar.google.com/calendar/ical/you%40gmail.com/private-XXXXX/basic.ics
-```
+Run the app and click the calendar icon in the menu bar → **Set Calendar URL…** Paste your iCal URL and press **Save**. The URL is stored in `UserDefaults` and persists across launches.
 
 ### Run
 
@@ -66,7 +62,19 @@ The status bar item shows a calendar SF Symbol and a live countdown label that u
 | Further away | `calendar` | Secondary grey |
 | No events today | `calendar` | Secondary grey, no label |
 
-Clicking the icon shows a dropdown with the next event's title and start time, an **Open Google Calendar** link, and **Quit**.
+Clicking the icon shows a dropdown:
+
+| Item | Action |
+|---|---|
+| Event title · start time | Read-only, shows the next upcoming event |
+| **Set Calendar URL…** ⌘, | Opens an input dialog to paste your iCal URL |
+| **Check every** ▶ | Submenu: 15 s / 30 s / 1 min / 5 min |
+| **Remind me** ▶ | Submenu: 5 / 10 / 15 / 30 minutes before |
+| **Sound** ✓ | Toggle the Glass sound on reminder |
+| **Open Calendar** ⌘O | Opens the day-view reminder window |
+| **Quit** ⌘Q | Quits the app |
+
+All settings are saved in `UserDefaults` and take effect immediately (no restart required).
 
 ---
 
@@ -103,6 +111,7 @@ Each event renders a time badge, a duration underline, and a title with duration
 
 - Events starting **before 13:00**: title appears to the **right** of the badge.
 - Events starting **at or after 13:00**: title appears to the **left** to avoid clipping.
+- Rows are **clickable** — clicking a row selects that event and shows its details in the left column. Clicking the same row again deselects it.
 
 #### Event state colours
 
@@ -110,9 +119,20 @@ Each event renders a time badge, a duration underline, and a title with duration
 |---|---|
 | Done (ended) | Grey |
 | Active (in progress) | Green |
-| **Focused** (this reminder) | Accent colour |
+| **Selected / focused** | Accent colour |
 | Overlapping | Orange |
 | Upcoming | Blue |
+
+#### Selected event detail (left column)
+
+When a timeline row is clicked, the top of the left column shows:
+
+| Element | Detail |
+|---|---|
+| Event title | Bold white, wraps to multiple lines |
+| Time range | `HH:mm – HH:mm` |
+| Duration | e.g. `1h 30m` |
+| Open in Calendar → | Opens the event in Google Calendar (day view for that date) |
 
 ---
 
@@ -138,15 +158,18 @@ calendar-blocker/
     ├── RRuleExpander.swift               — RFC 5545 RRULE → concrete occurrence dates
     ├── ReminderWindow.swift              — two-column NSWindow with Gantt timeline
     ├── StatusBarController.swift         — menu bar icon with live countdown
-    └── Config.swift                      — reads ICAL_URL from env / .env file
+    └── Config.swift                      — UserDefaults-backed settings with save helpers
 ```
 
 ---
 
 ## Configuration reference
 
-| Variable | Default | Description |
+All settings are stored in `UserDefaults` and configured via the menu bar. No config files or environment variables needed.
+
+| Setting | Default | Where to change |
 |---|---|---|
-| `ICAL_URL` | — | Private iCal feed URL (required) |
-| `pollInterval` | `30` s | Seconds between calendar fetches (in `Config.swift`) |
-| `warningThreshold` | `600` s | Seconds before event start to trigger reminder (in `Config.swift`) |
+| iCal URL | — | Menu bar → Set Calendar URL… |
+| Poll interval | 30 s | Menu bar → Check every |
+| Warning threshold | 10 min | Menu bar → Remind me |
+| Sound | On | Menu bar → Sound |
