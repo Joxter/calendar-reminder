@@ -26,11 +26,7 @@ enum Config {
         return parts[idx + 1].removingPercentEncoding
     }
 
-    static var pollInterval: TimeInterval {
-        let v = d.double(forKey: "pollInterval")
-        return v > 0 ? v : 30
-    }
-    static func savePollInterval(_ seconds: TimeInterval) { d.set(seconds, forKey: "pollInterval") }
+    static let pollInterval: TimeInterval = 60
 
     static var warningThreshold: TimeInterval {
         let v = d.double(forKey: "warningThreshold")

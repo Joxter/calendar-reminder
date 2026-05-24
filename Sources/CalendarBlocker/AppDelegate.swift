@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return }
             let result = self.lastResult
             DispatchQueue.main.async { self.showReminder(event: result?.next, today: result?.today ?? []) }
+            self.scheduleImmediatePoll()
         }
         bar.onMockChanged = { [weak self] in self?.scheduleImmediatePoll() }
         bar.onClearShown = { [weak self] in
@@ -26,7 +27,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.pollOnce()
             }
         }
-        bar.onIntervalChanged = { [weak self] in self?.restartPollTimer() }
         statusBar = bar
 
         print("Calendar Blocker started. Polling every \(Int(Config.pollInterval))s, warning \(Int(Config.warningThreshold / 60))min before events.")

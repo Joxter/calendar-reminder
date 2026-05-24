@@ -13,8 +13,6 @@ final class StatusBarController: NSObject {
     var onMockChanged: (() -> Void)?
     /// Called when the user asks to clear the shown-reminders set and re-poll.
     var onClearShown: (() -> Void)?
-    /// Called when the poll interval changes so the timer can be rescheduled.
-    var onIntervalChanged: (() -> Void)?
 
     override init() {
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -41,7 +39,7 @@ final class StatusBarController: NSObject {
         let secs = nextEvent.map { $0.startsInSeconds } ?? .infinity
 
         let symbolName: String
-        let tint: NSColor
+        let tint: NSColor?
         var label: String
 
         if secs <= 0 {
@@ -57,9 +55,9 @@ final class StatusBarController: NSObject {
             } else {
                 label = "\(m)m"
             }
-            symbolName = "calendar"; tint = .secondaryLabelColor
+            symbolName = "calendar"; tint = nil
         } else {
-            symbolName = "calendar"; tint = .secondaryLabelColor; label = ""
+            symbolName = "calendar"; tint = nil; label = ""
         }
 
         // Append a dot when any mock/testing feature is active so it's obvious.
@@ -68,8 +66,11 @@ final class StatusBarController: NSObject {
         }
 
         let cfg = NSImage.SymbolConfiguration(pointSize: 13, weight: .regular)
-        button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: "Calendar")?
-            .withSymbolConfiguration(cfg)
+        if let img = NSImage(systemSymbolName: symbolName, accessibilityDescription: "Calendar")?
+            .withSymbolConfiguration(cfg) {
+            img.isTemplate = (tint == nil)
+            button.image = img
+        }
         button.contentTintColor = tint
         button.title = label.isEmpty ? "" : "  \(label)"
         button.imagePosition = label.isEmpty ? .imageOnly : .imageLeft
@@ -93,7 +94,6 @@ final class StatusBarController: NSObject {
 
         menu.addItem(.separator())
 
-        menu.addItem(makePollIntervalMenu())
         menu.addItem(makeWarningThresholdMenu())
 
         let soundItem = NSMenuItem(title: "Sound", action: #selector(toggleSound), keyEquivalent: "")
@@ -116,24 +116,6 @@ final class StatusBarController: NSObject {
         menu.addItem(quit)
 
         item.menu = menu
-    }
-
-    private func makePollIntervalMenu() -> NSMenuItem {
-        let options: [(String, TimeInterval)] = [
-            ("15 seconds", 15), ("30 seconds", 30), ("1 minute", 60), ("5 minutes", 300)
-        ]
-        let sub = NSMenu()
-        for (title, secs) in options {
-            let it = NSMenuItem(title: title, action: #selector(setPollInterval(_:)), keyEquivalent: "")
-            it.target = self
-            it.representedObject = secs as AnyObject
-            it.state = Config.pollInterval == secs ? .on : .off
-            sub.addItem(it)
-        }
-        let parent = NSMenuItem(title: "Check every", action: nil, keyEquivalent: "")
-        parent.submenu = sub
-        parent.tag = 10
-        return parent
     }
 
     private func makeWarningThresholdMenu() -> NSMenuItem {
@@ -343,11 +325,6 @@ final class StatusBarController: NSObject {
     // MARK: - Standard actions
 
     private func refreshSubmenuStates() {
-        if let pollMenu = item.menu?.item(withTag: 10)?.submenu {
-            for it in pollMenu.items {
-                it.state = (it.representedObject as? TimeInterval) == Config.pollInterval ? .on : .off
-            }
-        }
         if let warnMenu = item.menu?.item(withTag: 11)?.submenu {
             for it in warnMenu.items {
                 it.state = (it.representedObject as? TimeInterval) == Config.warningThreshold ? .on : .off
@@ -403,13 +380,6 @@ final class StatusBarController: NSObject {
         guard !raw.isEmpty else { return }
         Config.saveIcalURLs(raw)
         onURLChanged?()
-    }
-
-    @objc private func setPollInterval(_ sender: NSMenuItem) {
-        guard let secs = sender.representedObject as? TimeInterval else { return }
-        Config.savePollInterval(secs)
-        refreshSubmenuStates()
-        onIntervalChanged?()
     }
 
     @objc private func setWarningThreshold(_ sender: NSMenuItem) {
