@@ -62,13 +62,13 @@ private let gapTitleToTimer: CGFloat = -1   // event title to countdown (slight 
 private let shapeStrokeW: CGFloat  = 2   // stroke thickness
 private let shapeCornerR: CGFloat  = 4   // corner radius (0 = sharp, max = badgeH/2 = 8)
 
-private let maxWinH:    CGFloat = 500
+private let maxWinH:    CGFloat = 400
 private let minWinH:    CGFloat = 230   // no NEXT event (placeholder only)
-private let winOverhead: CGFloat = 38   // space from window top/bottom to timeline view edges
+private let winOverhead: CGFloat = 58   // space from window top/bottom to timeline view edges
 private let panelGap:   CGFloat = 16   // breathing room between detail and NEXT panels
-private let maxTimelineTitleW: CGFloat = 160
+private let maxTimelineTitleW: CGFloat = 240
 
-private var maxTimelineRows: Int { Int((maxWinH - winOverhead - 2 * axisH) / rowH) } // = 18
+private var maxTimelineRows: Int { Int((maxWinH - winOverhead - 2 * axisH) / rowH) }
 
 // Left-panel title fields — 2 lines max.
 // NSTextField.maximumNumberOfLines does NOT cap Auto Layout intrinsic content size in
@@ -176,7 +176,7 @@ final class TimelineView: NSView {
             .font: NSFont.monospacedDigitSystemFont(ofSize: timelineFontSize - 2, weight: .medium),
             .foregroundColor: NSColor.secondaryLabelColor,
         ]
-        let bottomY = bounds.height - axisH  // top of bottom label area; fills full height
+        let bottomY = bounds.height - axisH - 18  // top of bottom label area; fills full height
         while cur <= re {
             let x = t2x(cur)
             NSColor.separatorColor.setStroke()
