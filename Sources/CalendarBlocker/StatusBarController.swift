@@ -41,10 +41,10 @@ final class StatusBarController: NSObject {
         if secs <= 0 {
             symbolName = "calendar.badge.clock"; tint = .systemRed;    label = "now"
         } else if secs < 5 * 60 {
-            let m = max(1, Int(ceil(secs / 60)))
+            let m = max(1, Int(secs / 60 + 0.5))
             symbolName = "calendar.badge.clock"; tint = .systemOrange; label = "\(m)m"
         } else if secs < .infinity {
-            let m = Int(ceil(secs / 60))
+            let m = Int(secs / 60 + 0.5)
             if m >= 60 {
                 let h = m / 60, rm = m % 60
                 label = rm > 0 ? "\(h)h \(rm)m" : "\(h)h"
@@ -226,8 +226,18 @@ final class StatusBarController: NSObject {
     // MARK: - Live countdown between polls
 
     private func scheduleRefreshTimer() {
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            self?.applyDisplay()
+        // Delay first fire until the next :00/:15/:30/:45 wall-clock second so
+        // subsequent 15s ticks land on those boundaries and stay in sync.
+        let comps = Calendar.current.dateComponents([.second, .nanosecond], from: Date())
+        let secFrac = Double(comps.second ?? 0) + Double(comps.nanosecond ?? 0) / 1_000_000_000
+        let delay = (floor(secFrac / 15) + 1) * 15 - secFrac
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self else { return }
+            self.applyDisplay()
+            self.refreshTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
+                self?.applyDisplay()
+            }
         }
     }
 }

@@ -31,6 +31,14 @@ enum CalendarChecker {
                 print("Failed to fetch \(url.host ?? url.absoluteString): \(error.localizedDescription)")
             }
         }
+
+        // Deduplicate events that appear in multiple calendar feeds (same UID = same event).
+        // Fall back to title+start key when UID is absent.
+        var seen = Set<String>()
+        allToday = allToday.filter { ev in
+            let key = ev.uid ?? "\(ev.title)|\(Int(ev.start.timeIntervalSinceReferenceDate))"
+            return seen.insert(key).inserted
+        }
         allToday.sort { $0.start < $1.start }
 
         let upcoming = allToday.filter { event in

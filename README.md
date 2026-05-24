@@ -1,17 +1,17 @@
 # Calendar Blocker
 
-A native macOS app (Swift + AppKit) that shows an aggressive reminder window when a Google Calendar event is about to start. No OAuth, no Google API SDK — just a private iCal feed URL. Includes a menu bar icon with a live countdown to your next event.
+A native macOS app (Swift + AppKit) that shows an aggressive reminder window when a Google Calendar event is about to start. No OAuth, no Google API SDK — just private iCal feed URLs. Supports multiple calendars simultaneously. Includes a menu bar icon with a live countdown to your next event.
 
 ---
 
 ## How it works
 
-1. A background timer polls your Google Calendar iCal feed every 30 seconds.
+1. A background timer polls one or more Google Calendar iCal feeds every 30 seconds (configurable).
 2. When an event falls within the warning window (default 10 min before start), a reminder window appears on top of all other windows and steals focus.
-3. The same event is never shown twice in the same session (dedup by title + start time).
+3. The same event is never shown twice in the same session. Events that appear in multiple calendar feeds are deduplicated by UID so they only appear once.
 4. Events that started up to a few minutes ago are still shown if a poll cycle missed them.
 5. Recurring events (RRULE) are fully expanded — daily, weekly, monthly, and yearly patterns are supported.
-6. A menu bar icon shows the next event title and an animated live countdown; clicking it opens a menu with a link to Google Calendar and a Quit option.
+6. A menu bar icon shows the next event title and an animated live countdown; clicking it opens a menu with settings and a Quit option.
 
 ---
 
@@ -31,7 +31,7 @@ A native macOS app (Swift + AppKit) that shows an aggressive reminder window whe
 
 ### Configure
 
-Run the app and click the calendar icon in the menu bar → **Set Calendar URL…** Paste your iCal URL and press **Save**. The URL is stored in `UserDefaults` and persists across launches.
+Run the app and click the calendar icon in the menu bar → **Set Calendar URLs…** Paste one iCal URL per line (one calendar per line) and press **Save**. All URLs are stored in `UserDefaults` and persist across launches.
 
 ### Run
 
@@ -53,7 +53,7 @@ Watches `Sources/` for `.swift` changes and hot-reloads the app automatically.
 
 ## Menu bar icon
 
-The status bar item shows a calendar SF Symbol and a live countdown label that updates every 30 seconds (between polls).
+The status bar item shows a calendar SF Symbol and a live countdown label. The countdown updates every 15 seconds, aligned to wall-clock boundaries (`:00` / `:15` / `:30` / `:45`), so the displayed minute is always the closest rounded minute rather than a ceiling — drift is negligible.
 
 | State | Symbol | Colour |
 |---|---|---|
@@ -67,7 +67,7 @@ Clicking the icon shows a dropdown:
 | Item | Action |
 |---|---|
 | Event title · start time | Read-only, shows the next upcoming event |
-| **Set Calendar URL…** ⌘, | Opens an input dialog to paste your iCal URL |
+| **Set Calendar URLs…** ⌘, | Opens a multi-line dialog; paste one iCal URL per line |
 | **Check every** ▶ | Submenu: 15 s / 30 s / 1 min / 5 min |
 | **Remind me** ▶ | Submenu: 5 / 10 / 15 / 30 minutes before |
 | **Sound** ✓ | Toggle the Glass sound on reminder |
@@ -169,7 +169,7 @@ All settings are stored in `UserDefaults` and configured via the menu bar. No co
 
 | Setting | Default | Where to change |
 |---|---|---|
-| iCal URL | — | Menu bar → Set Calendar URL… |
+| iCal URLs | — (one per line) | Menu bar → Set Calendar URLs… |
 | Poll interval | 30 s | Menu bar → Check every |
 | Warning threshold | 10 min | Menu bar → Remind me |
 | Sound | On | Menu bar → Sound |
