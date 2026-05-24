@@ -8,42 +8,50 @@ private let accentSoon       = NSColor(hex: "#2563eb")  // blue
 // MARK: - Layout constants
 //
 // Window layout (two columns, side by side):
-//   ┌──────────────────────────────────────────────────┐
-//   │ Left (210px wide)   │ Right (fills remainder)    │
-//   │ accent-color panel  │ white panel                │
-//   │                     │  date header  (9pt top pad)│
-//   │  [NEXT]  ← or →     │  TimelineView (fills rest) │
-//   │  event title        │   axisH (20) top strip     │
-//   │  (max 2 lines)      │   N × rowH event rows      │
-//   │  countdown timer    │   <empty space + gridlines>│
-//   │  ─── selected ───   │   axisH (20) hour labels   │
-//   │  calendar name      │                            │
-//   │  event title        │                            │
-//   │  time · duration    │                            │
-//   └──────────────────────────────────────────────────┘
+//   ┌───────────────────────────────────────────────┐
+//   │ "Left column"    │ "Timeline column"          │
+//   │ <selected event> │  <weekday, current day>    │
+//   │                  │                            │
+//   │ <next event>     │  <grid with events>        │
+//   └───────────────────────────────────────────────┘
 //
-// Window height = min(maxWinH, max(activeMinH, 2×axisH + rows×rowH + winOverhead))
-//   winOverhead  = topInset(9) + dateHeaderH(~19) + headerGap(6) + bottomInset(4) = 38
-//   TimelineView fills the right panel via bottomAnchor, so gridlines and the hour-label
-//   strip always span the full right-panel height regardless of event count.
-//   maxTimelineRows = ⌊(maxWinH − winOverhead − 2×axisH) / rowH⌋
-//                   = ⌊(500 − 38 − 40) / 23⌋ = 18
+//   Selected event:
+//      - fixed height for:
+//        - calendar name (1 line)
+//        - event title (2 lines max)
+//        - time · duration
 //
-// Left panel (no NEXT event):  placeholder "All clear".  activeMinH = minWinH (230).
+//   Next event:
+//      - fixed height for:
+//        - "next" label
+//        - event title (2 lines max)
+//        - countdown timer
 //
-// Left panel (NEXT event exists):  two stacks coexist when user selects a timeline row.
-//   Detail panel (top-anchored):
-//     topPad(16) + calLabel(calLblLineH) + calGap(4) + title(titleMaxH)
-//     + infoGap(6) + info(infoLineH) + botPad(16)
-//   NEXT stack (bottom-pinned, from window bottom to "NEXT" label top):
-//     botPad(16) + timer(timerLineH) + 1pt + title(titleMaxH) + nextLabel(nextLblLineH)
-//   Gap between panels: panelGap (16)
-//   activeMinH = minWinHWithEvent = detailPanelH + panelGap + nextStackH  (computed)
+//   Grid:
+//      - background: vertical gray lines with the hour number at the bottom, full height, below the title (weekday, current day)
+//      - vertical red line for the current time (at top)
+//      - rows with events:
+//         - fixed height
+//         - text has a white background, so the red line and grid lines don't show under the text (time and event names)
+//         - events are clickable; user selects an event by clicking, a second click unselects
+//         - only the selected event is bold
+//
+//
+//    Important details:
+//      - Window height = window_padding + max_possible_height_of_selected_event + GAP + max_possible_height_of_next_event + window_padding
+//      - Window height is constant, even for the "no events" case
+//      - Grid is full height (except the title)
+//      - calculate the max number of events based on window height, row height, and the gaps between them
+//      - if we have more events than the max: show at most 2 previous events and add ("X more" to indicate there are more); do the same for future events (show as many as possible and add "X more")
+//      - timeline should show at least the 8:00 - 20:00 period; even if we have one event in the middle, extend the timeline (according to start and end time), but show nothing after 3:00 past midnight (we can add a fade)
+//      - some fixed width for the left and timeline columns
+//      - we should have extra variables to adjust window padding for the left and right columns separately
+//      - left column changes color based on the timer (blue by default, red if less than 2 minutes)
 //
 // Timeline title placement:
 //   Morning (hour < 13): title right of time label, tail-truncated to right edge.
-//   Afternoon (hour ≥ 13): title left of L-shape start, right-edge at x1−6,
-//                           capped at maxTimelineTitleW (160), tail-truncated.
+//   Afternoon (hour ≥ 13): title sits left of the start marker with a small gap,
+//                           capped at maxTimelineTitleW, tail-truncated.
 
 private let axisH: CGFloat  = 20
 private let badgeH: CGFloat = 16
