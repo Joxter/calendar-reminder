@@ -13,6 +13,8 @@ final class StatusBarController: NSObject {
     var onMockChanged: (() -> Void)?
     /// Called when the user asks to clear the shown-reminders set and re-poll.
     var onClearShown: (() -> Void)?
+    /// Called when the poll interval changes so the timer can be rescheduled.
+    var onIntervalChanged: (() -> Void)?
 
     override init() {
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -354,11 +356,14 @@ final class StatusBarController: NSObject {
         item.menu?.item(withTag: 99)?.state = Config.soundEnabled ? .on : .off
     }
 
+    private static let eventTimeFmt: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "HH:mm"; return f
+    }()
+
     private func updateMenuEventItem() {
         guard let menuItem = item.menu?.item(withTag: 42) else { return }
         if let ev = nextEvent {
-            let fmt = DateFormatter(); fmt.dateFormat = "HH:mm"
-            menuItem.title = "\(ev.title)  ·  \(fmt.string(from: ev.start))"
+            menuItem.title = "\(ev.title)  ·  \(StatusBarController.eventTimeFmt.string(from: ev.start))"
         } else {
             menuItem.title = "No upcoming events today"
         }
@@ -404,6 +409,7 @@ final class StatusBarController: NSObject {
         guard let secs = sender.representedObject as? TimeInterval else { return }
         Config.savePollInterval(secs)
         refreshSubmenuStates()
+        onIntervalChanged?()
     }
 
     @objc private func setWarningThreshold(_ sender: NSMenuItem) {

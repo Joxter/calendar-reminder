@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Watch Sources/ for changes and hot-reload the app.
 # Usage: ./watch.sh
 set -e
@@ -16,7 +16,11 @@ kill_app() {
 build_and_run() {
     kill_app
     printf '\033[1;34m» Building...\033[0m\n'
-    if swift build 2>&1 | grep -v '^$'; then
+    local output
+    output=$(swift build 2>&1)
+    local build_ok=$?
+    echo "$output" | grep -v '^$' || true
+    if [ $build_ok -eq 0 ]; then
         printf '\033[1;32m» Launching\033[0m\n'
         "$BINARY" &
         PID=$!

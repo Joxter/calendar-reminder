@@ -16,9 +16,8 @@ private let timelineFontSize: CGFloat = 13
 private var rowH: CGFloat { timelineFontSize + 10 }  // row height tracks font size
 
 // MARK: - Left panel spacing
-// -8 and -17 are for font compensation
-private let gapNextToTitle: CGFloat  = -8 + 8   // between "NEXT" label and event title
-private let gapTitleToTimer: CGFloat = -17 + 16   // between event title and countdown timer
+private let gapNextToTitle: CGFloat  =  0   // "NEXT" label to event title
+private let gapTitleToTimer: CGFloat = -1   // event title to countdown timer (slight visual tuck)
 
 // MARK: - L-shape style
 private let shapeStrokeW: CGFloat  = 2   // thickness of the L stroke
@@ -68,6 +67,9 @@ final class TimelineView: NSView {
         }
     }
 
+    private static let hourFmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "H";     return f }()
+    private static let timeFmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "HH:mm"; return f }()
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         // No background fill — NSVisualEffectView parent (sidebar) shows through
@@ -96,7 +98,6 @@ final class TimelineView: NSView {
 
         // Hour gridlines + axis labels (labels at bottom)
         var cur = rs
-        let hourFmt = DateFormatter(); hourFmt.dateFormat = "H"
         let lblAttrs: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedDigitSystemFont(ofSize: timelineFontSize - 2, weight: .medium),
             .foregroundColor: NSColor.secondaryLabelColor,
@@ -111,7 +112,7 @@ final class TimelineView: NSView {
             grid.lineWidth = 0.5
             grid.stroke()
 
-            let lbl   = hourFmt.string(from: cur) as NSString
+            let lbl   = TimelineView.hourFmt.string(from: cur) as NSString
             let lblSz = lbl.size(withAttributes: lblAttrs)
             lbl.draw(at: NSPoint(x: x - lblSz.width / 2, y: bottomY + (axisH - lblSz.height) / 2),
                      withAttributes: lblAttrs)
@@ -138,8 +139,7 @@ final class TimelineView: NSView {
                                         width: dotR * 2, height: dotR * 2)).fill()
 
             // Current time label — right of dot, vertically centred in top strip
-            let nowFmt = DateFormatter(); nowFmt.dateFormat = "HH:mm"
-            let nowStr = nowFmt.string(from: now) as NSString
+            let nowStr = TimelineView.timeFmt.string(from: now) as NSString
             let nowAttrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.monospacedDigitSystemFont(ofSize: timelineFontSize - 2, weight: .semibold),
                 .foregroundColor: nowColor,
@@ -148,8 +148,6 @@ final class TimelineView: NSView {
             nowStr.draw(at: NSPoint(x: nx + dotR + 3, y: (axisH - nowSz.height) / 2),
                         withAttributes: nowAttrs)
         }
-
-        let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
 
         // Precompute per-event layout so we can use it across passes
         struct EvLayout {
@@ -165,14 +163,14 @@ final class TimelineView: NSView {
             let cy = axisH + CGFloat(i) * rowH + rowH / 2
             let x1 = t2x(ev.start), x2 = t2x(ev.end)
             let done      = ev.end   <= now
-            let isFocused = focused.map { $0.title == ev.title && $0.start == ev.start } ?? false
+            let isFocused = focused == ev
             let color: NSColor
             if done                                  { color = .tertiaryLabelColor }
             else if ev.start <= now && now < ev.end  { color = .systemGreen }
             else                                     { color = .systemBlue }
             let alpha: CGFloat = done ? 0.35 : 1
 
-            let timeStr   = timeFmt.string(from: ev.start) as NSString
+            let timeStr   = TimelineView.timeFmt.string(from: ev.start) as NSString
             let timeAttrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.boldSystemFont(ofSize: timelineFontSize),
                 .foregroundColor: color.withAlphaComponent(alpha),
@@ -257,8 +255,8 @@ final class ReminderWindow: NSWindow {
         let timelineH = axisH + CGFloat(max(todayEvents.count, 1)) * rowH + axisH
         let winH      = min(500, max(230, timelineH + 54) + 4)
         let winW: CGFloat = 720
-        let screen = NSScreen.main!.frame
-        let origin = NSPoint(x: (screen.width - winW) / 2, y: (screen.height - winH) / 2)
+        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let origin = NSPoint(x: (screenFrame.width - winW) / 2, y: (screenFrame.height - winH) / 2)
 
         super.init(
             contentRect: NSRect(origin: origin, size: NSSize(width: winW, height: winH)),

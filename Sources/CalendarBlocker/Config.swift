@@ -78,7 +78,7 @@ enum Config {
     static func saveMockDayOffset(_ days: Int) { d.set(days, forKey: "mockDayOffset") }
 
     static var testModeActive: Bool {
-        d.object(forKey: "testModeActive") == nil ? true : d.bool(forKey: "testModeActive")
+        d.bool(forKey: "testModeActive")
     }
     static func saveTestModeActive(_ on: Bool) { d.set(on, forKey: "testModeActive") }
 

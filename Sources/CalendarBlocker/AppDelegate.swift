@@ -1,89 +1,90 @@
 import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private var shown = Set<String>()
-    private var windows: [ReminderWindow] = []
-    private var pollThread: Thread?
+    private var shown = Set<String>()           // pollQueue only
+    private var windows: [ReminderWindow] = []  // main thread only
+    private var pollTimer: DispatchSourceTimer?
     private var statusBar: StatusBarController?
-    private var lastResult: FetchResult?
+    private var lastResult: FetchResult?        // main thread only
+
+    private let pollQueue = DispatchQueue(label: "com.calendarblocker.poll", qos: .utility)
+    private var isFirstPoll = true              // pollQueue only
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         installEditMenu()
         let bar = StatusBarController()
-        bar.onURLChanged = { [weak self] in
-            guard let self else { return }
-            let t = Thread { self.pollOnce() }
-            t.name = "ImmediatePoll"
-            t.start()
-        }
+        bar.onURLChanged = { [weak self] in self?.scheduleImmediatePoll() }
         bar.onOpenWindow = { [weak self] in
             guard let self else { return }
             let result = self.lastResult
             DispatchQueue.main.async { self.showReminder(event: result?.next, today: result?.today ?? []) }
         }
-        bar.onMockChanged = { [weak self] in
-            guard let self else { return }
-            let t = Thread { self.pollOnce() }
-            t.name = "MockPoll"
-            t.start()
-        }
+        bar.onMockChanged = { [weak self] in self?.scheduleImmediatePoll() }
         bar.onClearShown = { [weak self] in
-            guard let self else { return }
-            self.shown.removeAll()
-            let t = Thread { self.pollOnce() }
-            t.name = "ClearPoll"
-            t.start()
+            self?.pollQueue.async {
+                self?.shown.removeAll()
+                self?.pollOnce()
+            }
         }
+        bar.onIntervalChanged = { [weak self] in self?.restartPollTimer() }
         statusBar = bar
 
         print("Calendar Blocker started. Polling every \(Int(Config.pollInterval))s, warning \(Int(Config.warningThreshold / 60))min before events.")
-        let t = Thread { self.pollLoop(isStartup: true) }
-        t.name = "CalendarPoller"
-        t.start()
-        pollThread = t
+        startPollTimer()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        pollThread?.cancel()
+        pollTimer?.cancel()
         let lockURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("CalendarBlocker.pid")
         try? FileManager.default.removeItem(at: lockURL)
     }
 
-    // MARK: - Poll loop (runs on background thread)
+    // MARK: - Poll timer (any thread — safe because pollTimer mutations are bracketed by cancel+create)
 
-    private func pollLoop(isStartup: Bool) {
-        var startup = isStartup
-        while !Thread.current.isCancelled {
-            pollOnce(isStartup: startup)
-            startup = false
-            print("Next check in \(Int(Config.pollInterval))s.")
-            Thread.sleep(forTimeInterval: Config.pollInterval)
+    private func startPollTimer(isStartup: Bool = true) {
+        isFirstPoll = isStartup
+        let timer = DispatchSource.makeTimerSource(queue: pollQueue)
+        timer.schedule(deadline: .now(), repeating: Config.pollInterval, leeway: .seconds(1))
+        timer.setEventHandler { [weak self] in
+            guard let self else { return }
+            let first = self.isFirstPoll
+            self.isFirstPoll = false
+            self.pollOnce(isStartup: first)
         }
+        timer.resume()
+        pollTimer = timer
     }
 
-    // Single poll — safe to call from any background thread (including the immediate re-poll).
+    private func restartPollTimer() {
+        pollTimer?.cancel()
+        startPollTimer(isStartup: false)
+    }
+
+    private func scheduleImmediatePoll() {
+        pollQueue.async { [weak self] in self?.pollOnce() }
+    }
+
+    // MARK: - Poll (runs exclusively on pollQueue — no concurrent access to `shown`)
+
     private func pollOnce(isStartup: Bool = false) {
         print("Checking calendar…")
         do {
             let result = try CalendarChecker.fetch()
-            lastResult = result
 
-            if isStartup {
-                let ev = result.next, td = result.today
-                DispatchQueue.main.async { self.showReminder(event: ev, today: td) }
-            } else {
+            // Keep only keys that still correspond to today's events, so the set
+            // doesn't grow forever and old UIDs can't suppress re-triggered events.
+            let validKeys = Set(result.today.map { $0.uid ?? "\($0.title)|\($0.start)" })
+            shown = shown.intersection(validKeys)
+
+            var eventsToShow: [CalEvent] = []
+            if !isStartup {
                 for event in result.upcoming {
                     let key = event.uid ?? "\(event.title)|\(event.start)"
-                    guard !shown.contains(key) else { continue }
-                    shown.insert(key)
-                    print("Reminding: \(event.title) at \(timeStr(event.start))")
-                    let ev = event, td = result.today
-                    DispatchQueue.main.async { self.showReminder(event: ev, today: td) }
+                    if shown.insert(key).inserted {
+                        eventsToShow.append(event)
+                    }
                 }
-                if shown.count > 200 { shown.removeAll() }
             }
-
-            statusBar?.update(next: result.next)
 
             if let next = result.next {
                 let secs = next.startsInSeconds
@@ -93,10 +94,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 print("No upcoming events found.")
             }
+            print("Next check in \(Int(Config.pollInterval))s.")
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.lastResult = result
+                self.statusBar?.update(next: result.next)
+                if isStartup {
+                    self.showReminder(event: result.next, today: result.today)
+                } else {
+                    for ev in eventsToShow {
+                        print("Reminding: \(ev.title) at \(self.timeStr(ev.start))")
+                        self.showReminder(event: ev, today: result.today)
+                    }
+                }
+            }
 
         } catch CalendarError.noURL {
             print("No calendar URL configured. Use the menu bar to set one.")
-            statusBar?.update(next: nil)
+            DispatchQueue.main.async { [weak self] in self?.statusBar?.update(next: nil) }
         } catch {
             print("Fetch error: \(error.localizedDescription)")
         }

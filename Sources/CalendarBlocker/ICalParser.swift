@@ -57,7 +57,7 @@ enum ICalParser {
                 // Key is everything before the first ':' or ';'
                 let key = String(line.prefix(while: { $0 != ":" && $0 != ";" }))
                 switch key {
-                case "SUMMARY":  raw.title    = afterColon(line)
+                case "SUMMARY":  raw.title    = unescapeText(afterColon(line))
                 case "UID":      raw.uid      = afterColon(line)
                 case "DTSTART":  raw.start    = parseDate(line)
                 case "DTEND":    raw.end      = parseDate(line)
@@ -105,6 +105,25 @@ enum ICalParser {
     }
 
     // MARK: - Parsing helpers
+
+    // RFC 5545 TEXT escape sequences: \n → newline, \, → comma, \; → semicolon, \\ → backslash.
+    private static func unescapeText(_ s: String) -> String {
+        var result = ""
+        result.reserveCapacity(s.count)
+        var it = s.makeIterator()
+        while let ch = it.next() {
+            guard ch == "\\" else { result.append(ch); continue }
+            switch it.next() {
+            case "n":  result.append("\n")
+            case ",":  result.append(",")
+            case ";":  result.append(";")
+            case "\\":  result.append("\\")
+            case let c?: result.append("\\"); result.append(c)
+            case nil:   result.append("\\")
+            }
+        }
+        return result
+    }
 
     // iCal folds long lines by inserting CRLF + space/tab. Strip the fold markers.
     private static func unfold(_ text: String) -> String {
