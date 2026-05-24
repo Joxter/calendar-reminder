@@ -43,10 +43,52 @@ enum Config {
     }
     static func saveSoundEnabled(_ on: Bool) { d.set(on, forKey: "soundEnabled") }
 
-    // Set to true to freeze "now" at 13:00 today for UI testing
-    static let mockNowEnabled = false
+    // MARK: - Mock / Testing
+
+    struct MockEventDef {
+        let id: String
+        let title: String
+        let offsetMinutes: Int   // minutes from Config.now; negative = already started
+        let durationMinutes: Int
+    }
+
+    static let mockEventDefs: [MockEventDef] = [
+        .init(id: "very_long",  title: "very long event with <b>very long name</b>, probably some broken import from another systems",      offsetMinutes:  90, durationMinutes: 180),
+        .init(id: "inprogress", title: "All-hands",          offsetMinutes: -20, durationMinutes: 60),
+        .init(id: "verysoon",   title: "Standup",            offsetMinutes:   1, durationMinutes: 15),
+        .init(id: "soon",       title: "Design Review",      offsetMinutes:   8, durationMinutes: 60),
+        .init(id: "upcoming",   title: "Lunch",              offsetMinutes:  30, durationMinutes: 60),
+        .init(id: "overlap1",   title: "Sprint Planning",    offsetMinutes:  65, durationMinutes: 60),
+        .init(id: "overlap2",   title: "Retrospective",      offsetMinutes:  90, durationMinutes: 60),
+        .init(id: "later",      title: "1:1 with Manager",   offsetMinutes: 160, durationMinutes: 30),
+    ]
+
+    static var enabledMockEventIDs: Set<String> {
+        Set(d.stringArray(forKey: "mockEventIDs") ?? [])
+    }
+    static func saveMockEventIDs(_ ids: Set<String>) { d.set(Array(ids), forKey: "mockEventIDs") }
+
+    static var mockHideReal: Bool { d.bool(forKey: "mockHideReal") }
+    static func saveMockHideReal(_ on: Bool) { d.set(on, forKey: "mockHideReal") }
+
+    static var mockTimeOffset: TimeInterval { d.double(forKey: "mockTimeOffset") }
+    static func saveMockTimeOffset(_ secs: TimeInterval) { d.set(secs, forKey: "mockTimeOffset") }
+
+    static var mockDayOffset: Int { d.integer(forKey: "mockDayOffset") }
+    static func saveMockDayOffset(_ days: Int) { d.set(days, forKey: "mockDayOffset") }
+
+    static var testModeActive: Bool {
+        d.object(forKey: "testModeActive") == nil ? true : d.bool(forKey: "testModeActive")
+    }
+    static func saveTestModeActive(_ on: Bool) { d.set(on, forKey: "testModeActive") }
+
+    static var isMockActive: Bool {
+        testModeActive && (mockTimeOffset != 0 || mockDayOffset != 0 || !enabledMockEventIDs.isEmpty)
+    }
+
     static var now: Date {
-        guard mockNowEnabled else { return Date() }
-        return Calendar.current.date(bySettingHour: 13, minute: 8, second: 0, of: Date())!
+        guard testModeActive else { return Date() }
+        let base = Calendar.current.date(byAdding: .day, value: mockDayOffset, to: Date()) ?? Date()
+        return base.addingTimeInterval(mockTimeOffset)
     }
 }

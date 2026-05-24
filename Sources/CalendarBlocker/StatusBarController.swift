@@ -9,6 +9,10 @@ final class StatusBarController: NSObject {
     var onURLChanged: (() -> Void)?
     /// Called when the user clicks "Open Calendar" in the menu.
     var onOpenWindow: (() -> Void)?
+    /// Called when any mock/testing setting changes — triggers an immediate re-poll.
+    var onMockChanged: (() -> Void)?
+    /// Called when the user asks to clear the shown-reminders set and re-poll.
+    var onClearShown: (() -> Void)?
 
     override init() {
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -36,7 +40,7 @@ final class StatusBarController: NSObject {
 
         let symbolName: String
         let tint: NSColor
-        let label: String
+        var label: String
 
         if secs <= 0 {
             symbolName = "calendar.badge.clock"; tint = .systemRed;    label = "now"
@@ -54,6 +58,11 @@ final class StatusBarController: NSObject {
             symbolName = "calendar"; tint = .secondaryLabelColor
         } else {
             symbolName = "calendar"; tint = .secondaryLabelColor; label = ""
+        }
+
+        // Append a dot when any mock/testing feature is active so it's obvious.
+        if Config.isMockActive {
+            label = label.isEmpty ? "·" : "\(label) ·"
         }
 
         let cfg = NSImage.SymbolConfiguration(pointSize: 13, weight: .regular)
@@ -96,6 +105,8 @@ final class StatusBarController: NSObject {
         let calItem = NSMenuItem(title: "Open Calendar", action: #selector(openCalendarWindow), keyEquivalent: "o")
         calItem.target = self
         menu.addItem(calItem)
+
+        menu.addItem(makeTestingMenu())
 
         menu.addItem(.separator())
 
@@ -141,6 +152,193 @@ final class StatusBarController: NSObject {
         parent.tag = 11
         return parent
     }
+
+    // MARK: - Testing menu
+
+    private func makeTestingMenu() -> NSMenuItem {
+        let sub = NSMenu()
+
+        // Master on/off switch — keeps all settings intact when disabled
+        let enableItem = NSMenuItem(title: "Test mode enabled",
+                                    action: #selector(toggleTestMode(_:)), keyEquivalent: "")
+        enableItem.target = self
+        enableItem.state = Config.testModeActive ? .on : .off
+        enableItem.tag = 25
+        sub.addItem(enableItem)
+
+        sub.addItem(.separator())
+
+        // Section: mock events
+        let evHdr = NSMenuItem(title: "Inject mock events:", action: nil, keyEquivalent: "")
+        evHdr.isEnabled = false
+        sub.addItem(evHdr)
+
+        let enabledIDs = Config.enabledMockEventIDs
+        for def in Config.mockEventDefs {
+            let it = NSMenuItem(title: mockEventMenuTitle(def),
+                                action: #selector(toggleMockEvent(_:)), keyEquivalent: "")
+            it.target = self
+            it.representedObject = def.id
+            it.state = enabledIDs.contains(def.id) ? .on : .off
+            it.indentationLevel = 1
+            sub.addItem(it)
+        }
+
+        sub.addItem(.separator())
+
+        let hideReal = NSMenuItem(title: "Hide real events", action: #selector(toggleHideReal(_:)), keyEquivalent: "")
+        hideReal.target = self
+        hideReal.state = Config.mockHideReal ? .on : .off
+        hideReal.tag = 21
+        sub.addItem(hideReal)
+
+        sub.addItem(.separator())
+
+        // Section: day selection
+        let dayHdr = NSMenuItem(title: "Choose day:", action: nil, keyEquivalent: "")
+        dayHdr.isEnabled = false
+        sub.addItem(dayHdr)
+
+        let days: [(String, Int)] = [
+            ("Last week",    -7),
+            ("2 days ago",   -2),
+            ("Yesterday",    -1),
+            ("Today",         0),
+            ("Tomorrow",     +1),
+            ("2 days ahead", +2),
+            ("Next week",    +7),
+        ]
+        let currentDay = Config.mockDayOffset
+        for (title, offset) in days {
+            let it = NSMenuItem(title: title, action: #selector(setMockDayOffset(_:)), keyEquivalent: "")
+            it.target = self
+            it.representedObject = offset as AnyObject
+            it.state = currentDay == offset ? .on : .off
+            it.indentationLevel = 1
+            sub.addItem(it)
+        }
+
+        sub.addItem(.separator())
+
+        // Section: time simulation
+        let timeHdr = NSMenuItem(title: "Simulate time:", action: nil, keyEquivalent: "")
+        timeHdr.isEnabled = false
+        sub.addItem(timeHdr)
+
+        let offsets: [(String, TimeInterval)] = [
+            ("Real time",   0),
+            ("− 30 min",  -30 * 60),
+            ("− 10 min",  -10 * 60),
+            ("− 5 min",    -5 * 60),
+            ("+ 5 min",     5 * 60),
+            ("+ 10 min",   10 * 60),
+            ("+ 30 min",   30 * 60),
+            ("+ 1 hour",   60 * 60),
+            ("+ 2 hours", 120 * 60),
+        ]
+        let current = Config.mockTimeOffset
+        for (title, secs) in offsets {
+            let it = NSMenuItem(title: title, action: #selector(setMockTimeOffset(_:)), keyEquivalent: "")
+            it.target = self
+            it.representedObject = secs as AnyObject
+            it.state = current == secs ? .on : .off
+            it.indentationLevel = 1
+            sub.addItem(it)
+        }
+
+        sub.addItem(.separator())
+
+        let forceCheck = NSMenuItem(title: "Force check now", action: #selector(forceCheckNow), keyEquivalent: "")
+        forceCheck.target = self
+        sub.addItem(forceCheck)
+
+        let clearShown = NSMenuItem(title: "Clear shown reminders", action: #selector(clearShownReminders), keyEquivalent: "")
+        clearShown.target = self
+        sub.addItem(clearShown)
+
+        let parent = NSMenuItem(title: "Testing", action: nil, keyEquivalent: "")
+        parent.submenu = sub
+        parent.tag = 20
+        return parent
+    }
+
+    private func mockEventMenuTitle(_ def: Config.MockEventDef) -> String {
+        let m = abs(def.offsetMinutes)
+        let sign = def.offsetMinutes < 0 ? "−" : "+"
+        let offsetStr: String
+        if m == 0 {
+            offsetStr = "now"
+        } else if m >= 60 {
+            let h = m / 60, rm = m % 60
+            offsetStr = rm > 0 ? "\(sign)\(h)h \(rm)m" : "\(sign)\(h)h"
+        } else {
+            offsetStr = "\(sign)\(m)m"
+        }
+        let d = def.durationMinutes
+        let durStr = d >= 60 ? (d % 60 > 0 ? "\(d/60)h \(d%60)m" : "\(d/60)h") : "\(d)m"
+        return "\(def.title)  \(offsetStr) · \(durStr)"
+    }
+
+    // MARK: - Testing actions
+
+    @objc private func toggleMockEvent(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? String else { return }
+        var ids = Config.enabledMockEventIDs
+        if ids.contains(id) { ids.remove(id) } else { ids.insert(id) }
+        Config.saveMockEventIDs(ids)
+        sender.state = ids.contains(id) ? .on : .off
+        applyDisplay()
+        onMockChanged?()
+    }
+
+    @objc private func toggleHideReal(_ sender: NSMenuItem) {
+        let newVal = !Config.mockHideReal
+        Config.saveMockHideReal(newVal)
+        sender.state = newVal ? .on : .off
+        onMockChanged?()
+    }
+
+    @objc private func setMockTimeOffset(_ sender: NSMenuItem) {
+        guard let secs = sender.representedObject as? TimeInterval else { return }
+        Config.saveMockTimeOffset(secs)
+        // Update checkmarks in the time offset section of the Testing submenu
+        if let testSub = item.menu?.item(withTag: 20)?.submenu {
+            for it in testSub.items {
+                guard let offset = it.representedObject as? TimeInterval else { continue }
+                it.state = offset == secs ? .on : .off
+            }
+        }
+        applyDisplay()
+        onMockChanged?()
+    }
+
+    @objc private func toggleTestMode(_ sender: NSMenuItem) {
+        let newVal = !Config.testModeActive
+        Config.saveTestModeActive(newVal)
+        sender.state = newVal ? .on : .off
+        applyDisplay()
+        onMockChanged?()
+    }
+
+    @objc private func setMockDayOffset(_ sender: NSMenuItem) {
+        guard let days = sender.representedObject as? Int else { return }
+        Config.saveMockDayOffset(days)
+        if let testSub = item.menu?.item(withTag: 20)?.submenu {
+            for it in testSub.items {
+                guard it.action == #selector(setMockDayOffset(_:)),
+                      let offset = it.representedObject as? Int else { continue }
+                it.state = offset == days ? .on : .off
+            }
+        }
+        applyDisplay()
+        onMockChanged?()
+    }
+
+    @objc private func forceCheckNow() { onMockChanged?() }
+
+    @objc private func clearShownReminders() { onClearShown?() }
+
+    // MARK: - Standard actions
 
     private func refreshSubmenuStates() {
         if let pollMenu = item.menu?.item(withTag: 10)?.submenu {

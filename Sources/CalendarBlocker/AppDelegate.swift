@@ -21,6 +21,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let result = self.lastResult
             DispatchQueue.main.async { self.showReminder(event: result?.next, today: result?.today ?? []) }
         }
+        bar.onMockChanged = { [weak self] in
+            guard let self else { return }
+            let t = Thread { self.pollOnce() }
+            t.name = "MockPoll"
+            t.start()
+        }
+        bar.onClearShown = { [weak self] in
+            guard let self else { return }
+            self.shown.removeAll()
+            let t = Thread { self.pollOnce() }
+            t.name = "ClearPoll"
+            t.start()
+        }
         statusBar = bar
 
         print("Calendar Blocker started. Polling every \(Int(Config.pollInterval))s, warning \(Int(Config.warningThreshold / 60))min before events.")
@@ -60,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.async { self.showReminder(event: ev, today: td) }
             } else {
                 for event in result.upcoming {
-                    let key = "\(event.title)|\(event.start)"
+                    let key = event.uid ?? "\(event.title)|\(event.start)"
                     guard !shown.contains(key) else { continue }
                     shown.insert(key)
                     print("Reminding: \(event.title) at \(timeStr(event.start))")

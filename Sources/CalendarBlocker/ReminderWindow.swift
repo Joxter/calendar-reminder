@@ -42,17 +42,6 @@ private func durString(_ event: CalEvent) -> String {
     return "\(m / 60):\(String(format: "%02d", m % 60))"
 }
 
-private func overlappingIndices(_ events: [CalEvent]) -> Set<Int> {
-    var result = Set<Int>()
-    for i in events.indices {
-        for j in (i+1)..<events.count {
-            if events[i].start < events[j].end && events[j].start < events[i].end {
-                result.insert(i); result.insert(j)
-            }
-        }
-    }
-    return result
-}
 
 // MARK: - Timeline View
 
@@ -160,8 +149,7 @@ final class TimelineView: NSView {
                         withAttributes: nowAttrs)
         }
 
-        let overlaps = overlappingIndices(todayEvents)
-        let timeFmt  = DateFormatter(); timeFmt.dateFormat = "HH:mm"
+        let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
 
         // Precompute per-event layout so we can use it across passes
         struct EvLayout {
@@ -180,9 +168,7 @@ final class TimelineView: NSView {
             let isFocused = focused.map { $0.title == ev.title && $0.start == ev.start } ?? false
             let color: NSColor
             if done                                  { color = .tertiaryLabelColor }
-            else if isFocused                        { color = accent }
             else if ev.start <= now && now < ev.end  { color = .systemGreen }
-            else if overlaps.contains(i)             { color = .systemOrange }
             else                                     { color = .systemBlue }
             let alpha: CGFloat = done ? 0.35 : 1
 
@@ -441,7 +427,7 @@ final class ReminderWindow: NSWindow {
         let timeline = TimelineView()
         timeline.translatesAutoresizingMaskIntoConstraints = false
         timeline.todayEvents = todayEvents
-        timeline.focused     = event
+        timeline.focused     = nil
         timeline.accent      = accent
         timeline.onEventSelected = { [weak self] ev in self?.handleTimelineEventSelected(ev) }
         right.addSubview(timeline)
@@ -466,7 +452,7 @@ final class ReminderWindow: NSWindow {
         // Toggle: re-clicking the selected event deselects
         if selectedEvent == ev {
             selectedEvent = nil
-            timelineView?.focused = event
+            timelineView?.focused = nil
             timelineView?.needsDisplay = true
             detailContainer?.removeFromSuperview()
             detailContainer = nil

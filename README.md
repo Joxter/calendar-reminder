@@ -55,24 +55,24 @@ Watches `Sources/` for `.swift` changes and hot-reloads the app automatically.
 
 The status bar item shows a calendar SF Symbol and a live countdown label. The countdown updates every 15 seconds, aligned to wall-clock boundaries (`:00` / `:15` / `:30` / `:45`), so the displayed minute is always the closest rounded minute rather than a ceiling — drift is negligible.
 
-| State | Symbol | Colour |
-|---|---|---|
-| Event in progress or just started | `calendar.badge.clock` | Red |
-| < 5 min away | `calendar.badge.clock` | Orange |
-| Further away | `calendar` | Secondary grey |
-| No events today | `calendar` | Secondary grey, no label |
+| State                             | Symbol                 | Colour                   |
+| --------------------------------- | ---------------------- | ------------------------ |
+| Event in progress or just started | `calendar.badge.clock` | Red                      |
+| < 5 min away                      | `calendar.badge.clock` | Orange                   |
+| Further away                      | `calendar`             | Secondary grey           |
+| No events today                   | `calendar`             | Secondary grey, no label |
 
 Clicking the icon shows a dropdown:
 
-| Item | Action |
-|---|---|
-| Event title · start time | Read-only, shows the next upcoming event |
+| Item                      | Action                                                 |
+| ------------------------- | ------------------------------------------------------ |
+| Event title · start time  | Read-only, shows the next upcoming event               |
 | **Set Calendar URLs…** ⌘, | Opens a multi-line dialog; paste one iCal URL per line |
-| **Check every** ▶ | Submenu: 15 s / 30 s / 1 min / 5 min |
-| **Remind me** ▶ | Submenu: 5 / 10 / 15 / 30 minutes before |
-| **Sound** ✓ | Toggle the Glass sound on reminder |
-| **Open Calendar** ⌘O | Opens the day-view reminder window |
-| **Quit** ⌘Q | Quits the app |
+| **Check every** ▶         | Submenu: 15 s / 30 s / 1 min / 5 min                   |
+| **Remind me** ▶           | Submenu: 5 / 10 / 15 / 30 minutes before               |
+| **Sound** ✓               | Toggle the Glass sound on reminder                     |
+| **Open Calendar** ⌘O      | Opens the day-view reminder window                     |
+| **Quit** ⌘Q               | Quits the app                                          |
 
 All settings are saved in `UserDefaults` and take effect immediately (no restart required).
 
@@ -85,12 +85,12 @@ It is split into two columns separated by a 1 px hairline.
 
 ### Left column (white)
 
-| Element | Detail |
-|---|---|
-| Urgency badge | Coloured pill: amber / orange / red depending on time to start |
-| Animated timer | Live countdown (updates every second) showing time until event starts |
-| Event title | SF Pro Display bold, wraps to multiple lines |
-| Duration | `h:mm` format (e.g. `0:30`, `1:00`) |
+| Element        | Detail                                                                                |
+| -------------- | ------------------------------------------------------------------------------------- |
+| Urgency badge  | Coloured pill: amber / orange / red depending on time to start                        |
+| Animated timer | Live countdown (updates every second) showing time until event starts                 |
+| Event title    | SF Pro Display bold, wraps to multiple lines                                          |
+| Duration       | `h:mm` format (e.g. `0:30`, `1:00`)                                                   |
 | Dismiss button | Accent colour; hover darkens. Also responds to **Esc**, **Return**, and window close. |
 
 ### Right column (`#f5f5f7`)
@@ -115,23 +115,22 @@ Each event renders a time badge, a duration underline, and a title with duration
 
 #### Event state colours
 
-| State | Colour |
-|---|---|
-| Done (ended) | Grey |
-| Active (in progress) | Green |
+| State                  | Colour        |
+| ---------------------- | ------------- |
+| Past (ended)           | Grey          |
+| In progress            | Green         |
+| Future                 | Blue          |
 | **Selected / focused** | Accent colour |
-| Overlapping | Orange |
-| Upcoming | Blue |
 
 #### Selected event detail (left column)
 
 When a timeline row is clicked, the top of the left column shows:
 
-| Element | Detail |
-|---|---|
-| Event title | Bold white, wraps to multiple lines |
-| Time range | `HH:mm – HH:mm` |
-| Duration | e.g. `1h 30m` |
+| Element            | Detail                                                      |
+| ------------------ | ----------------------------------------------------------- |
+| Event title        | Bold white, wraps to multiple lines                         |
+| Time range         | `HH:mm – HH:mm`                                             |
+| Duration           | e.g. `1h 30m`                                               |
 | Open in Calendar → | Opens the event in Google Calendar (day view for that date) |
 
 ---
@@ -167,9 +166,9 @@ calendar-blocker/
 
 All settings are stored in `UserDefaults` and configured via the menu bar. No config files or environment variables needed.
 
-| Setting | Default | Where to change |
-|---|---|---|
-| iCal URLs | — (one per line) | Menu bar → Set Calendar URLs… |
-| Poll interval | 30 s | Menu bar → Check every |
-| Warning threshold | 10 min | Menu bar → Remind me |
-| Sound | On | Menu bar → Sound |
+| Setting           | Default          | Where to change               |
+| ----------------- | ---------------- | ----------------------------- |
+| iCal URLs         | — (one per line) | Menu bar → Set Calendar URLs… |
+| Poll interval     | 30 s             | Menu bar → Check every        |
+| Warning threshold | 10 min           | Menu bar → Remind me          |
+| Sound             | On               | Menu bar → Sound              |
