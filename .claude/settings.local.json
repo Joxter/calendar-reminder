@@ -5,7 +5,10 @@
       "Bash(uv init *)",
       "Bash(uv add *)",
       "Bash(uv run *)",
-      "Bash(swift build *)"
+      "Bash(swift build *)",
+      "Bash(npx tsc *)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(npm run *)"
     ]
   }
 }

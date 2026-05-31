@@ -3,7 +3,8 @@
 // buildSelectedContent / buildAllClear. Styling lives in index.html.
 
 import { CalEvent } from './model'
-import { accentColor, countdownText, durString, hhmm, startsInSeconds, durationSeconds } from './layout'
+import { accentColor, countdownText, durString, startsInSeconds, durationSeconds } from './layout';
+import { hhmm } from './utils';
 
 export interface LeftColumnProps {
   selected: CalEvent | null // top slot — filled on timeline click

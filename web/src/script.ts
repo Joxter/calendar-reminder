@@ -6,8 +6,6 @@ import { CalEvent, buildMockEvents, mockEventDefs } from "./model";
 import {
   computeVisible,
   rowAt,
-  startOfDay,
-  pad2,
   timeMap,
   timelineWidth,
   timelineHeight,
@@ -20,9 +18,10 @@ import {
   dateHeaderTop,
   dateHeaderH,
   dateHeaderGap,
+  renderTimeline,
 } from "./layout";
+import { startOfDay, pad2 } from "./utils";
 import { CanvasDrawCtx } from "./canvas";
-import { renderTimeline } from "./timeline";
 import { renderLeftColumn } from "./leftColumn";
 
 // MARK: - Debug log
