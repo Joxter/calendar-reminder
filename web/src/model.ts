@@ -23,27 +23,29 @@ export function durationSeconds(ev: CalEvent): number {
 export interface MockEventDef {
   id: string
   title: string
-  offsetMinutes: number // minutes from `now`; negative = already started
+  startMinute: number // absolute minute of the day (0..1439)
   durationMinutes: number
 }
 
+const hm = (h: number, m = 0) => h * 60 + m // minute-of-day helper
+
 export const mockEventDefs: MockEventDef[] = [
-  { id: 'very_long', title: 'very long event with very long name, probably some broken import from another systems', offsetMinutes: 90, durationMinutes: 180 },
-  { id: 'inprogress', title: 'All-hands', offsetMinutes: -20, durationMinutes: 60 },
-  { id: 'verysoon', title: 'Standup', offsetMinutes: 1, durationMinutes: 15 },
-  { id: 'soon', title: 'Design Review', offsetMinutes: 8, durationMinutes: 60 },
-  { id: 'upcoming', title: 'Lunch', offsetMinutes: 30, durationMinutes: 60 },
-  { id: 'overlap1', title: 'Sprint Planning', offsetMinutes: 65, durationMinutes: 60 },
-  { id: 'overlap2', title: 'Retrospective', offsetMinutes: 90, durationMinutes: 60 },
-  { id: 'later', title: '1:1 with Manager', offsetMinutes: 160, durationMinutes: 30 },
+  { id: 'verysoon', title: 'Standup', startMinute: hm(9, 0), durationMinutes: 15 },
+  { id: 'inprogress', title: 'All-hands', startMinute: hm(9, 30), durationMinutes: 60 },
+  { id: 'soon', title: 'Design Review', startMinute: hm(11, 0), durationMinutes: 60 },
+  { id: 'upcoming', title: 'Lunch', startMinute: hm(12, 30), durationMinutes: 60 },
+  { id: 'overlap1', title: 'Sprint Planning', startMinute: hm(14, 0), durationMinutes: 60 },
+  { id: 'overlap2', title: 'Retrospective', startMinute: hm(14, 30), durationMinutes: 60 },
+  { id: 'later', title: '1:1 with Manager', startMinute: hm(16, 0), durationMinutes: 30 },
+  { id: 'very_long', title: 'very long event with very long name, probably some broken import from another systems', startMinute: hm(17, 0), durationMinutes: 180 },
 ]
 
-/// Builds CalEvents for the enabled mock ids, relative to `now`, sorted by start.
-export function buildMockEvents(enabledIds: Set<string>, now: Date): CalEvent[] {
+/// Builds CalEvents for the enabled mock ids on `day` (start-of-day), sorted by start.
+export function buildMockEvents(enabledIds: Set<string>, day: Date): CalEvent[] {
   return mockEventDefs
     .filter((d) => enabledIds.has(d.id))
     .map((d) => {
-      const start = new Date(now.getTime() + d.offsetMinutes * 60_000)
+      const start = new Date(day.getTime() + d.startMinute * 60_000)
       const end = new Date(start.getTime() + d.durationMinutes * 60_000)
       return {
         title: d.title,
