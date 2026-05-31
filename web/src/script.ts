@@ -8,7 +8,10 @@ import {
   rowAt,
   startOfDay,
   pad2,
-  winW,
+  timeMap,
+  timelineWidth,
+  timelineHeight,
+  windowWidth,
   winContentH,
   leftW,
   leftColPad,
@@ -17,8 +20,6 @@ import {
   dateHeaderTop,
   dateHeaderH,
   dateHeaderGap,
-  timelineW,
-  timelineH,
 } from "./layout";
 import { CanvasDrawCtx } from "./canvas";
 import { renderTimeline } from "./timeline";
@@ -108,6 +109,21 @@ function render() {
   const now = simulatedNow();
   const vis = computeVisible(state.events, now);
 
+  // Recompute canvas dimensions from event data each render.
+  const { rs, re } = timeMap(vis.visible, now);
+  const tlW = timelineWidth(rs, re);
+  const tlH = timelineHeight(vis.visible.length);
+
+  // Resize DOM elements to fit content.
+  const winEl = document.getElementById("window")!;
+  const rightColH = dateHeaderTop + dateHeaderH + dateHeaderGap + tlH + rightColPad;
+  const winH = Math.max(winContentH, rightColH);
+  winEl.style.width = `${windowWidth(tlW)}px`;
+  winEl.style.height = `${winH}px`;
+  canvasEl.style.width = `${tlW}px`;
+  canvasEl.style.height = `${tlH}px`;
+  ctx.setupHiDPI();
+
   dateEl.textContent = dateFmt.format(now);
   renderLeftColumn(leftEl, { selected: state.selected, next: vis.next, now });
 
@@ -116,16 +132,13 @@ function render() {
     events: vis.visible,
     focused: state.selected,
     now,
-    width: timelineW,
-    height: timelineH,
+    width: tlW,
+    height: tlH,
   });
 }
 
-// MARK: - Window dimensions (single source of truth = layout.ts)
-function applyDimensions() {
-  const win = document.getElementById("window")!;
-  win.style.width = `${winW}px`;
-  win.style.height = `${winContentH}px`;
+// MARK: - Window dimensions (static parts only; dynamic parts set in render())
+function applyStaticDimensions() {
 
   leftEl.style.width = `${leftW}px`;
   leftEl.style.padding = `${winVPad}px ${leftColPad}px`;
@@ -134,8 +147,6 @@ function applyDimensions() {
   dateEl.style.height = `${dateHeaderH}px`;
   dateEl.style.fontSize = `15px`;
 
-  canvasEl.style.width = `${timelineW}px`;
-  canvasEl.style.height = `${timelineH}px`;
   canvasEl.style.marginLeft = `${rightColPad}px`;
 }
 
@@ -213,7 +224,7 @@ function init() {
   dateEl = document.getElementById("date-header")!;
   canvasEl = document.getElementById("timeline") as HTMLCanvasElement;
 
-  applyDimensions();
+  applyStaticDimensions();
   ctx = new CanvasDrawCtx(canvasEl);
 
   buildMockControls();

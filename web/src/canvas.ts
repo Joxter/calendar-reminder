@@ -33,8 +33,10 @@ class CanvasPath implements Path {
     return this
   }
   arc(cx: number, cy: number, r: number, startDeg: number, endDeg: number, clockwise: boolean): Path {
-    // Both NSBezierPath (flipped view) and Canvas use a y-down system, so the
-    // degree values carry over directly; clockwise maps to !counterclockwise.
+    // Canvas arc: anticlockwise=true means decreasing angle (short path from start to end).
+    // clockwise=true here means we want the short increasing-angle path, so anticlockwise=false.
+    // Swift port note: in a flipped NSBezierPath, clockwise:false produces the same short arc
+    // (the flipped view reverses the sweep direction relative to the DrawCtx convention).
     this.ctx.arc(cx, cy, r, startDeg * DEG, endDeg * DEG, !clockwise)
     return this
   }

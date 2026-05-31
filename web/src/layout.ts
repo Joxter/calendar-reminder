@@ -26,8 +26,6 @@ export const palette = {
 // MARK: - Layout constants (from ReminderWindow.swift)
 export const axisH = 20
 export const badgeH = 16
-export const lPad = 10
-export const rPad = 10
 
 export const timelineFontSize = 13
 export const rowH = timelineFontSize + 10 // 23
@@ -44,13 +42,22 @@ export const dateHeaderTop = 9
 export const dateHeaderGap = 6
 
 export const maxTimelineTitleW = 240
+// Events starting at or after this hour get the title drawn to the LEFT of the start marker.
+export const titleLeftThresholdHour = 13
 
 export const leftPanelTitleFontSz = 15
 export const leftPanelMaxTitleLines = 2
 
-export const winW = 720
 export const leftW = 210
 export const urgentThreshold = 120 // seconds
+
+// MARK: - Timeline geometry knobs
+export const pxPerHour = 40                              // fixed horizontal scale
+export const defaultHourRange: [number, number] = [8, 20] // guaranteed visible hours
+export const axisPaddingMin = 30                          // extra minutes before first / after last event
+export const timelinePadL = 10                            // px — left axis inset
+export const timelinePadR = 10                            // px — right axis inset
+export const timelineMinHeight = 80                       // px — canvas never shorter than this
 
 // MARK: - Font-metric approximation
 // AppKit derives slot heights from real font metrics; on the web we approximate
@@ -72,12 +79,7 @@ export const nextSlotH = nextLblLineH + leftPanelTitleMaxH + 1 + timerLineH
 // Constant window content height — both slots always reserved.
 export const winContentH = winVPad + selectedSlotH + panelGap + nextSlotH + winVPad
 
-// Right column geometry.
-export const rightW = winW - leftW
-// Timeline canvas height = right column minus the date header band and bottom pad.
-export const timelineH = winContentH - dateHeaderTop - dateHeaderH - dateHeaderGap - rightColPad
-// Timeline canvas width = right column minus its insets.
-export const timelineW = rightW - rightColPad * 2
+// winW and timeline dimensions are now dynamic — see computeTimelineDimensions().
 
 // MARK: - Date helpers
 export function startOfDay(d: Date): Date {
@@ -163,24 +165,50 @@ export interface TimeMap {
   t2x: (t: Date) => number
 }
 
-/// Window is at least 08:00–20:00, extended to fit events, capped at 03:00 next day.
-export function timeMap(events: CalEvent[], now: Date, width: number): TimeMap {
-  const barW = width - lPad - rPad
-  let rs = setHour(now, 8)
-  let re = setHour(now, 20)
-  if (events.length > 0) {
-    rs = new Date(Math.min(rs.getTime(), floorToMinute(events[0].start).getTime()))
-    re = new Date(Math.max(re.getTime(), floorToMinute(events[events.length - 1].end).getTime()))
-  }
-  const cap3am = addHours(startOfDay(now), 27)
-  re = new Date(Math.min(re.getTime(), cap3am.getTime()))
+const pxPerMin = pxPerHour / 60
 
-  const totSecs = Math.max((re.getTime() - rs.getTime()) / 1000, 1)
-  const t2x = (t: Date) => {
-    const frac = (t.getTime() - rs.getTime()) / 1000 / totSecs
-    return lPad + Math.max(0, Math.min(barW, frac * barW))
+/// Computes the visible time range and a t→x function based on fixed pxPerHour scale.
+/// Range is at least defaultHourRange, extended by axisPaddingMin on each side to
+/// cover all event starts/ends.
+export function timeMap(events: CalEvent[], now: Date): TimeMap {
+  let rs = setHour(now, defaultHourRange[0])
+  let re = setHour(now, defaultHourRange[1])
+
+  if (events.length > 0) {
+    const paddingMs = axisPaddingMin * 60_000
+    const earliest = new Date(events[0].start.getTime() - paddingMs)
+    const latest   = new Date(events[events.length - 1].end.getTime() + paddingMs)
+    rs = new Date(Math.min(rs.getTime(), earliest.getTime()))
+    re = new Date(Math.max(re.getTime(), latest.getTime()))
   }
+
+  // Snap to whole hours for clean gridlines.
+  rs = setHour(now, Math.floor((rs.getTime() - startOfDay(now).getTime()) / 3_600_000))
+  re = addHours(setHour(now, Math.ceil((re.getTime() - startOfDay(now).getTime()) / 3_600_000)), 0)
+
+  // Cap at 03:00 next day.
+  re = new Date(Math.min(re.getTime(), addHours(startOfDay(now), 27).getTime()))
+
+  const t2x = (t: Date) =>
+    timelinePadL + (t.getTime() - rs.getTime()) / 60_000 * pxPerMin
+
   return { rs, re, t2x }
+}
+
+/// Timeline canvas width derived from the time range.
+export function timelineWidth(rs: Date, re: Date): number {
+  const minutes = (re.getTime() - rs.getTime()) / 60_000
+  return timelinePadL + minutes * pxPerMin + timelinePadR
+}
+
+/// Timeline canvas height derived from event count.
+export function timelineHeight(eventCount: number): number {
+  return Math.max(timelineMinHeight, axisH + eventCount * rowH + axisH)
+}
+
+/// Full window width = left column + right padding + timeline.
+export function windowWidth(tlWidth: number): number {
+  return leftW + rightColPad * 2 + tlWidth
 }
 
 /// Hour gridline timestamps spanning [rs, re].

@@ -31,6 +31,12 @@ const hm = (h: number, m = 0) => h * 60 + m; // minute-of-day helper
 
 export const mockEventDefs: MockEventDef[] = [
   {
+    id: "Crazy early",
+    title: "Crazy early",
+    startMinute: hm(2, 30),
+    durationMinutes: 42,
+  },
+  {
     id: "Standup",
     title: "Standup",
     startMinute: hm(9, 30),
@@ -60,6 +66,12 @@ export const mockEventDefs: MockEventDef[] = [
     startMinute: hm(12, 9),
     durationMinutes: 60,
   },
+  { id: "ex1", title: "ex1", startMinute: hm(13, 0), durationMinutes: 15 },
+  { id: "ex2", title: "ex2", startMinute: hm(13, 0), durationMinutes: 15 },
+  { id: "ex3", title: "ex3", startMinute: hm(13, 0), durationMinutes: 15 },
+  { id: "ex4", title: "ex4", startMinute: hm(13, 0), durationMinutes: 15 },
+  { id: "ex5", title: "ex5", startMinute: hm(13, 0), durationMinutes: 15 },
+  { id: "ex6", title: "ex6", startMinute: hm(13, 0), durationMinutes: 15 },
   {
     id: "very long event with very long name, probably some broken import from another systems",
     title:
