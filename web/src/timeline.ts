@@ -11,9 +11,7 @@ import {
 } from './layout'
 
 export interface TimelineProps {
-  events: CalEvent[] // visible events (already trimmed)
-  hiddenPast: number
-  hiddenFuture: number
+  events: CalEvent[] // all of today's events, in order
   focused: CalEvent | null
   now: Date
   width: number
@@ -37,7 +35,6 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
   const { events, now, width: w, height } = p
   if (events.length === 0) return
 
-  const rowOffset = p.hiddenPast > 0 ? 1 : 0
   const { rs, re, t2x } = timeMap(events, now, w)
   const bottomY = height - axisH - 18 // top of bottom label band
 
@@ -85,7 +82,7 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
 
   const layouts: EvLayout[] = []
   events.forEach((ev, i) => {
-    const cy = axisH + (i + rowOffset) * rowH + rowH / 2
+    const cy = axisH + i * rowH + rowH / 2
     const x1 = t2x(ev.start)
     const x2 = t2x(ev.end)
     const done = ev.end <= now
@@ -155,14 +152,4 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
     const shown = truncate(ctx, l.titleStr, l.titleFont, l.titleRect.w)
     ctx.fillText(shown, l.titleRect.x, l.titleRect.y, l.titleFont, l.titleColor)
   }
-
-  // "+N more" collapse rows.
-  const moreFont = font(timelineFontSize - 1, 'regular')
-  const drawMore = (text: string, row: number) => {
-    const cy = axisH + row * rowH + rowH / 2
-    const sz = ctx.measureText(text, moreFont)
-    ctx.fillText(text, lPad, cy - sz.height / 2, moreFont, palette.tertiaryLabel)
-  }
-  if (p.hiddenPast > 0) drawMore(`+${p.hiddenPast} earlier`, 0)
-  if (p.hiddenFuture > 0) drawMore(`+${p.hiddenFuture} more`, rowOffset + events.length)
 }

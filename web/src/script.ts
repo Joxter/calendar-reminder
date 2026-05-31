@@ -39,14 +39,26 @@ const debugLog = {
 };
 
 // MARK: - State
-const DEFAULT_ENABLED = [
-  "inprogress",
-  "soon",
-  "upcoming",
-  "overlap1",
-  "later",
-  "very_long",
-];
+const ALL_IDS = mockEventDefs.map((d) => d.id);
+const STORAGE_KEY = "cb.enabledEvents";
+
+/// Persisted set of enabled mock-event ids (falls back to "all enabled").
+function loadEnabled(): Set<string> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const ids = JSON.parse(raw) as string[];
+      return new Set(ids.filter((id) => ALL_IDS.includes(id))); // drop stale ids
+    }
+  } catch {
+    /* ignore corrupt storage */
+  }
+  return new Set(ALL_IDS);
+}
+
+function saveEnabled() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...state.enabled]));
+}
 
 function nowMinuteOfDay(): number {
   const d = new Date();
@@ -54,7 +66,7 @@ function nowMinuteOfDay(): number {
 }
 
 const state = {
-  enabled: new Set<string>(DEFAULT_ENABLED),
+  enabled: loadEnabled(),
   minuteOfDay: nowMinuteOfDay(), // simulated time-of-day (0..1439), absolute
   events: [] as CalEvent[],
   selected: null as CalEvent | null,
@@ -102,8 +114,6 @@ function render() {
   ctx.clear();
   renderTimeline(ctx, {
     events: vis.visible,
-    hiddenPast: vis.hiddenPast,
-    hiddenFuture: vis.hiddenFuture,
     focused: state.selected,
     now,
     width: timelineW,
@@ -142,6 +152,7 @@ function buildMockControls() {
     cb.addEventListener("change", () => {
       if (cb.checked) state.enabled.add(def.id);
       else state.enabled.delete(def.id);
+      saveEnabled();
       debugLog.log(`${cb.checked ? "enabled" : "disabled"} "${def.id}"`);
       rebuildEvents();
     });
@@ -168,7 +179,8 @@ function wireTimeControls() {
   });
 
   document.getElementById("reset-btn")!.addEventListener("click", () => {
-    state.enabled = new Set(DEFAULT_ENABLED);
+    state.enabled = new Set(ALL_IDS);
+    saveEnabled();
     for (const def of mockEventDefs) {
       (document.getElementById(`mock-${def.id}`) as HTMLInputElement).checked =
         state.enabled.has(def.id);
@@ -187,7 +199,7 @@ function wireCanvasSelection() {
     const y = e.clientY - rect.top;
     const now = simulatedNow();
     const vis = computeVisible(state.events, now);
-    const row = rowAt(y, vis.rowOffset, vis.visible.length);
+    const row = rowAt(y, vis.visible.length);
     if (row == null) return;
     const ev = vis.visible[row];
     state.selected = state.selected === ev ? null : ev; // toggle

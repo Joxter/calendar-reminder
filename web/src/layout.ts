@@ -44,7 +44,6 @@ export const dateHeaderTop = 9
 export const dateHeaderGap = 6
 
 export const maxTimelineTitleW = 240
-export const maxPastVisible = 2
 
 export const leftPanelTitleFontSz = 15
 export const leftPanelMaxTitleLines = 2
@@ -80,14 +79,14 @@ export const timelineH = winContentH - dateHeaderTop - dateHeaderH - dateHeaderG
 // Timeline canvas width = right column minus its insets.
 export const timelineW = rightW - rightColPad * 2
 
-// Rows that fit in the grid (top axis strip + bottom label strip removed).
-export const maxTimelineRows = Math.max(1, Math.floor((timelineH - 2 * axisH) / rowH))
-
 // MARK: - Date helpers
 export function startOfDay(d: Date): Date {
   const r = new Date(d)
   r.setHours(0, 0, 0, 0)
   return r
+}
+export function sameDay(a: Date, b: Date): boolean {
+  return startOfDay(a).getTime() === startOfDay(b).getTime()
 }
 export function setHour(d: Date, h: number): Date {
   const r = new Date(d)
@@ -140,37 +139,19 @@ export function accentColor(next: CalEvent | null, now: Date): string {
   return startsInSeconds(next, now) <= urgentThreshold ? palette.accentInProgress : palette.accentSoon
 }
 
-// MARK: - Visibility trimming (mirrors ReminderWindow.init)
+// MARK: - Day selection
 
 export interface VisibleEvents {
-  visible: CalEvent[]  // shownPast + shownFuture, in order
-  hiddenPast: number
-  hiddenFuture: number
-  next: CalEvent | null
-  rowOffset: number    // 1 when a "+N earlier" row occupies row 0
+  visible: CalEvent[]      // every event starting on `now`'s day, in order
+  next: CalEvent | null    // first not-yet-ended event (drives the left column)
 }
 
+/// All events that start today — no trimming, no collapse rows.
 export function computeVisible(all: CalEvent[], now: Date, triggering: CalEvent | null = null): VisibleEvents {
-  const past = all.filter((e) => e.end <= now)
-  const future = all.filter((e) => e.end > now)
-
-  const shownPast = past.slice(Math.max(0, past.length - maxPastVisible))
-  const hp = past.length - shownPast.length
-
-  const budget = Math.max(0, maxTimelineRows - (hp > 0 ? 1 : 0) - shownPast.length)
-  let shownFuture = future
-  let hf = 0
-  if (future.length > budget) {
-    shownFuture = future.slice(0, Math.max(0, budget - 1)) // reserve a row for "+N more"
-    hf = future.length - shownFuture.length
-  }
-
+  const visible = all.filter((e) => sameDay(e.start, now))
   return {
-    visible: [...shownPast, ...shownFuture],
-    hiddenPast: hp,
-    hiddenFuture: hf,
-    next: triggering ?? future[0] ?? null,
-    rowOffset: hp > 0 ? 1 : 0,
+    visible,
+    next: triggering ?? visible.find((e) => e.end > now) ?? null,
   }
 }
 
@@ -213,9 +194,9 @@ export function hourGridlines(rs: Date, re: Date): Date[] {
   return out
 }
 
-/// Hit-test a click at canvas y to a visible-event index (mirrors mouseDown).
-export function rowAt(y: number, rowOffset: number, count: number): number | null {
-  const row = Math.floor((y - axisH) / rowH) - rowOffset
+/// Hit-test a click at canvas y to an event index (mirrors mouseDown).
+export function rowAt(y: number, count: number): number | null {
+  const row = Math.floor((y - axisH) / rowH)
   if (row < 0 || row >= count) return null
   return row
 }
