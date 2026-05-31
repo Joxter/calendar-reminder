@@ -2,7 +2,6 @@ import AppKit
 
 // MARK: - Urgency accent colors
 private let accentInProgress = NSColor(hex: "#dc2626")  // red
-private let accentImminent   = NSColor(hex: "#7c3aed")  // purple
 private let accentSoon       = NSColor(hex: "#2563eb")  // blue
 
 // MARK: - Layout constants
@@ -62,7 +61,7 @@ private let rPad: CGFloat   = 10
 private let timelineFontSize: CGFloat = 13
 private var rowH: CGFloat { timelineFontSize + 10 }   // 23px at default font size
 
-// Left panel spacing
+// Left column spacing
 private let gapNextToTitle: CGFloat  =  0   // "NEXT" label to event title
 private let gapTitleToTimer: CGFloat = -1   // event title to countdown (slight visual tuck)
 
@@ -70,13 +69,23 @@ private let gapTitleToTimer: CGFloat = -1   // event title to countdown (slight 
 private let shapeStrokeW: CGFloat  = 2   // stroke thickness
 private let shapeCornerR: CGFloat  = 4   // corner radius (0 = sharp, max = badgeH/2 = 8)
 
-private let maxWinH:    CGFloat = 400
-private let minWinH:    CGFloat = 230   // no NEXT event (placeholder only)
-private let winOverhead: CGFloat = 58   // space from window top/bottom to timeline view edges
-private let panelGap:   CGFloat = 16   // breathing room between detail and NEXT panels
-private let maxTimelineTitleW: CGFloat = 240
+// Window padding — separate knobs for the two columns.
+private let leftColPad:  CGFloat = 16   // inset inside the left column
+private let rightColPad: CGFloat = 4    // inset inside the right (timeline) column
+private let winVPad:     CGFloat = 16   // top & bottom padding of window content (left column)
+private let panelGap:    CGFloat = 16   // gap between the selected-event and next-event slots
+private let dateHeaderH:   CGFloat = 22  // right-column date header height
+private let dateHeaderTop: CGFloat = 9   // top inset above the date header
+private let dateHeaderGap: CGFloat = 6   // gap between date header and timeline
 
-private var maxTimelineRows: Int { Int((maxWinH - winOverhead - 2 * axisH) / rowH) }
+private let maxTimelineTitleW: CGFloat = 240
+private let maxPastVisible: Int = 2      // past events shown before collapsing into "+N more"
+
+// Left-column accent: blue by default, red when next event is < urgentThreshold away.
+private let accentDefault = accentSoon         // blue  (#2563eb)
+private let accentUrgent  = accentInProgress   // red   (#dc2626)
+private let accentNone    = NSColor(hex: "#475569")  // neutral gray (no next event)
+private let urgentThreshold: TimeInterval = 120
 
 // Left-panel title fields — 2 lines max.
 // NSTextField.maximumNumberOfLines does NOT cap Auto Layout intrinsic content size in
@@ -88,7 +97,7 @@ private var leftPanelTitleMaxH: CGFloat {
     return ceil(f.ascender - f.descender + f.leading) * CGFloat(leftPanelMaxTitleLines) + 4
 }
 
-// Heights derived from font metrics for left-panel window sizing.
+// Heights derived from font metrics for left-column window sizing.
 private var timerLineH: CGFloat {
     let f = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
     return ceil(f.ascender - f.descender + f.leading)
@@ -97,23 +106,16 @@ private var nextLblLineH: CGFloat { ceil(NSFont.boldSystemFont(ofSize: 9).boundi
 private var infoLineH:    CGFloat { ceil(NSFont.systemFont(ofSize: 11).boundingRectForFont.height) }
 private var calLblLineH:  CGFloat { ceil(NSFont.systemFont(ofSize: 10, weight: .medium).boundingRectForFont.height) }
 
-// detail panel: topPad + calLabel + calGap + title + infoGap + info + botPad
-private var detailPanelH: CGFloat { 16 + calLblLineH + 4 + leftPanelTitleMaxH + 6 + infoLineH + 16 }
-// NEXT stack: botPad + timer + 1pt tuck + title + nextLabel
-private var nextStackH:   CGFloat { 16 + timerLineH + 1 + leftPanelTitleMaxH + nextLblLineH }
-// min window height when NEXT event is present (two panels must fit without overlap)
-private var minWinHWithEvent: CGFloat { detailPanelH + panelGap + nextStackH }
-
-// MARK: - Urgency
-
-private func urgency(_ event: CalEvent) -> (String, NSColor) {
-    let secs = event.startsInSeconds
-    if secs <= 0   { return ("IN PROGRESS",                     accentInProgress) }
-    if secs <= 120 {
-        let m = Int(secs) / 60, s = Int(secs) % 60
-        return ("STARTING IN \(m)m \(s)s",                      accentImminent)
-    }
-    return ("STARTING IN \(Int(secs) / 60) MIN",                accentSoon)
+// Selected-event slot (top): calLabel + calGap + title + infoGap + info
+private var selectedSlotH: CGFloat { calLblLineH + 4 + leftPanelTitleMaxH + 6 + infoLineH }
+// Next-event slot (bottom): nextLabel + title + 1pt tuck + timer
+private var nextSlotH:     CGFloat { nextLblLineH + leftPanelTitleMaxH + 1 + timerLineH }
+// Constant window content height: both slots always reserved, regardless of events.
+private var winContentH:   CGFloat { winVPad + selectedSlotH + panelGap + nextSlotH + winVPad }
+// Rows that fit in the right column's grid given the fixed window height.
+private var maxTimelineRows: Int {
+    let gridH = winContentH - dateHeaderTop - dateHeaderH - dateHeaderGap - rightColPad - 2 * axisH
+    return max(1, Int(gridH / rowH))
 }
 
 /// Formats a duration in minutes as "Xh Ym", capped at 23:59 (1439 min).
@@ -124,12 +126,30 @@ private func durString(minutes rawMin: Int) -> String {
     return h > 0 ? (rem > 0 ? "\(h)h \(rem)m" : "\(h)h") : "\(rem)m"
 }
 
+/// Left-column accent: gray when no next event, red when imminent, blue otherwise.
+private func accentColor(for next: CalEvent?) -> NSColor {
+    guard let next else { return accentNone }
+    return next.startsInSeconds <= urgentThreshold ? accentUrgent : accentDefault
+}
+
+/// Countdown string: "H:MM" when ≥ 1h away, "MM:SS" otherwise, "NOW" once started.
+private func countdownText(_ rawSecs: TimeInterval) -> String {
+    let secs = max(0, rawSecs)
+    guard secs > 0 else { return "NOW" }
+    let totalMin = Int(secs) / 60
+    if totalMin >= 60 {
+        return String(format: "%d:%02d", totalMin / 60, totalMin % 60)
+    }
+    return String(format: "%02d:%02d", totalMin, Int(secs) % 60)
+}
+
 
 // MARK: - Timeline View
 
 final class TimelineView: NSView {
-    var todayEvents: [CalEvent] = []
-    var hiddenCount: Int = 0
+    var todayEvents: [CalEvent] = []   // visible events only (already trimmed)
+    var hiddenPast: Int = 0            // collapsed past events ("+N more" row at top)
+    var hiddenFuture: Int = 0          // collapsed future events ("+N more" row at bottom)
     var focused: CalEvent?
     var accent: NSColor = .systemBlue
     var onEventSelected: ((CalEvent) -> Void)?
@@ -137,16 +157,19 @@ final class TimelineView: NSView {
     // y=0 at top, increasing downward — matches Python/tkinter exactly
     override var isFlipped: Bool { true }
 
+    // Event rows are pushed down by one when a "+N more" past row occupies row 0.
+    private var rowOffset: Int { hiddenPast > 0 ? 1 : 0 }
+
     override func mouseDown(with event: NSEvent) {
         let loc = convert(event.locationInWindow, from: nil)
-        let row = Int((loc.y - axisH) / rowH)
+        let row = Int((loc.y - axisH) / rowH) - rowOffset
         guard row >= 0, row < todayEvents.count else { return }
         onEventSelected?(todayEvents[row])
     }
 
     override func resetCursorRects() {
         for i in todayEvents.indices {
-            let y = axisH + CGFloat(i) * rowH
+            let y = axisH + CGFloat(i + rowOffset) * rowH
             addCursorRect(NSRect(x: 0, y: y, width: bounds.width, height: rowH), cursor: .pointingHand)
         }
     }
@@ -165,13 +188,16 @@ final class TimelineView: NSView {
 
         let cal = Calendar.current
         var rs = cal.date(bySettingHour: 8,  minute: 0, second: 0, of: now)!
-        var re = cal.date(bySettingHour: 18, minute: 0, second: 0, of: now)!
+        var re = cal.date(bySettingHour: 20, minute: 0, second: 0, of: now)!
         if let first = todayEvents.first {
             rs = min(rs, cal.date(bySetting: .minute, value: 0, of: first.start)!)
         }
         if let last = todayEvents.last {
             re = max(re, cal.date(bySetting: .minute, value: 0, of: last.end)!)
         }
+        // Never extend past 3:00 the morning after the displayed day.
+        let cap3am = cal.date(byAdding: .hour, value: 27, to: cal.startOfDay(for: now))!
+        re = min(re, cap3am)
 
         let totSecs = max(re.timeIntervalSince(rs), 1)
         func t2x(_ t: Date) -> CGFloat {
@@ -246,7 +272,7 @@ final class TimelineView: NSView {
         }
         var layouts: [EvLayout] = []
         for (i, ev) in todayEvents.enumerated() {
-            let cy = axisH + CGFloat(i) * rowH + rowH / 2
+            let cy = axisH + CGFloat(i + rowOffset) * rowH + rowH / 2
             let x1 = t2x(ev.start), x2 = t2x(ev.end)
             let done      = ev.end   <= now
             let isFocused = focused == ev
@@ -330,16 +356,22 @@ final class TimelineView: NSView {
             l.titleStr.draw(in: l.titleRect, withAttributes: l.titleAttrs)
         }
 
-        // "+N more" footer row when events were trimmed
-        if hiddenCount > 0 {
-            let footerCy = axisH + CGFloat(todayEvents.count) * rowH + rowH / 2
-            let moreStr  = "+\(hiddenCount) more" as NSString
-            let moreAttrs: [NSAttributedString.Key: Any] = [
-                .font:            NSFont.systemFont(ofSize: timelineFontSize - 1),
-                .foregroundColor: NSColor.tertiaryLabelColor,
-            ]
-            let moreSz = moreStr.size(withAttributes: moreAttrs)
-            moreStr.draw(at: NSPoint(x: lPad, y: footerCy - moreSz.height / 2), withAttributes: moreAttrs)
+        // "+N more" collapse rows: past at the top (row 0), future at the bottom.
+        let moreAttrs: [NSAttributedString.Key: Any] = [
+            .font:            NSFont.systemFont(ofSize: timelineFontSize - 1),
+            .foregroundColor: NSColor.tertiaryLabelColor,
+        ]
+        func drawMore(_ text: String, atRow row: Int) {
+            let cy  = axisH + CGFloat(row) * rowH + rowH / 2
+            let str = text as NSString
+            let sz  = str.size(withAttributes: moreAttrs)
+            str.draw(at: NSPoint(x: lPad, y: cy - sz.height / 2), withAttributes: moreAttrs)
+        }
+        if hiddenPast > 0 {
+            drawMore("+\(hiddenPast) earlier", atRow: 0)
+        }
+        if hiddenFuture > 0 {
+            drawMore("+\(hiddenFuture) more", atRow: rowOffset + todayEvents.count)
         }
     }
 }
@@ -347,38 +379,48 @@ final class TimelineView: NSView {
 // MARK: - Reminder Window
 
 final class ReminderWindow: NSWindow {
-    private let event: CalEvent?
-    private let todayEvents: [CalEvent]
-    private let hiddenEventCount: Int
+    private let event: CalEvent?          // triggering event (nil = opened without a reminder)
+    private let nextEvent: CalEvent?      // event shown in the bottom slot / drives the countdown + color
+    private let todayEvents: [CalEvent]   // visible timeline events (already trimmed)
+    private let hiddenPast: Int
+    private let hiddenFuture: Int
 
     private var countdownField: NSTextField?
-    private var countdownColor = NSColor.white
     private var colonVisible   = true
     private var tickTimer: Timer?
 
     private var leftColumn: NSView?
     private var timelineView: TimelineView?
-    private var detailContainer: NSView?
+    private var selectedSlot: NSView?     // top slot — filled on timeline click
+    private var nextSlotView: NSView?     // bottom slot — next event
     private var selectedEvent: CalEvent?
-    private var accentColor: NSColor = NSColor(hex: "#475569")
 
     init(event: CalEvent?, todayEvents allEvents: [CalEvent]) {
         self.event = event
-        // Cap visible rows; if overflow exists, replace the last visible slot with the "+N more" footer.
-        let cap = maxTimelineRows
-        if allEvents.count > cap {
-            self.todayEvents      = Array(allEvents.prefix(cap - 1))
-            self.hiddenEventCount = allEvents.count - (cap - 1)
-        } else {
-            self.todayEvents      = allEvents
-            self.hiddenEventCount = 0
-        }
-        let visibleRows = todayEvents.count + (hiddenEventCount > 0 ? 1 : 0)
+        let now = Config.now
 
-        let accent: NSColor = event.map { urgency($0).1 } ?? NSColor(hex: "#475569")
-        let activeMinH = event != nil ? minWinHWithEvent : minWinH
-        let timelineH  = axisH + CGFloat(max(visibleRows, 1)) * rowH + axisH
-        let winH       = min(maxWinH, max(activeMinH, timelineH + winOverhead - 4) + 4)
+        // Split into past (ended) and current/future, then trim each side with a collapse row.
+        let past   = allEvents.filter { $0.end <= now }
+        let future = allEvents.filter { $0.end >  now }
+
+        let shownPast = Array(past.suffix(maxPastVisible))
+        let hp        = past.count - shownPast.count
+
+        let budget = max(0, maxTimelineRows - (hp > 0 ? 1 : 0) - shownPast.count)
+        var shownFuture = future
+        var hf = 0
+        if future.count > budget {
+            shownFuture = Array(future.prefix(max(0, budget - 1)))  // reserve a row for "+N more"
+            hf = future.count - shownFuture.count
+        }
+
+        self.todayEvents  = shownPast + shownFuture
+        self.hiddenPast   = hp
+        self.hiddenFuture = hf
+        self.nextEvent    = event ?? future.first
+
+        let accent = accentColor(for: nextEvent)
+        let winH   = winContentH
         let winW: CGFloat = 720
         let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
         let origin = NSPoint(x: (screenFrame.width - winW) / 2, y: (screenFrame.height - winH) / 2)
@@ -396,10 +438,8 @@ final class ReminderWindow: NSWindow {
         isMovableByWindowBackground = true
 
         buildUI(accent: accent)
-        if event != nil {
-            if Config.soundEnabled { NSSound.playSystemSound("Glass") }
-            startTickTimer()
-        }
+        if event != nil, Config.soundEnabled { NSSound.playSystemSound("Glass") }
+        if nextEvent != nil { startTickTimer() }
     }
 
     // MARK: - UI
@@ -438,107 +478,95 @@ final class ReminderWindow: NSWindow {
             right.bottomAnchor.constraint(equalTo: root.bottomAnchor),
         ])
 
-        self.leftColumn  = left
-        self.accentColor = accent
+        self.leftColumn = left
 
-        if let event = event {
-            buildLeftEvent(in: left, accent: accent, event: event)
-        } else {
-            buildLeftPlaceholder(in: left)
-        }
+        buildLeftSlots(in: left)
         buildRight(in: right, accent: accent)
     }
 
-    private func buildLeftEvent(in left: NSView, accent: NSColor, event: CalEvent) {
-        let pad: CGFloat = 16
+    // Two fixed-height slots that are always reserved: selected event (top), next event (bottom).
+    private func buildLeftSlots(in left: NSView) {
+        let selected = NSView()
+        selected.translatesAutoresizingMaskIntoConstraints = false
+        left.addSubview(selected)
+
+        let next = NSView()
+        next.translatesAutoresizingMaskIntoConstraints = false
+        left.addSubview(next)
+
+        NSLayoutConstraint.activate([
+            selected.topAnchor.constraint(equalTo: left.topAnchor, constant: winVPad),
+            selected.leadingAnchor.constraint(equalTo: left.leadingAnchor),
+            selected.trailingAnchor.constraint(equalTo: left.trailingAnchor),
+            selected.heightAnchor.constraint(equalToConstant: selectedSlotH),
+
+            next.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -winVPad),
+            next.leadingAnchor.constraint(equalTo: left.leadingAnchor),
+            next.trailingAnchor.constraint(equalTo: left.trailingAnchor),
+            next.heightAnchor.constraint(equalToConstant: nextSlotH),
+        ])
+
+        self.selectedSlot = selected
+        self.nextSlotView = next
+
+        if let nextEvent { buildNextContent(in: next, event: nextEvent) }
+        else             { buildAllClear(in: next) }
+    }
+
+    // Bottom slot: "NEXT" label, event title (2 lines), big countdown timer.
+    private func buildNextContent(in view: NSView, event: CalEvent) {
         let white = NSColor.white
 
-        // "NEXT" label
         let nextLbl = NSTextField(labelWithString: "NEXT")
         nextLbl.translatesAutoresizingMaskIntoConstraints = false
         nextLbl.font      = NSFont.boldSystemFont(ofSize: 9)
         nextLbl.textColor = white.withAlphaComponent(0.9)
-        left.addSubview(nextLbl)
+        view.addSubview(nextLbl)
 
-        // Event title — capped at leftPanelMaxTitleLines.
-        // The explicit heightAnchor constraint is required: maximumNumberOfLines alone does
-        // not limit the Auto Layout intrinsic content size in AppKit.
+        // The explicit heightAnchor is required: maximumNumberOfLines alone does
+        // not cap the Auto Layout intrinsic content size in AppKit.
         let titleField = NSTextField(wrappingLabelWithString: event.title)
         titleField.translatesAutoresizingMaskIntoConstraints = false
         titleField.font                    = NSFont.boldSystemFont(ofSize: leftPanelTitleFontSz)
         titleField.textColor               = white.withAlphaComponent(0.9)
-        titleField.preferredMaxLayoutWidth = 210 - pad * 2
+        titleField.preferredMaxLayoutWidth = 210 - leftColPad * 2
         titleField.maximumNumberOfLines    = leftPanelMaxTitleLines
         (titleField.cell as? NSTextFieldCell)?.truncatesLastVisibleLine = true
         titleField.heightAnchor.constraint(lessThanOrEqualToConstant: leftPanelTitleMaxH).isActive = true
-        left.addSubview(titleField)
+        view.addSubview(titleField)
 
-        // Big countdown timer — the main focus
-        let secs = event.startsInSeconds
-        let timerText: String
-        if secs <= 0 {
-            timerText = "NOW"
-        } else {
-            let totalMin = Int(secs) / 60
-            if totalMin >= 60 {
-                let h = totalMin / 60, m = totalMin % 60
-                timerText = String(format: "%d:%02d", h, m)
-            } else {
-                let m = totalMin, s = Int(secs) % 60
-                timerText = String(format: "%02d:%02d", m, s)
-            }
-        }
-        let timerField = NSTextField(labelWithString: timerText)
+        let timerField = NSTextField(labelWithString: countdownText(event.startsInSeconds))
         timerField.translatesAutoresizingMaskIntoConstraints = false
         timerField.font      = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
         timerField.textColor = white
-        left.addSubview(timerField)
-        countdownColor = white
+        view.addSubview(timerField)
         self.countdownField = timerField
 
-        // Everything pinned to the bottom, gaps controlled by gapNextToTitle / gapTitleToTimer
         NSLayoutConstraint.activate([
-            timerField.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad - 4),
-            timerField.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            timerField.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -pad),
+            nextLbl.topAnchor.constraint(equalTo: view.topAnchor),
+            nextLbl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
 
-            titleField.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            titleField.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            titleField.bottomAnchor.constraint(equalTo: timerField.topAnchor, constant: -gapTitleToTimer),
+            titleField.topAnchor.constraint(equalTo: nextLbl.bottomAnchor, constant: gapNextToTitle),
+            titleField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
+            titleField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -leftColPad),
 
-            nextLbl.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            nextLbl.bottomAnchor.constraint(equalTo: titleField.topAnchor, constant: -gapNextToTitle),
+            timerField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad - 4),
+            timerField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -leftColPad),
+            timerField.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 
-    private func buildLeftPlaceholder(in left: NSView) {
-        let pad: CGFloat = 18
-
+    // Fallback for the bottom slot when there is no upcoming event.
+    private func buildAllClear(in view: NSView) {
         let heading = NSTextField(labelWithString: "All clear")
         heading.translatesAutoresizingMaskIntoConstraints = false
         heading.font      = NSFont.boldSystemFont(ofSize: 15)
         heading.textColor = NSColor.white
-        heading.lineBreakMode = .byWordWrapping
-        heading.preferredMaxLayoutWidth = 210 - pad * 2
-        left.addSubview(heading)
-
-        let count = todayEvents.count
-        let sub = NSTextField(labelWithString: count == 0
-            ? "Nothing scheduled today"
-            : "\(count) event\(count == 1 ? "" : "s") today")
-        sub.translatesAutoresizingMaskIntoConstraints = false
-        sub.font      = NSFont.systemFont(ofSize: 12)
-        sub.textColor = NSColor.white.withAlphaComponent(0.7)
-        left.addSubview(sub)
+        view.addSubview(heading)
 
         NSLayoutConstraint.activate([
-            heading.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            heading.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            heading.topAnchor.constraint(equalTo: left.topAnchor, constant: 24),
-
-            sub.leadingAnchor.constraint(equalTo: left.leadingAnchor, constant: pad),
-            sub.trailingAnchor.constraint(equalTo: left.trailingAnchor, constant: -pad),
-            sub.topAnchor.constraint(equalTo: heading.bottomAnchor, constant: 6),
+            heading.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
+            heading.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 
@@ -555,7 +583,8 @@ final class ReminderWindow: NSWindow {
         let timeline = TimelineView()
         timeline.translatesAutoresizingMaskIntoConstraints = false
         timeline.todayEvents  = todayEvents
-        timeline.hiddenCount  = hiddenEventCount
+        timeline.hiddenPast   = hiddenPast
+        timeline.hiddenFuture = hiddenFuture
         timeline.focused      = nil
         timeline.accent       = accent
         timeline.onEventSelected = { [weak self] ev in self?.handleTimelineEventSelected(ev) }
@@ -563,63 +592,46 @@ final class ReminderWindow: NSWindow {
         self.timelineView = timeline
 
         NSLayoutConstraint.activate([
-            dateField.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 12),
-            dateField.topAnchor.constraint(equalTo: right.topAnchor, constant: 9),
+            dateField.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: rightColPad + 8),
+            dateField.topAnchor.constraint(equalTo: right.topAnchor, constant: dateHeaderTop),
 
-            timeline.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: 4),
-            timeline.trailingAnchor.constraint(equalTo: right.trailingAnchor, constant: -4),
-            timeline.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 6),
-            timeline.bottomAnchor.constraint(equalTo: right.bottomAnchor, constant: -4),
+            timeline.leadingAnchor.constraint(equalTo: right.leadingAnchor, constant: rightColPad),
+            timeline.trailingAnchor.constraint(equalTo: right.trailingAnchor, constant: -rightColPad),
+            timeline.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: dateHeaderGap),
+            timeline.bottomAnchor.constraint(equalTo: right.bottomAnchor, constant: -rightColPad),
         ])
     }
 
     // MARK: - Timeline event selection
 
     private func handleTimelineEventSelected(_ ev: CalEvent) {
-        guard let left = leftColumn else { return }
+        guard let slot = selectedSlot else { return }
 
-        // Toggle: re-clicking the selected event deselects
+        // Always clear the slot first; toggle off if re-clicking the current selection.
+        slot.subviews.forEach { $0.removeFromSuperview() }
         if selectedEvent == ev {
             selectedEvent = nil
             timelineView?.focused = nil
             timelineView?.needsDisplay = true
-            detailContainer?.removeFromSuperview()
-            detailContainer = nil
-            if event == nil { buildLeftPlaceholder(in: left) }
             return
         }
 
         selectedEvent = ev
         timelineView?.focused = ev
         timelineView?.needsDisplay = true
-
-        // Remove previous detail and, in browse mode, the placeholder (it's top-pinned)
-        detailContainer?.removeFromSuperview()
-        if event == nil { left.subviews.forEach { $0.removeFromSuperview() } }
-
-        let container = NSView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-        left.addSubview(container)
-        NSLayoutConstraint.activate([
-            container.topAnchor.constraint(equalTo: left.topAnchor),
-            container.leadingAnchor.constraint(equalTo: left.leadingAnchor),
-            container.trailingAnchor.constraint(equalTo: left.trailingAnchor),
-        ])
-        buildDetailContent(in: container, event: ev)
-        detailContainer = container
+        buildSelectedContent(in: slot, event: ev)
     }
 
-    private func buildDetailContent(in view: NSView, event: CalEvent) {
-        let pad: CGFloat = 16
+    // Top slot: calendar name, event title (2 lines), time · duration. Top-aligned.
+    private func buildSelectedContent(in view: NSView, event: CalEvent) {
         let white = NSColor.white
 
         let timeFmt = DateFormatter(); timeFmt.dateFormat = "HH:mm"
         let timeStr = "\(timeFmt.string(from: event.start)) – \(timeFmt.string(from: event.end))"
-
-        let dur = durString(minutes: Int(event.duration / 60))
+        let dur     = durString(minutes: Int(event.duration / 60))
 
         var topAnchor: NSLayoutYAxisAnchor = view.topAnchor
-        var topConstant: CGFloat = pad
+        var topConstant: CGFloat = 0
 
         if let name = event.calendarName {
             let calLabel = NSTextField(labelWithString: name)
@@ -629,9 +641,9 @@ final class ReminderWindow: NSWindow {
             calLabel.lineBreakMode = .byTruncatingTail
             view.addSubview(calLabel)
             NSLayoutConstraint.activate([
-                calLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: pad),
-                calLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
-                calLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
+                calLabel.topAnchor.constraint(equalTo: view.topAnchor),
+                calLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
+                calLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -leftColPad),
             ])
             topAnchor = calLabel.bottomAnchor
             topConstant = 4
@@ -641,7 +653,7 @@ final class ReminderWindow: NSWindow {
         titleField.translatesAutoresizingMaskIntoConstraints = false
         titleField.font                    = NSFont.boldSystemFont(ofSize: leftPanelTitleFontSz)
         titleField.textColor               = white
-        titleField.preferredMaxLayoutWidth = 210 - pad * 2
+        titleField.preferredMaxLayoutWidth = 210 - leftColPad * 2
         titleField.maximumNumberOfLines    = leftPanelMaxTitleLines
         (titleField.cell as? NSTextFieldCell)?.truncatesLastVisibleLine = true
         titleField.heightAnchor.constraint(lessThanOrEqualToConstant: leftPanelTitleMaxH).isActive = true
@@ -657,14 +669,12 @@ final class ReminderWindow: NSWindow {
 
         NSLayoutConstraint.activate([
             titleField.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
-            titleField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
-            titleField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
+            titleField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
+            titleField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -leftColPad),
 
             infoField.topAnchor.constraint(equalTo: titleField.bottomAnchor, constant: 6),
-            infoField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
-            infoField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
-
-            view.bottomAnchor.constraint(equalTo: infoField.bottomAnchor, constant: pad),
+            infoField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leftColPad),
+            infoField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -leftColPad),
         ])
     }
 
@@ -675,29 +685,21 @@ final class ReminderWindow: NSWindow {
     }
 
     private func tick() {
-        guard let event = event, let field = countdownField else { return }
+        guard let nextEvent = nextEvent, let field = countdownField else { return }
         colonVisible.toggle()
-        let secs = max(0, event.startsInSeconds)
-        let text: String
-        if secs <= 0 {
-            text = "NOW"
-        } else {
-            let totalMin = Int(secs) / 60
-            if totalMin >= 60 {
-                let h = totalMin / 60, m = totalMin % 60
-                text = String(format: "%d:%02d", h, m)
-            } else {
-                let m = totalMin, s = Int(secs) % 60
-                text = String(format: "%02d:%02d", m, s)
-            }
-        }
-        let font = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: countdownColor]
+
+        // Recolor the left column live: blue by default, red when imminent.
+        leftColumn?.layer?.backgroundColor = accentColor(for: nextEvent).cgColor
+
+        let text = countdownText(nextEvent.startsInSeconds)
+        let white = NSColor.white
+        let font  = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: white]
         let attributed = NSMutableAttributedString(string: text, attributes: attrs)
         if let colonRange = text.range(of: ":") {
             let nsRange = NSRange(colonRange, in: text)
             attributed.addAttribute(.foregroundColor,
-                                    value: countdownColor.withAlphaComponent(colonVisible ? 1 : 0),
+                                    value: white.withAlphaComponent(colonVisible ? 1 : 0),
                                     range: nsRange)
         }
         field.attributedStringValue = attributed
