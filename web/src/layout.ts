@@ -18,11 +18,11 @@ export const palette = {
   white: "#ffffff",
 };
 
-export const axisH = 20;
+export const hoursYoffset = 20;
 export const badgeH = 16;
 
+
 export const timelineFontSize = 13;
-export const rowH = timelineFontSize + 10;
 
 export const shapeStrokeW = 2;
 export const shapeCornerR = 4;
@@ -54,7 +54,14 @@ export const snapToWholeHours = true;
 export const timelinePadL = 10; // px
 export const timelinePadR = 10; // px
 export const timelineMinHeight = 80;
-export const timelineBottomPad = 50;
+
+// timeline height:
+export const nowLabelH = 20;
+export const firstEventPad = 0;
+export const eventsGap = 0;
+export const rowH = badgeH + eventsGap;
+export const lastEventPad = 0;
+export const hoursH = 50;
 
 // Web approximation of AppKit line height (fontSize * 1.21).
 export function lineHeight(size: number): number {
@@ -158,16 +165,61 @@ export function timeMap(events: CalEvent[], now: Date): TimeMap {
   return { rs, re, t2x };
 }
 
-export function timelineWidth(rs: Date, re: Date): number {
-  const minutes = (re.getTime() - rs.getTime()) / 60_000;
-  return timelinePadL + minutes * pxPerMin + timelinePadR;
+export interface TimelineLayout {
+  // height components (sum to total height)
+  nowLabelH: number;
+  firstEventPad: number;
+  eventsH: number;
+  eventsGap: number;
+  lastEventPad: number;
+  hoursH: number;
+  // width components (sum to total width)
+  padL: number;
+  eventsSpanW: number;
+  padR: number;
+  // derived totals
+  width: number;
+  height: number;
+  // time mapping
+  rs: Date;
+  re: Date;
+  t2x: (t: Date) => number;
 }
 
-export function timelineHeight(eventCount: number): number {
-  return Math.max(
+export function computeTimelineLayout(
+  events: CalEvent[],
+  now: Date,
+): TimelineLayout {
+  const { rs, re, t2x } = timeMap(events, now);
+  const minutes = (re.getTime() - rs.getTime()) / 60_000;
+
+  const evH = events.length * rowH;
+  const padL = timelinePadL;
+  const eventsSpanW = minutes * pxPerMin;
+  const padR = timelinePadR;
+
+  const height = Math.max(
     timelineMinHeight,
-    axisH + eventCount * rowH + timelineBottomPad,
+    nowLabelH + firstEventPad + evH + lastEventPad + hoursH,
   );
+  const width = padL + eventsSpanW + padR;
+
+  return {
+    nowLabelH,
+    firstEventPad,
+    eventsH: evH,
+    eventsGap,
+    lastEventPad,
+    hoursH,
+    padL,
+    eventsSpanW,
+    padR,
+    width,
+    height,
+    rs,
+    re,
+    t2x,
+  };
 }
 
 export function windowWidth(tlWidth: number): number {
@@ -176,11 +228,13 @@ export function windowWidth(tlWidth: number): number {
 
 export function hourGridlines(rs: Date, re: Date): Date[] {
   const count = Math.floor((re.getTime() - rs.getTime()) / 3_600_000) + 1;
-  return Array.from({ length: count }, (_, i) => addHours(rs, i));
+  return Array(count)
+    .fill(0)
+    .map((_, i) => addHours(rs, i));
 }
 
 export function rowAt(y: number, count: number): number | null {
-  const row = Math.floor((y - axisH) / rowH);
+  const row = Math.floor((y - hoursYoffset) / rowH);
   if (row < 0 || row >= count) return null;
   return row;
 }
@@ -193,8 +247,7 @@ export interface TimelineProps {
   events: CalEvent[];
   focused: CalEvent | null;
   now: Date;
-  width: number;
-  height: number;
+  layout: TimelineLayout;
 }
 
 function truncate(ctx: DrawCtx, text: string, f: Font, maxW: number): string {
@@ -210,27 +263,30 @@ function truncate(ctx: DrawCtx, text: string, f: Font, maxW: number): string {
 }
 
 export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
-  const { events, now, width: w, height } = p;
+  const { events, now, layout } = p;
   if (events.length === 0) return;
 
-  const { rs, re, t2x } = timeMap(events, now);
-  const bottomY = height - timelineBottomPad;
+  const { rs, re, t2x, nowLabelH, firstEventPad, hoursH } = layout;
+  const eventsTop = nowLabelH + firstEventPad;
+  const bottomY = layout.height - hoursH;
 
   // Hour gridlines + axis labels
   const lblFont = font(timelineFontSize - 2, "medium", true);
   for (const cur of hourGridlines(rs, re)) {
     const x = t2x(cur);
+
     ctx.stroke(
-      ctx.beginPath().moveTo(x, axisH).lineTo(x, bottomY),
+      ctx.beginPath().moveTo(x, nowLabelH).lineTo(x, bottomY),
       palette.separator,
       0.5,
     );
+
     const lbl = String(cur.getHours());
     const sz = ctx.measureText(lbl, lblFont);
     ctx.fillText(
       lbl,
       x - sz.width / 2,
-      bottomY + (axisH - sz.height) / 2,
+      bottomY + (nowLabelH - sz.height) / 2,
       lblFont,
       palette.secondaryLabel,
     );
@@ -243,14 +299,14 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
     ctx.stroke(
       ctx
         .beginPath()
-        .moveTo(nx, axisH / 2)
+        .moveTo(nx, nowLabelH / 2)
         .lineTo(nx, bottomY),
       palette.systemRed,
       1,
       0.5,
     );
     ctx.fill(
-      ctx.beginPath().arc(nx, axisH / 2, dotR, 0, 360, true),
+      ctx.beginPath().arc(nx, nowLabelH / 2, dotR, 0, 360, true),
       palette.systemRed,
     );
     const nowFont = font(timelineFontSize - 2, "semibold", true);
@@ -259,7 +315,7 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
     ctx.fillText(
       nowStr,
       nx + dotR + 3,
-      (axisH - nsz.height) / 2,
+      (nowLabelH - nsz.height) / 2,
       nowFont,
       palette.systemRed,
     );
@@ -283,7 +339,7 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
 
   const layouts: EvLayout[] = [];
   events.forEach((ev, i) => {
-    const cy = axisH + i * rowH + rowH / 2;
+    const cy = eventsTop + i * rowH + rowH / 2;
     const x1 = t2x(ev.start);
     const x2 = t2x(ev.end);
     const done = ev.end <= now;

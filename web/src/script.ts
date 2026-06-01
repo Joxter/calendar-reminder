@@ -6,9 +6,7 @@ import { CalEvent, buildMockEvents, mockEventDefs } from "./model";
 import {
   computeVisible,
   rowAt,
-  timeMap,
-  timelineWidth,
-  timelineHeight,
+  computeTimelineLayout,
   windowWidth,
   winContentH,
   leftW,
@@ -108,19 +106,16 @@ function render() {
   const now = simulatedNow();
   const vis = computeVisible(state.events, now);
 
-  // Recompute canvas dimensions from event data each render.
-  const { rs, re } = timeMap(vis.visible, now);
-  const tlW = timelineWidth(rs, re);
-  const tlH = timelineHeight(vis.visible.length);
+  const layout = computeTimelineLayout(vis.visible, now);
 
   // Resize DOM elements to fit content.
   const winEl = document.getElementById("window")!;
-  const rightColH = dateHeaderTop + dateHeaderH + dateHeaderGap + tlH + rightColPad;
+  const rightColH = dateHeaderTop + dateHeaderH + dateHeaderGap + layout.height + rightColPad;
   const winH = Math.max(winContentH, rightColH);
-  winEl.style.width = `${windowWidth(tlW)}px`;
+  winEl.style.width = `${windowWidth(layout.width)}px`;
   winEl.style.height = `${winH}px`;
-  canvasEl.style.width = `${tlW}px`;
-  canvasEl.style.height = `${tlH}px`;
+  canvasEl.style.width = `${layout.width}px`;
+  canvasEl.style.height = `${layout.height}px`;
   ctx.setupHiDPI();
 
   dateEl.textContent = dateFmt.format(now);
@@ -131,8 +126,7 @@ function render() {
     events: vis.visible,
     focused: state.selected,
     now,
-    width: tlW,
-    height: tlH,
+    layout,
   });
 }
 
