@@ -25,13 +25,23 @@ export const hoursYoffset = 20;
 export const shapeStrokeW = 2;
 export const shapeCornerR = 4;
 
-export const leftColPad = 16;
-export const rightColPad = 4;
-export const winVPad = 16;
+// Left column padding (the HTML accent panel) — each side independent.
+export const leftColPadT = 16;
+export const leftColPadR = 16;
+export const leftColPadB = 16;
+export const leftColPadL = 16;
+
+// Right column padding (date header + timeline canvas) — each side independent.
+export const rightColPadT = 9;
+export const rightColPadR = 4;
+export const rightColPadB = 4;
+export const rightColPadL = 4;
+
 export const panelGap = 16;
 export const dateHeaderH = 22;
-export const dateHeaderTop = 9;
 export const dateHeaderGap = 6;
+// Extra left indent of the date text, to align it with the timeline content.
+export const dateHeaderIndent = 8;
 
 export const maxTimelineTitleW = 150;
 // Events at or after this hour get the title drawn left of the start marker.
@@ -85,7 +95,7 @@ export const selectedSlotH =
 // nextLabel + title + 1 + timer
 export const nextSlotH = nextLblLineH + leftPanelTitleMaxH + 1 + timerLineH;
 export const winContentH =
-  winVPad + selectedSlotH + panelGap + nextSlotH + winVPad;
+  leftColPadT + selectedSlotH + panelGap + nextSlotH + leftColPadB;
 
 export function durString(minutes: number): string {
   if (minutes <= 0) return "";
@@ -231,7 +241,7 @@ export function computeTimelineLayout(
 }
 
 export function windowWidth(tlWidth: number): number {
-  return leftW + rightColPad * 2 + tlWidth;
+  return leftW + rightColPadL + rightColPadR + tlWidth;
 }
 
 export function hourGridlines(rs: Date, re: Date): Date[] {
@@ -372,13 +382,13 @@ export function renderTimeline(ctx: DrawCtx, p: TimelineProps): void {
 
     const titleColor = done ? palette.tertiaryLabel : palette.label;
     const titleFont = font(timelineFontSize, isFocused ? "bold" : "regular");
-    const isAfternoon = ev.start.getHours() >= titleLeftThresholdHour;
+    const isTitleOnLeft = ev.start.getHours() >= titleLeftThresholdHour;
     const afterTimeX = x1 + shapeStrokeW / 2 + 4 + timeSz.width + 6;
     const natural = ctx.measureText(ev.title, titleFont);
     const titleH = natural.height;
 
     let titleRect: { x: number; y: number; w: number; h: number };
-    if (isAfternoon) {
+    if (isTitleOnLeft) {
       const maxW = Math.min(
         maxTimelineTitleW,
         Math.max(0, x1 - 6 - timelinePadL),

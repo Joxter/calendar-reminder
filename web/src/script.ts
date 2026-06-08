@@ -10,12 +10,17 @@ import {
   windowWidth,
   winContentH,
   leftW,
-  leftColPad,
-  winVPad,
-  rightColPad,
-  dateHeaderTop,
+  leftColPadT,
+  leftColPadR,
+  leftColPadB,
+  leftColPadL,
+  rightColPadT,
+  rightColPadR,
+  rightColPadB,
+  rightColPadL,
   dateHeaderH,
   dateHeaderGap,
+  dateHeaderIndent,
   renderTimeline,
 } from "./layout";
 import { startOfDay, pad2 } from "./utils";
@@ -110,7 +115,8 @@ function render() {
 
   // Resize DOM elements to fit content.
   const winEl = document.getElementById("window")!;
-  const rightColH = dateHeaderTop + dateHeaderH + dateHeaderGap + layout.height + rightColPad;
+  const rightColH =
+    rightColPadT + dateHeaderH + dateHeaderGap + layout.height + rightColPadB;
   const winH = Math.max(winContentH, rightColH);
   winEl.style.width = `${windowWidth(layout.width)}px`;
   winEl.style.height = `${winH}px`;
@@ -134,13 +140,13 @@ function render() {
 function applyStaticDimensions() {
 
   leftEl.style.width = `${leftW}px`;
-  leftEl.style.padding = `${winVPad}px ${leftColPad}px`;
+  leftEl.style.padding = `${leftColPadT}px ${leftColPadR}px ${leftColPadB}px ${leftColPadL}px`;
 
-  dateEl.style.margin = `${dateHeaderTop}px 0 ${dateHeaderGap}px ${rightColPad + 8}px`;
+  dateEl.style.margin = `${rightColPadT}px 0 ${dateHeaderGap}px ${rightColPadL + dateHeaderIndent}px`;
   dateEl.style.height = `${dateHeaderH}px`;
   dateEl.style.fontSize = `15px`;
 
-  canvasEl.style.marginLeft = `${rightColPad}px`;
+  canvasEl.style.marginLeft = `${rightColPadL}px`;
 }
 
 // MARK: - Dev tools
