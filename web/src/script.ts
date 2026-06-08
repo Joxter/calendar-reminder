@@ -217,6 +217,8 @@ function init() {
   dateEl = document.getElementById("date-header")!;
   canvasEl = document.getElementById("timeline") as HTMLCanvasElement;
 
+  // canvasEl.style.background = 'green';
+
   applyStaticDimensions();
   ctx = new CanvasDrawCtx(canvasEl);
 

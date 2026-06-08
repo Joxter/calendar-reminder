@@ -19,10 +19,8 @@ export const palette = {
 };
 
 export const hoursYoffset = 20;
-export const badgeH = 16;
 
 
-export const timelineFontSize = 13;
 
 export const shapeStrokeW = 2;
 export const shapeCornerR = 4;
@@ -53,15 +51,21 @@ export const axisPaddingEndMin = 0;
 export const snapToWholeHours = true;
 export const timelinePadL = 10; // px
 export const timelinePadR = 10; // px
-export const timelineMinHeight = 80;
+
+export const timelineFontSize = 13;
 
 // timeline height:
 export const nowLabelH = 20;
-export const firstEventPad = 0;
-export const eventsGap = 0;
+export const firstEventPad = 8;
+// event
+export const eventsGap = 4;
+export const badgeH = 16;
 export const rowH = badgeH + eventsGap;
-export const lastEventPad = 0;
-export const hoursH = 50;
+//
+export const lastEventPad = 8;
+export const hoursH = 12 + 19;
+
+export const timelineMinHeight = timeLineHeight(7);
 
 // Web approximation of AppKit line height (fontSize * 1.21).
 export function lineHeight(size: number): number {
@@ -186,6 +190,12 @@ export interface TimelineLayout {
   t2x: (t: Date) => number;
 }
 
+export function timeLineHeight(evCnt: number) {
+  const evH = evCnt * rowH;
+
+  return nowLabelH + firstEventPad + evH + lastEventPad + hoursH;
+}
+
 export function computeTimelineLayout(
   events: CalEvent[],
   now: Date,
@@ -198,10 +208,8 @@ export function computeTimelineLayout(
   const eventsSpanW = minutes * pxPerMin;
   const padR = timelinePadR;
 
-  const height = Math.max(
-    timelineMinHeight,
-    nowLabelH + firstEventPad + evH + lastEventPad + hoursH,
-  );
+  const height = Math.max(timelineMinHeight, timeLineHeight(events.length));
+  console.log({height});
   const width = padL + eventsSpanW + padR;
 
   return {
