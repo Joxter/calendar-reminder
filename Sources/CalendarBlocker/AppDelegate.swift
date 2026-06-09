@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pollTimer: DispatchSourceTimer?
     private var statusBar: StatusBarController?
     private var lastResult: FetchResult?        // main thread only
+    private var refreshCalendarPending = false  // main thread only — recreate open calendar window after next poll
 
     private let pollQueue = DispatchQueue(label: "com.calendarblocker.poll", qos: .utility)
     private var isFirstPoll = true              // pollQueue only
@@ -20,7 +21,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async { self.showReminder(event: result?.next, today: result?.today ?? []) }
             self.scheduleImmediatePoll()
         }
-        bar.onMockChanged = { [weak self] in self?.scheduleImmediatePoll() }
+        bar.onMockChanged = { [weak self] in
+            self?.refreshCalendarPending = true   // recreate any open calendar window with fresh events
+            self?.scheduleImmediatePoll()
+        }
+        bar.onTimeChanged = { [weak self] in
+            DispatchQueue.main.async { self?.refreshOpenWindowsForTime() }
+        }
         bar.onClearShown = { [weak self] in
             self?.pollQueue.async {
                 self?.shown.removeAll()
@@ -108,6 +115,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                         self.showReminder(event: ev, today: result.today)
                     }
                 }
+                if self.refreshCalendarPending {
+                    self.refreshCalendarPending = false
+                    self.refreshOpenCalendarWindow(today: result.today)
+                }
             }
 
         } catch CalendarError.noURL {
@@ -119,6 +130,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Main thread
+
+    // Live time-scrubber: refresh open windows in place instead of recreating them.
+    @MainActor
+    private func refreshOpenWindowsForTime() {
+        for win in windows where win.isVisible { win.refreshForTimeChange() }
+    }
+
+    // Mock change (events / day / hide-real / force-fallback): recreate the open
+    // calendar window with fresh events so the change is visible immediately.
+    @MainActor
+    private func refreshOpenCalendarWindow(today: [CalEvent]) {
+        let openCalendars = windows.filter { $0.isVisible && $0.isCalendarWindow }
+        guard !openCalendars.isEmpty else { return }
+        openCalendars.forEach { $0.close() }
+        windows.removeAll { !$0.isVisible }
+        showReminder(event: nil, today: today)
+    }
 
     @MainActor
     private func showReminder(event: CalEvent?, today: [CalEvent]) {

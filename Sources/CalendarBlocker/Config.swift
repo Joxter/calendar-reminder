@@ -44,19 +44,29 @@ enum Config {
     struct MockEventDef {
         let id: String
         let title: String
-        let offsetMinutes: Int   // minutes from Config.now; negative = already started
+        let startMinute: Int     // absolute minute of the day (0..1439)
         let durationMinutes: Int
     }
 
+    // Absolute time-of-day mock events (mirrors web/src/model.ts mockEventDefs).
     static let mockEventDefs: [MockEventDef] = [
-        .init(id: "very_long",  title: "very long event with <b>very long name</b>, probably some broken import from another systems",      offsetMinutes:  90, durationMinutes: 180),
-        .init(id: "inprogress", title: "All-hands",          offsetMinutes: -20, durationMinutes: 60),
-        .init(id: "verysoon",   title: "Standup",            offsetMinutes:   1, durationMinutes: 15),
-        .init(id: "soon",       title: "Design Review",      offsetMinutes:   8, durationMinutes: 60),
-        .init(id: "upcoming",   title: "Lunch",              offsetMinutes:  30, durationMinutes: 60),
-        .init(id: "overlap1",   title: "Sprint Planning",    offsetMinutes:  65, durationMinutes: 60),
-        .init(id: "overlap2",   title: "Retrospective",      offsetMinutes:  90, durationMinutes: 60),
-        .init(id: "later",      title: "1:1 with Manager",   offsetMinutes: 160, durationMinutes: 30),
+        .init(id: "Crazy early",                       title: "Crazy early",                       startMinute:  2*60+30, durationMinutes:  42),
+        .init(id: "Standup",                           title: "Standup",                           startMinute:  9*60+30, durationMinutes:  15),
+        .init(id: "Ampiwise: Standup",                 title: "Ampiwise: Standup",                 startMinute: 10*60+15, durationMinutes:  15),
+        .init(id: "Full-stack guild: Sptint planning", title: "Full-stack guild: Sptint planning", startMinute: 10*60+30, durationMinutes:  45),
+        .init(id: "1-1 Alex, Nikolai",                 title: "1-1 Alex, Nikolai",                 startMinute: 10*60+30, durationMinutes:  30),
+        .init(id: "Lunch",                             title: "Lunch",                             startMinute: 12*60+9,  durationMinutes:  60),
+        .init(id: "ex1", title: "ex1", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "ex2", title: "ex2", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "ex3", title: "ex3", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "ex4", title: "ex4", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "ex5", title: "ex5", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "ex6", title: "ex6", startMinute: 13*60, durationMinutes: 15),
+        .init(id: "very long event with very long name, probably some broken import from another systems",
+              title: "very long event with very long name, probably some broken import from another systems",
+              startMinute: 14*60, durationMinutes: 60),
+        .init(id: "Monthly update, 152min",            title: "Monthly update, 152min",            startMinute: 16*60+15, durationMinutes: 152),
+        .init(id: "Very late WTF!? and 52 min!",       title: "Very late WTF!?",                   startMinute: 23*60+23, durationMinutes:  52),
     ]
 
     static var enabledMockEventIDs: Set<String> {
@@ -67,11 +77,18 @@ enum Config {
     static var mockHideReal: Bool { d.bool(forKey: "mockHideReal") }
     static func saveMockHideReal(_ on: Bool) { d.set(on, forKey: "mockHideReal") }
 
-    static var mockTimeOffset: TimeInterval { d.double(forKey: "mockTimeOffset") }
-    static func saveMockTimeOffset(_ secs: TimeInterval) { d.set(secs, forKey: "mockTimeOffset") }
+    /// Absolute simulated time-of-day in minutes (0..1439); -1 means "use real time-of-day".
+    static var mockMinuteOfDay: Int {
+        d.object(forKey: "mockMinuteOfDay") == nil ? -1 : d.integer(forKey: "mockMinuteOfDay")
+    }
+    static func saveMockMinuteOfDay(_ minute: Int) { d.set(minute, forKey: "mockMinuteOfDay") }
 
     static var mockDayOffset: Int { d.integer(forKey: "mockDayOffset") }
     static func saveMockDayOffset(_ days: Int) { d.set(days, forKey: "mockDayOffset") }
+
+    /// Debug: force the timeline's plain-list fallback view regardless of event count/span.
+    static var forceFallback: Bool { d.bool(forKey: "forceFallback") }
+    static func saveForceFallback(_ on: Bool) { d.set(on, forKey: "forceFallback") }
 
     static var testModeActive: Bool {
         d.bool(forKey: "testModeActive")
@@ -79,12 +96,16 @@ enum Config {
     static func saveTestModeActive(_ on: Bool) { d.set(on, forKey: "testModeActive") }
 
     static var isMockActive: Bool {
-        testModeActive && (mockTimeOffset != 0 || mockDayOffset != 0 || !enabledMockEventIDs.isEmpty)
+        testModeActive && (mockMinuteOfDay >= 0 || mockDayOffset != 0 || !enabledMockEventIDs.isEmpty || forceFallback)
     }
 
     static var now: Date {
         guard testModeActive else { return Date() }
-        let base = Calendar.current.date(byAdding: .day, value: mockDayOffset, to: Date()) ?? Date()
-        return base.addingTimeInterval(mockTimeOffset)
+        let cal = Calendar.current
+        let baseDay = cal.date(byAdding: .day, value: mockDayOffset, to: Date()) ?? Date()
+        if mockMinuteOfDay >= 0 {   // absolute time-of-day override (scrubber)
+            return cal.startOfDay(for: baseDay).addingTimeInterval(TimeInterval(mockMinuteOfDay) * 60)
+        }
+        return baseDay   // real time-of-day on the (possibly offset) day
     }
 }

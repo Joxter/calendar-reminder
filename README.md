@@ -6,7 +6,7 @@ A native macOS app (Swift + AppKit) that shows an aggressive reminder window whe
 
 ## How it works
 
-1. A background timer polls one or more Google Calendar iCal feeds every 30 seconds (configurable).
+1. A background timer polls one or more Google Calendar iCal feeds every 60 seconds.
 2. When an event falls within the warning window (default 10 min before start), a reminder window appears on top of all other windows and steals focus.
 3. The same event is never shown twice in the same session. Events that appear in multiple calendar feeds are deduplicated by UID so they only appear once.
 4. Events that started up to a few minutes ago are still shown if a poll cycle missed them.
@@ -62,17 +62,19 @@ The status bar item shows a calendar SF Symbol and a live countdown label. The c
 | Further away                      | `calendar`             | Secondary grey           |
 | No events today                   | `calendar`             | Secondary grey, no label |
 
+When any test/mock setting is active a `·` is appended to the label, so it's obvious you're not looking at live data.
+
 Clicking the icon shows a dropdown:
 
-| Item                      | Action                                                 |
-| ------------------------- | ------------------------------------------------------ |
-| Event title · start time  | Read-only, shows the next upcoming event               |
-| **Set Calendar URLs…** ⌘, | Opens a multi-line dialog; paste one iCal URL per line |
-| **Check every** ▶         | Submenu: 15 s / 30 s / 1 min / 5 min                   |
-| **Remind me** ▶           | Submenu: 5 / 10 / 15 / 30 minutes before               |
-| **Sound** ✓               | Toggle the Glass sound on reminder                     |
-| **Open Calendar** ⌘O      | Opens the day-view reminder window                     |
-| **Quit** ⌘Q               | Quits the app                                          |
+| Item                      | Action                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| Event title · start time  | Read-only, shows the next upcoming event                                            |
+| **Set Calendar URLs…** ⌘, | Opens a multi-line dialog; paste one iCal URL per line                              |
+| **Remind me** ▶           | Submenu: 5 / 10 / 15 / 30 minutes before                                            |
+| **Sound** ✓               | Toggle the Glass sound on reminder                                                  |
+| **Open Calendar** ⌘O      | Opens the day-view reminder window                                                  |
+| **Testing** ▶             | Mock events, time scrubber, day picker, fallback toggle — see [Testing & debug](#testing--debug) |
+| **Quit** ⌘Q               | Quits the app                                                                       |
 
 All settings are saved in `UserDefaults` and take effect immediately (no restart required).
 
@@ -80,64 +82,79 @@ All settings are saved in `UserDefaults` and take effect immediately (no restart
 
 ## Reminder window
 
-The window is 720 × (dynamic height) px, always on top, steals keyboard focus.  
-It is split into two columns separated by a 1 px hairline.
+Always on top, centred, and steals keyboard focus. **Esc** or the title-bar close button dismisses it. The window has **no fixed size** — both dimensions are derived from the day's events:
 
-### Left column (white)
+- **Width** scales with the visible time span (45 px per hour), so a busy day is wider than a quiet one.
+- **Height** grows to fit every event (minimum 7 rows), never shrinking below a constant minimum set by the left column.
 
-| Element        | Detail                                                                                |
-| -------------- | ------------------------------------------------------------------------------------- |
-| Urgency badge  | Coloured pill: amber / orange / red depending on time to start                        |
-| Animated timer | Live countdown (updates every second) showing time until event starts                 |
-| Event title    | SF Pro Display bold, wraps to multiple lines                                          |
-| Duration       | `h:mm` format (e.g. `0:30`, `1:00`)                                                   |
-| Dismiss button | Accent colour; hover darkens. Also responds to **Esc**, **Return**, and window close. |
+It is split into two columns.
 
-### Right column (`#f5f5f7`)
+### Left column (accent colour)
 
-**Date header** — weekday and date (e.g. `Sunday, May 17`).
+The whole column is tinted by urgency and recolours live as the countdown ticks:
 
-**Timeline canvas** — Gantt-style, one row per event sorted by start time.
+| Next event is…   | Colour |
+| ---------------- | ------ |
+| > 2 minutes away | Blue   |
+| ≤ 2 minutes away | Red    |
+| none (all clear) | Grey   |
 
-#### Time axis
+It holds two fixed-height slots:
 
-- Fixed range **08:00 – 18:00** local time, extended automatically if any event falls outside.
-- Hour labels in light grey, vertical gridlines at each hour.
-- **"Now" marker** — dashed vertical line in light pink.
+- **Top — selected event** (empty until you click a timeline row): calendar name, event title (up to 2 lines), and `HH:mm – HH:mm · duration`.
+- **Bottom — next event**: a `NEXT` label, the event title, and a large monospaced countdown with a blinking colon. When there is no upcoming event it reads **All clear**.
 
-#### Event rows
+### Right column (white)
 
-Each event renders a time badge, a duration underline, and a title with duration label.
+**Date header** — weekday and date (e.g. `Sunday, May 17`). Below it, one of two views:
 
-- Events starting **before 13:00**: title appears to the **right** of the badge.
-- Events starting **at or after 13:00**: title appears to the **left** to avoid clipping.
-- Rows are **clickable** — clicking a row selects that event and shows its details in the left column. Clicking the same row again deselects it.
+#### Timeline (default)
 
-#### Event state colours
+A Gantt-style timeline, one row per event sorted by start time.
 
-| State                  | Colour        |
-| ---------------------- | ------------- |
-| Past (ended)           | Grey          |
-| In progress            | Green         |
-| Future                 | Blue          |
-| **Selected / focused** | Accent colour |
+- **Time axis** — minimum **09:00 – 18:00**, extended to fit any events outside that band, snapped to whole hours, and capped at **03:00** the next morning. Hour gridlines with labels along the bottom.
+- **"Now" marker** — a solid red vertical line with a dot and the current `HH:mm` at the top.
+- **Event rows** — each draws a bold time badge, an L-shaped start marker + duration line, and the title:
+  - starting **before 13:00** → title to the **right** of the badge;
+  - starting **at/after 13:00** → title to the **left** of the start marker.
+- Rows are **clickable** — click to show that event in the left column's top slot; click again to deselect (the selected event's title is drawn bold).
 
-#### Selected event detail (left column)
+| Event state  | Colour        |
+| ------------ | ------------- |
+| Past (ended) | Grey (dimmed) |
+| In progress  | Green         |
+| Future       | Blue          |
 
-When a timeline row is clicked, the top of the left column shows:
+#### Fallback list
 
-| Element            | Detail                                                      |
-| ------------------ | ----------------------------------------------------------- |
-| Event title        | Bold white, wraps to multiple lines                         |
-| Time range         | `HH:mm – HH:mm`                                             |
-| Duration           | e.g. `1h 30m`                                               |
-| Open in Calendar → | Opens the event in Google Calendar (day view for that date) |
+When the timeline would be impractical — **more than 10 events**, or any event starting **before 08:00** or ending **after 20:00** — the right column switches to a plain scrolling list instead. Each row shows the start time, title, and a relative offset (`now`, `in 1h 5m`); past events are dimmed. It can also be forced from the Testing menu.
 
 ---
 
 ## Sound
 
 Plays `/System/Library/Sounds/Glass.aiff` via `NSSound` when the reminder window appears.
+
+---
+
+## Testing & debug
+
+The menu bar **Testing ▶** submenu drives a simulated environment for working on the UI without waiting for real meetings. Nothing here affects what you see unless **Test mode enabled** is on.
+
+| Control               | What it does                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
+| Test mode enabled     | Master switch — keeps every setting below intact when off                |
+| Inject mock events    | Toggle individual fixed time-of-day sample events (e.g. `Standup 09:30`) |
+| Hide real events      | Show only the mock events                                                 |
+| Force fallback list   | Force the plain-list view regardless of event count/span                 |
+| Choose day            | Shift the simulated day (last week … next week)                          |
+| Simulate time         | A slider to scrub the clock across the whole day; **Real-time** resets it |
+| Force check now       | Re-poll immediately                                                       |
+| Clear shown reminders | Forget which reminders have fired so they can re-trigger                 |
+
+Scrubbing the time slider refreshes any open calendar window **in place** (now-marker, colours, countdown). Toggling mock events, the day, or the fallback view recreates the open calendar window so the change shows immediately.
+
+The same logic powers a browser prototype under `web/` (TypeScript + Vite), which is the design reference the Swift timeline mirrors.
 
 ---
 
@@ -169,6 +186,7 @@ All settings are stored in `UserDefaults` and configured via the menu bar. No co
 | Setting           | Default          | Where to change               |
 | ----------------- | ---------------- | ----------------------------- |
 | iCal URLs         | — (one per line) | Menu bar → Set Calendar URLs… |
-| Poll interval     | 30 s             | Menu bar → Check every        |
 | Warning threshold | 10 min           | Menu bar → Remind me          |
 | Sound             | On               | Menu bar → Sound              |
+
+The poll interval is fixed at 60 s.

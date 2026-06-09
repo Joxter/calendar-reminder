@@ -11,8 +11,14 @@ final class StatusBarController: NSObject {
     var onOpenWindow: (() -> Void)?
     /// Called when any mock/testing setting changes — triggers an immediate re-poll.
     var onMockChanged: (() -> Void)?
+    /// Called when only the simulated clock moved — refresh open windows in place (no re-poll).
+    var onTimeChanged: (() -> Void)?
     /// Called when the user asks to clear the shown-reminders set and re-poll.
     var onClearShown: (() -> Void)?
+
+    // Time-scrubber controls (live HH:mm label + slider).
+    private weak var scrubberLabel: NSTextField?
+    private weak var scrubberSlider: NSSlider?
 
     override init() {
         item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -176,6 +182,12 @@ final class StatusBarController: NSObject {
         hideReal.tag = 21
         sub.addItem(hideReal)
 
+        let forceFallback = NSMenuItem(title: "Force fallback list", action: #selector(toggleForceFallback(_:)), keyEquivalent: "")
+        forceFallback.target = self
+        forceFallback.state = Config.forceFallback ? .on : .off
+        forceFallback.tag = 22
+        sub.addItem(forceFallback)
+
         sub.addItem(.separator())
 
         // Section: day selection
@@ -204,31 +216,11 @@ final class StatusBarController: NSObject {
 
         sub.addItem(.separator())
 
-        // Section: time simulation
+        // Section: time simulation — continuous scrubber over the whole day.
         let timeHdr = NSMenuItem(title: "Simulate time:", action: nil, keyEquivalent: "")
         timeHdr.isEnabled = false
         sub.addItem(timeHdr)
-
-        let offsets: [(String, TimeInterval)] = [
-            ("Real time",   0),
-            ("− 30 min",  -30 * 60),
-            ("− 10 min",  -10 * 60),
-            ("− 5 min",    -5 * 60),
-            ("+ 5 min",     5 * 60),
-            ("+ 10 min",   10 * 60),
-            ("+ 30 min",   30 * 60),
-            ("+ 1 hour",   60 * 60),
-            ("+ 2 hours", 120 * 60),
-        ]
-        let current = Config.mockTimeOffset
-        for (title, secs) in offsets {
-            let it = NSMenuItem(title: title, action: #selector(setMockTimeOffset(_:)), keyEquivalent: "")
-            it.target = self
-            it.representedObject = secs as AnyObject
-            it.state = current == secs ? .on : .off
-            it.indentationLevel = 1
-            sub.addItem(it)
-        }
+        sub.addItem(makeTimeScrubberItem())
 
         sub.addItem(.separator())
 
@@ -247,20 +239,52 @@ final class StatusBarController: NSObject {
     }
 
     private func mockEventMenuTitle(_ def: Config.MockEventDef) -> String {
-        let m = abs(def.offsetMinutes)
-        let sign = def.offsetMinutes < 0 ? "−" : "+"
-        let offsetStr: String
-        if m == 0 {
-            offsetStr = "now"
-        } else if m >= 60 {
-            let h = m / 60, rm = m % 60
-            offsetStr = rm > 0 ? "\(sign)\(h)h \(rm)m" : "\(sign)\(h)h"
-        } else {
-            offsetStr = "\(sign)\(m)m"
-        }
+        let timeStr = String(format: "%02d:%02d", def.startMinute / 60, def.startMinute % 60)
         let d = def.durationMinutes
         let durStr = d >= 60 ? (d % 60 > 0 ? "\(d/60)h \(d%60)m" : "\(d/60)h") : "\(d)m"
-        return "\(def.title)  \(offsetStr) · \(durStr)"
+        return "\(def.title)  \(timeStr) · \(durStr)"
+    }
+
+    // MARK: - Time scrubber (custom menu view)
+
+    /// Current scrubber minute-of-day: the simulated value when set, else wall-clock.
+    private func currentScrubMinute() -> Int {
+        if Config.mockMinuteOfDay >= 0 { return Config.mockMinuteOfDay }
+        let c = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        return (c.hour ?? 0) * 60 + (c.minute ?? 0)
+    }
+
+    private func scrubberLabelText() -> String {
+        let m = currentScrubMinute()
+        let s = String(format: "%02d:%02d", m / 60, m % 60)
+        return Config.mockMinuteOfDay >= 0 ? "Simulated time:  \(s)" : "Simulated time:  \(s)  (real-time)"
+    }
+
+    private func makeTimeScrubberItem() -> NSMenuItem {
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: 260, height: 52))
+
+        let label = NSTextField(labelWithString: scrubberLabelText())
+        label.frame = NSRect(x: 21, y: 30, width: 230, height: 16)
+        label.font = NSFont.systemFont(ofSize: 12)
+        container.addSubview(label)
+        self.scrubberLabel = label
+
+        let slider = NSSlider(value: Double(currentScrubMinute()), minValue: 0, maxValue: 1439,
+                              target: self, action: #selector(timeScrubbed(_:)))
+        slider.frame = NSRect(x: 21, y: 6, width: 168, height: 19)
+        slider.isContinuous = true
+        container.addSubview(slider)
+        self.scrubberSlider = slider
+
+        let reset = NSButton(title: "Real-time", target: self, action: #selector(resetTimeScrub))
+        reset.frame = NSRect(x: 192, y: 3, width: 64, height: 24)
+        reset.bezelStyle = .rounded
+        reset.font = NSFont.systemFont(ofSize: 10)
+        container.addSubview(reset)
+
+        let item = NSMenuItem()
+        item.view = container
+        return item
     }
 
     // MARK: - Testing actions
@@ -282,18 +306,26 @@ final class StatusBarController: NSObject {
         onMockChanged?()
     }
 
-    @objc private func setMockTimeOffset(_ sender: NSMenuItem) {
-        guard let secs = sender.representedObject as? TimeInterval else { return }
-        Config.saveMockTimeOffset(secs)
-        // Update checkmarks in the time offset section of the Testing submenu
-        if let testSub = item.menu?.item(withTag: 20)?.submenu {
-            for it in testSub.items {
-                guard let offset = it.representedObject as? TimeInterval else { continue }
-                it.state = offset == secs ? .on : .off
-            }
-        }
+    @objc private func timeScrubbed(_ sender: NSSlider) {
+        Config.saveMockMinuteOfDay(Int(sender.doubleValue.rounded()))
+        scrubberLabel?.stringValue = scrubberLabelText()
         applyDisplay()
-        onMockChanged?()
+        onTimeChanged?()   // live, in-place: events are unchanged, only the clock moved
+    }
+
+    @objc private func resetTimeScrub() {
+        Config.saveMockMinuteOfDay(-1)
+        scrubberSlider?.doubleValue = Double(currentScrubMinute())
+        scrubberLabel?.stringValue = scrubberLabelText()
+        applyDisplay()
+        onTimeChanged?()
+    }
+
+    @objc private func toggleForceFallback(_ sender: NSMenuItem) {
+        let newVal = !Config.forceFallback
+        Config.saveForceFallback(newVal)
+        sender.state = newVal ? .on : .off
+        onMockChanged?()   // changes the right-column layout → rebuild the window
     }
 
     @objc private func toggleTestMode(_ sender: NSMenuItem) {

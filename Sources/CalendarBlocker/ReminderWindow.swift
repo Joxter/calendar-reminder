@@ -400,7 +400,7 @@ private final class FlippedStackView: NSStackView {
 
 final class ReminderWindow: NSWindow {
     private let event: CalEvent?          // triggering event (nil = opened without a reminder)
-    private let nextEvent: CalEvent?      // event shown in the bottom slot / drives countdown + color
+    private var nextEvent: CalEvent?      // event shown in the bottom slot / drives countdown + color
     private let visibleEvents: [CalEvent] // today's events, sorted by start
     private let now: Date
     private let useFallback: Bool
@@ -416,6 +416,10 @@ final class ReminderWindow: NSWindow {
     private var nextSlotView: NSView?     // bottom slot — next event
     private var selectedEvent: CalEvent?
 
+    /// True when opened via "Open Calendar" (no triggering reminder) — these get
+    /// live-recreated on mock changes, unlike reminder pop-ups.
+    var isCalendarWindow: Bool { event == nil }
+
     init(event: CalEvent?, todayEvents allEvents: [CalEvent]) {
         self.event = event
         let now = Config.now
@@ -429,7 +433,7 @@ final class ReminderWindow: NSWindow {
         self.visibleEvents = visible
         self.nextEvent     = event ?? visible.first { $0.end > now }
 
-        let fallback = shouldUseFallback(visible, now: now)
+        let fallback = Config.forceFallback || shouldUseFallback(visible, now: now)
         self.useFallback = fallback
 
         let contentW: CGFloat
@@ -466,7 +470,27 @@ final class ReminderWindow: NSWindow {
         let accent = accentColor(for: nextEvent)
         buildUI(accent: accent)
         if event != nil, Config.soundEnabled { NSSound.playSystemSound("Glass") }
-        if nextEvent != nil { startTickTimer() }
+        startTickTimer()   // always: also drives the live time-scrubber refresh
+    }
+
+    /// Refresh the window in place when only the (simulated) clock moved — no
+    /// recreation, since the window size is stable while scrubbing within a day.
+    /// Recomputes the next event, rebuilds the bottom slot if it changed, and
+    /// repaints the timeline's now-marker / colors / countdown / accent.
+    func refreshForTimeChange() {
+        let newNext = event ?? visibleEvents.first { $0.end > Config.now }
+        if newNext != nextEvent {
+            nextEvent = newNext
+            if let slot = nextSlotView {
+                slot.subviews.forEach { $0.removeFromSuperview() }
+                countdownField = nil
+                if let newNext { buildNextContent(in: slot, event: newNext) }
+                else           { buildAllClear(in: slot) }
+            }
+        }
+        leftColumn?.layer?.backgroundColor = accentColor(for: nextEvent).cgColor
+        timelineView?.needsDisplay = true
+        if nextEvent != nil { tick() }
     }
 
     // MARK: - UI

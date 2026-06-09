@@ -44,9 +44,9 @@ enum CalendarChecker {
             }
         }
 
-        // Inject enabled mock events (relative to current/simulated now).
+        // Inject enabled mock events at their absolute time-of-day on the simulated day.
         for def in Config.mockEventDefs where enabledMocks.contains(def.id) {
-            let start = now.addingTimeInterval(TimeInterval(def.offsetMinutes) * 60)
+            let start = todayStart.addingTimeInterval(TimeInterval(def.startMinute) * 60)
             let end   = start.addingTimeInterval(TimeInterval(def.durationMinutes) * 60)
             allToday.append(CalEvent(title: def.title, start: start, end: end,
                                      uid: "mock_\(def.id)", calendarName: "Mock", calendarEmail: nil))
