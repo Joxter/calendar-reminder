@@ -37,10 +37,29 @@ The real win is not the API choice but the structure:
 | `src/canvas.ts` | Canvas2D-backed `DrawCtx` | *(web only)* |
 | `src/timeline.ts` | `renderTimeline` — 1:1 port of `draw()` | `TimelineView.draw` |
 | `src/leftColumn.ts` | Left column as HTML/CSS | `buildLeftSlots` / `build*Content` |
+| `src/fallbackList.ts` | Right column as a plain event list (fallback view) | *(web only)* |
 | `src/script.ts` | Devtools wiring + render loop | *(web only)* |
 
 When porting: `layout.ts` and `timeline.ts` are the files that map to Swift.
 `canvas.ts` and `script.ts` are web-only glue and have no Swift counterpart.
+
+## Fallback list view
+
+When the canvas timeline would be impractical, the right column switches to a
+plain HTML list (`fallbackList.ts`): one fixed-width, scrollable row per event
+showing just **start time + title + relative offset** (`in 1h 5m`, `now`, or
+dimmed once ended). No duration, hour grid, or now-marker.
+
+It engages when **either** condition holds (see `shouldUseFallback` in
+`layout.ts`):
+
+- more than `fallbackMaxEvents` (10) events on the day, or
+- any event starting before `fallbackEarliestHour` (08:00) or ending after
+  `fallbackLatestHour` (20:00).
+
+`shouldUseFallback` is pure (it lives in `layout.ts`, so it ports to Swift); the
+list renderer itself is web-only. The **Fallback list (debug)** checkbox in the
+dev tools forces it on regardless, for inspection.
 
 ## Dev tools
 
@@ -48,6 +67,7 @@ The right sidebar (pure HTML inputs) lets you:
 
 - Toggle individual mock events (mirrors `Config.mockEventDefs`).
 - Scrub simulated time (offset in minutes) — countdown and now-marker advance live.
+- Force the fallback list view on (**Fallback list (debug)**, persisted).
 - Reset to defaults.
 - Read a timestamped debug log.
 
