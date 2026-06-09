@@ -56,6 +56,13 @@ export const urgentThreshold = 120; // seconds
 export const pxPerHour = 45;
 export const pxPerMin = pxPerHour / 60;
 export const defaultHourRange: [number, number] = [9, 18]; // minimum visible range
+
+// Auto-fallback thresholds: the timeline gets impractical when events span too
+// wide a day or there are too many of them — switch to the plain list instead.
+export const fallbackEarliestHour = 8; // any event starting before this hour
+export const fallbackLatestHour = 20; // any event ending after this hour
+export const fallbackMaxEvents = 10; // more than this many events
+
 export const axisPaddingStartMin = 0;
 export const axisPaddingEndMin = 0;
 export const snapToWholeHours = true;
@@ -139,6 +146,16 @@ export function computeVisible(
     visible,
     next: triggering ?? visible.find((e) => e.end > now) ?? null,
   };
+}
+
+/// Whether the timeline should be replaced by the plain list: too many events,
+/// or any event reaching outside the [earliest, latest] hour band of the day.
+export function shouldUseFallback(events: CalEvent[], now: Date): boolean {
+  if (events.length > fallbackMaxEvents) return true;
+  const dayStart = startOfDay(now);
+  const earliest = addHours(dayStart, fallbackEarliestHour);
+  const latest = addHours(dayStart, fallbackLatestHour);
+  return events.some((e) => e.start < earliest || e.end > latest);
 }
 
 export interface TimeMap {

@@ -90,6 +90,30 @@
     #date-header { font-weight: 700; color: #000; }
     #timeline { display: block; cursor: default; }
 
+    /* ---- Fallback list (debug view, replaces the canvas timeline) ---- */
+    /* flex:1 + min-height:0 lets it fill the fixed window height and scroll. */
+    #fallback-list { display: none; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; }
+    .fb-row {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 5px 8px; font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .fb-row:last-child { border-bottom: none; }
+    .fb-time {
+      flex: none; font-weight: 700; color: #000;
+      font-variant-numeric: tabular-nums;
+    }
+    .fb-title {
+      flex: 1; color: #333;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fb-offset {
+      flex: none; font-size: 11px; color: #999;
+      font-variant-numeric: tabular-nums;
+    }
+    .fb-done { opacity: 0.4; }
+    .fb-empty { padding: 12px 8px; color: #999; font-size: 13px; }
+
     /* ---- Dev tools (pure HTML inputs) ---- */
     #dev-tools {
       position: fixed;
@@ -136,6 +160,7 @@
         <div id="right-column">
           <div id="date-header"></div>
           <canvas id="timeline"></canvas>
+          <div id="fallback-list"></div>
         </div>
       </div>
     </div>
@@ -151,6 +176,14 @@
         <div class="dev-row">
           <input type="range" id="time-range" min="0" max="1439" step="1" value="0" />
           <input type="time" id="time-input" />
+        </div>
+      </div>
+
+      <div class="dev-section">
+        <h3>View</h3>
+        <div class="mock-row">
+          <input type="checkbox" id="fallback-toggle" />
+          <label for="fallback-toggle">Fallback list (debug)</label>
         </div>
       </div>
 

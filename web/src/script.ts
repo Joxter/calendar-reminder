@@ -5,6 +5,7 @@
 import { CalEvent, buildMockEvents, mockEventDefs } from "./model";
 import {
   computeVisible,
+  shouldUseFallback,
   rowAt,
   computeTimelineLayout,
   windowWidth,
@@ -21,11 +22,13 @@ import {
   dateHeaderH,
   dateHeaderGap,
   dateHeaderIndent,
+  timelineMinHeight,
   renderTimeline,
 } from "./layout";
 import { startOfDay, pad2 } from "./utils";
 import { CanvasDrawCtx } from "./canvas";
 import { renderLeftColumn } from "./leftColumn";
+import { renderFallbackList, fallbackListW } from "./fallbackList";
 
 // MARK: - Debug log
 const debugLog = {
@@ -44,6 +47,12 @@ const debugLog = {
 // MARK: - State
 const ALL_IDS = mockEventDefs.map((d) => d.id);
 const STORAGE_KEY = "cb.enabledEvents";
+const FALLBACK_KEY = "cb.fallback";
+
+/// Persisted fallback-list (debug view) toggle.
+function loadFallback(): boolean {
+  return localStorage.getItem(FALLBACK_KEY) === "true";
+}
 
 /// Persisted set of enabled mock-event ids (falls back to "all enabled").
 function loadEnabled(): Set<string> {
@@ -73,12 +82,14 @@ const state = {
   minuteOfDay: nowMinuteOfDay(), // simulated time-of-day (0..1439), absolute
   events: [] as CalEvent[],
   selected: null as CalEvent | null,
+  fallback: loadFallback(), // debug: render right column as a plain list
 };
 
 let ctx: CanvasDrawCtx;
 let leftEl: HTMLElement;
 let dateEl: HTMLElement;
 let canvasEl: HTMLCanvasElement;
+let fallbackEl: HTMLElement;
 
 const dateFmt = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
@@ -111,10 +122,37 @@ function render() {
   const now = simulatedNow();
   const vis = computeVisible(state.events, now);
 
+  const winEl = document.getElementById("window")!;
+  dateEl.textContent = dateFmt.format(now);
+  renderLeftColumn(leftEl, { selected: state.selected, next: vis.next, now });
+
+  // Fallback engages on the debug toggle, or automatically when the events make
+  // the timeline impractical (too many, or reaching outside the day's band).
+  const useFallback = state.fallback || shouldUseFallback(vis.visible, now);
+
+  if (useFallback) {
+    // Plain list, fixed width. Height is locked to the timeline's minimum
+    // window height; the list scrolls (CSS) when events overflow.
+    const fixedH = Math.max(
+      winContentH,
+      rightColPadT + dateHeaderH + dateHeaderGap + timelineMinHeight + rightColPadB,
+    );
+    canvasEl.style.display = "none";
+    fallbackEl.style.display = "flex";
+    fallbackEl.style.width = `${fallbackListW}px`;
+    fallbackEl.style.marginLeft = `${rightColPadL}px`;
+    renderFallbackList(fallbackEl, { events: vis.visible, now });
+    winEl.style.width = `${windowWidth(fallbackListW)}px`;
+    winEl.style.height = `${fixedH}px`;
+    return;
+  }
+
+  canvasEl.style.display = "block";
+  fallbackEl.style.display = "none";
+
   const layout = computeTimelineLayout(vis.visible, now);
 
   // Resize DOM elements to fit content.
-  const winEl = document.getElementById("window")!;
   const rightColH =
     rightColPadT + dateHeaderH + dateHeaderGap + layout.height + rightColPadB;
   const winH = Math.max(winContentH, rightColH);
@@ -123,9 +161,6 @@ function render() {
   canvasEl.style.width = `${layout.width}px`;
   canvasEl.style.height = `${layout.height}px`;
   ctx.setupHiDPI();
-
-  dateEl.textContent = dateFmt.format(now);
-  renderLeftColumn(leftEl, { selected: state.selected, next: vis.next, now });
 
   ctx.clear();
   renderTimeline(ctx, {
@@ -203,6 +238,17 @@ function wireTimeControls() {
   apply(state.minuteOfDay); // sync both inputs to the initial value
 }
 
+function wireFallbackToggle() {
+  const cb = document.getElementById("fallback-toggle") as HTMLInputElement;
+  cb.checked = state.fallback;
+  cb.addEventListener("change", () => {
+    state.fallback = cb.checked;
+    localStorage.setItem(FALLBACK_KEY, String(cb.checked));
+    debugLog.log(`fallback list ${cb.checked ? "on" : "off"}`);
+    render();
+  });
+}
+
 function wireCanvasSelection() {
   canvasEl.addEventListener("click", (e) => {
     const rect = canvasEl.getBoundingClientRect();
@@ -222,6 +268,7 @@ function init() {
   leftEl = document.getElementById("left-column")!;
   dateEl = document.getElementById("date-header")!;
   canvasEl = document.getElementById("timeline") as HTMLCanvasElement;
+  fallbackEl = document.getElementById("fallback-list")!;
 
   // canvasEl.style.background = 'green';
 
@@ -232,6 +279,7 @@ function init() {
   rebuildEvents(); // build fixed events before the first render
   wireTimeControls(); // also performs the initial render via apply()
   wireCanvasSelection();
+  wireFallbackToggle();
 
   debugLog.log("App initialized", "success");
 }
