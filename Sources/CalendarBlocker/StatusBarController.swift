@@ -15,6 +15,8 @@ final class StatusBarController: NSObject {
     var onTimeChanged: (() -> Void)?
     /// Called when the user asks to clear the shown-reminders set and re-poll.
     var onClearShown: (() -> Void)?
+    /// Called when the set of enabled reminder offsets changes — reschedule alerts.
+    var onRemindersChanged: (() -> Void)?
 
     // Time-scrubber controls (live HH:mm label + slider).
     private weak var scrubberLabel: NSTextField?
@@ -124,17 +126,16 @@ final class StatusBarController: NSObject {
         item.menu = menu
     }
 
+    // Multiple choice: each offset toggles independently, several can be active.
     private func makeWarningThresholdMenu() -> NSMenuItem {
-        let options: [(String, TimeInterval)] = [
-            ("5 minutes before", 5 * 60), ("10 minutes before", 10 * 60),
-            ("15 minutes before", 15 * 60), ("30 minutes before", 30 * 60)
-        ]
         let sub = NSMenu()
-        for (title, secs) in options {
-            let it = NSMenuItem(title: title, action: #selector(setWarningThreshold(_:)), keyEquivalent: "")
+        let enabled = Config.reminderMinutes
+        for minutes in Config.reminderOptions {
+            let title = minutes == 1 ? "1 minute before" : "\(minutes) minutes before"
+            let it = NSMenuItem(title: title, action: #selector(toggleReminderMinute(_:)), keyEquivalent: "")
             it.target = self
-            it.representedObject = secs as AnyObject
-            it.state = Config.warningThreshold == secs ? .on : .off
+            it.representedObject = minutes as AnyObject
+            it.state = enabled.contains(minutes) ? .on : .off
             sub.addItem(it)
         }
         let parent = NSMenuItem(title: "Remind me", action: nil, keyEquivalent: "")
@@ -357,9 +358,11 @@ final class StatusBarController: NSObject {
     // MARK: - Standard actions
 
     private func refreshSubmenuStates() {
-        if let warnMenu = item.menu?.item(withTag: 11)?.submenu {
-            for it in warnMenu.items {
-                it.state = (it.representedObject as? TimeInterval) == Config.warningThreshold ? .on : .off
+        if let remindMenu = item.menu?.item(withTag: 11)?.submenu {
+            let enabled = Config.reminderMinutes
+            for it in remindMenu.items {
+                guard let minutes = it.representedObject as? Int else { continue }
+                it.state = enabled.contains(minutes) ? .on : .off
             }
         }
         item.menu?.item(withTag: 99)?.state = Config.soundEnabled ? .on : .off
@@ -414,10 +417,13 @@ final class StatusBarController: NSObject {
         onURLChanged?()
     }
 
-    @objc private func setWarningThreshold(_ sender: NSMenuItem) {
-        guard let secs = sender.representedObject as? TimeInterval else { return }
-        Config.saveWarningThreshold(secs)
-        refreshSubmenuStates()
+    @objc private func toggleReminderMinute(_ sender: NSMenuItem) {
+        guard let minutes = sender.representedObject as? Int else { return }
+        var enabled = Config.reminderMinutes
+        if enabled.contains(minutes) { enabled.remove(minutes) } else { enabled.insert(minutes) }
+        Config.saveReminderMinutes(enabled)
+        sender.state = enabled.contains(minutes) ? .on : .off
+        onRemindersChanged?()
     }
 
     @objc private func toggleSound() {

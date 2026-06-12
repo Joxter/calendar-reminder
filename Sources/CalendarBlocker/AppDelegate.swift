@@ -1,15 +1,16 @@
 import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private var shown = Set<String>()           // pollQueue only
-    private var windows: [ReminderWindow] = []  // main thread only
+    private var firedAlerts = Set<String>()      // main thread — "eventKey|minutes" alerts already shown
+    private var reminderWindow: ReminderWindow?  // main thread — the single shared window
+    private var alertTimer: Timer?               // main thread — aimed at the next exact alert time
     private var pollTimer: DispatchSourceTimer?
     private var statusBar: StatusBarController?
-    private var lastResult: FetchResult?        // main thread only
-    private var refreshCalendarPending = false  // main thread only — recreate open calendar window after next poll
+    private var lastResult: FetchResult?         // main thread only
+    private var refreshCalendarPending = false   // main thread only — recreate open calendar window after next poll
+    private var isFirstResult = true             // main thread only — show window once, silence past-due alerts
 
     private let pollQueue = DispatchQueue(label: "com.calendarblocker.poll", qos: .utility)
-    private var isFirstPoll = true              // pollQueue only
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         installEditMenu()
@@ -18,7 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bar.onOpenWindow = { [weak self] in
             guard let self else { return }
             let result = self.lastResult
-            DispatchQueue.main.async { self.showReminder(event: result?.next, today: result?.today ?? []) }
+            DispatchQueue.main.async { self.showReminder(event: nil, today: result?.today ?? []) }
             self.scheduleImmediatePoll()
         }
         bar.onMockChanged = { [weak self] in
@@ -26,17 +27,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.scheduleImmediatePoll()
         }
         bar.onTimeChanged = { [weak self] in
-            DispatchQueue.main.async { self?.refreshOpenWindowsForTime() }
+            DispatchQueue.main.async {
+                self?.refreshOpenWindowForTime()
+                self?.rescheduleAlerts(silencePastDue: true)   // re-aim timers at the simulated clock
+            }
+        }
+        bar.onRemindersChanged = { [weak self] in
+            DispatchQueue.main.async { self?.rescheduleAlerts() }
         }
         bar.onClearShown = { [weak self] in
-            self?.pollQueue.async {
-                self?.shown.removeAll()
-                self?.pollOnce()
-            }
+            DispatchQueue.main.async { self?.firedAlerts.removeAll() }
+            self?.scheduleImmediatePoll()
         }
         statusBar = bar
 
-        print("Calendar Blocker started. Polling every \(Int(Config.pollInterval))s, warning \(Int(Config.warningThreshold / 60))min before events.")
+        print("Calendar Blocker started. Fetching every \(Int(Config.fetchInterval))s, reminders \(Config.reminderMinutes.sorted())min before events.")
         startPollTimer()
     }
 
@@ -48,50 +53,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Poll timer (any thread — safe because pollTimer mutations are bracketed by cancel+create)
 
-    private func startPollTimer(isStartup: Bool = true) {
-        isFirstPoll = isStartup
+    private func startPollTimer() {
         let timer = DispatchSource.makeTimerSource(queue: pollQueue)
-        timer.schedule(deadline: .now(), repeating: Config.pollInterval, leeway: .seconds(1))
-        timer.setEventHandler { [weak self] in
-            guard let self else { return }
-            let first = self.isFirstPoll
-            self.isFirstPoll = false
-            self.pollOnce(isStartup: first)
-        }
+        timer.schedule(deadline: .now(), repeating: Config.fetchInterval, leeway: .seconds(1))
+        timer.setEventHandler { [weak self] in self?.pollOnce() }
         timer.resume()
         pollTimer = timer
-    }
-
-    private func restartPollTimer() {
-        pollTimer?.cancel()
-        startPollTimer(isStartup: false)
     }
 
     private func scheduleImmediatePoll() {
         pollQueue.async { [weak self] in self?.pollOnce() }
     }
 
-    // MARK: - Poll (runs exclusively on pollQueue — no concurrent access to `shown`)
+    // MARK: - Poll (runs exclusively on pollQueue) — fetches only; alerts are scheduled separately
 
-    private func pollOnce(isStartup: Bool = false) {
+    private func pollOnce() {
         print("Checking calendar…")
         do {
             let result = try CalendarChecker.fetch()
-
-            // Keep only keys that still correspond to today's events, so the set
-            // doesn't grow forever and old UIDs can't suppress re-triggered events.
-            let validKeys = Set(result.today.map { $0.uid ?? "\($0.title)|\($0.start)" })
-            shown = shown.intersection(validKeys)
-
-            var eventsToShow: [CalEvent] = []
-            if !isStartup {
-                for event in result.upcoming {
-                    let key = event.uid ?? "\(event.title)|\(event.start)"
-                    if shown.insert(key).inserted {
-                        eventsToShow.append(event)
-                    }
-                }
-            }
 
             if let next = result.next {
                 let secs = next.startsInSeconds
@@ -101,20 +80,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 print("No upcoming events found.")
             }
-            print("Next check in \(Int(Config.pollInterval))s.")
+            print("Next check in \(Int(Config.fetchInterval))s.")
 
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.lastResult = result
                 self.statusBar?.update(next: result.next)
-                if isStartup {
+                let first = self.isFirstResult
+                self.isFirstResult = false
+                if first {
                     self.showReminder(event: result.next, today: result.today)
-                } else {
-                    for ev in eventsToShow {
-                        print("Reminding: \(ev.title) at \(self.timeStr(ev.start))")
-                        self.showReminder(event: ev, today: result.today)
-                    }
                 }
+                self.rescheduleAlerts(silencePastDue: first)
                 if self.refreshCalendarPending {
                     self.refreshCalendarPending = false
                     self.refreshOpenCalendarWindow(today: result.today)
@@ -129,30 +106,86 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Main thread
+    // MARK: - Alert scheduling (main thread)
+    //
+    // Alerts fire from their own timer aimed at the exact moment (event start
+    // minus each enabled offset), independent of the fetch cadence — so a
+    // "1 min before" reminder opens showing ~1:00 on the countdown.
 
-    // Live time-scrubber: refresh open windows in place instead of recreating them.
-    @MainActor
-    private func refreshOpenWindowsForTime() {
-        for win in windows where win.isVisible { win.refreshForTimeChange() }
+    /// Alerts due within this window fire now; the timer aims half of it early so
+    /// the countdown still reads a round value (1:00, not 0:59) when it opens.
+    private let alertTolerance: TimeInterval = 0.5
+
+    private func alertKey(_ event: CalEvent, _ minutes: Int) -> String {
+        "\(event.uid ?? "\(event.title)|\(event.start)")|\(minutes)"
     }
 
-    // Mock change (events / day / hide-real / force-fallback): recreate the open
+    @MainActor
+    private func rescheduleAlerts(silencePastDue: Bool = false) {
+        alertTimer?.invalidate()
+        alertTimer = nil
+        guard let result = lastResult else { return }
+        let now = Config.now
+
+        // Keep only keys for events that still exist, so the set doesn't grow
+        // forever and old UIDs can't suppress re-triggered events.
+        let validKeys = Set(result.today.flatMap { ev in Config.reminderOptions.map { alertKey(ev, $0) } })
+        firedAlerts.formIntersection(validKeys)
+
+        var dueEvents: [CalEvent] = []
+        var nextAlertAt: Date?
+
+        for event in result.today where event.start > now {
+            for minutes in Config.reminderMinutes {
+                let key = alertKey(event, minutes)
+                guard !firedAlerts.contains(key) else { continue }
+                let alertAt = event.start.addingTimeInterval(TimeInterval(-minutes * 60))
+                if alertAt.timeIntervalSince(now) <= alertTolerance {
+                    firedAlerts.insert(key)
+                    if !silencePastDue { dueEvents.append(event) }
+                } else if nextAlertAt == nil || alertAt < nextAlertAt! {
+                    nextAlertAt = alertAt
+                }
+            }
+        }
+
+        if let soonest = dueEvents.min(by: { $0.start < $1.start }) {
+            print("Reminding: \(soonest.title) at \(timeStr(soonest.start))")
+            showReminder(event: soonest, today: result.today)
+        }
+
+        if let nextAlertAt {
+            let delay = max(0.1, nextAlertAt.timeIntervalSince(now) - alertTolerance / 2)
+            let timer = Timer(timeInterval: delay, repeats: false) { [weak self] _ in
+                DispatchQueue.main.async { self?.rescheduleAlerts() }
+            }
+            RunLoop.main.add(timer, forMode: .common)   // .common: fires even while a menu is open
+            alertTimer = timer
+        }
+    }
+
+    // MARK: - Main thread
+
+    // Live time-scrubber: refresh the open window in place instead of recreating it.
+    @MainActor
+    private func refreshOpenWindowForTime() {
+        if let win = reminderWindow, win.isVisible { win.refreshForTimeChange() }
+    }
+
+    // Mock change (events / day / hide-real / force-fallback): rebuild the open
     // calendar window with fresh events so the change is visible immediately.
     @MainActor
     private func refreshOpenCalendarWindow(today: [CalEvent]) {
-        let openCalendars = windows.filter { $0.isVisible && $0.isCalendarWindow }
-        guard !openCalendars.isEmpty else { return }
-        openCalendars.forEach { $0.close() }
-        windows.removeAll { !$0.isVisible }
+        guard let win = reminderWindow, win.isVisible, win.isCalendarWindow else { return }
         showReminder(event: nil, today: today)
     }
 
+    // Single shared window: reuse (rebuild + move to front) instead of stacking new ones.
     @MainActor
     private func showReminder(event: CalEvent?, today: [CalEvent]) {
-        let win = ReminderWindow(event: event, todayEvents: today)
-        windows.removeAll { !$0.isVisible }
-        windows.append(win)
+        let win = reminderWindow ?? ReminderWindow()
+        reminderWindow = win
+        win.configure(event: event, todayEvents: today)
         win.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }

@@ -6,12 +6,13 @@ A native macOS app (Swift + AppKit) that shows an aggressive reminder window whe
 
 ## How it works
 
-1. A background timer polls one or more Google Calendar iCal feeds every 60 seconds.
-2. When an event falls within the warning window (default 10 min before start), a reminder window appears on top of all other windows and steals focus.
-3. The same event is never shown twice in the same session. Events that appear in multiple calendar feeds are deduplicated by UID so they only appear once.
-4. Events that started up to a few minutes ago are still shown if a poll cycle missed them.
-5. Recurring events (RRULE) are fully expanded — daily, weekly, monthly, and yearly patterns are supported.
-6. A menu bar icon shows the next event title and an animated live countdown; clicking it opens a menu with settings and a Quit option.
+1. A background timer refetches one or more Google Calendar iCal feeds every 60 seconds.
+2. Alerts are scheduled independently of the fetch cycle: a dedicated timer fires at the exact moment `event start − offset`, so a "1 minute before" reminder opens showing 1:00 on the countdown. Several offsets can be enabled at once (1–30 minutes, default 10).
+3. The reminder window appears on top of all other windows and steals focus. It closes itself 1 minute after the alert if you don't dismiss it first.
+4. There is only ever **one** window — a new alert reuses the open window (rebuilding its content in place, keeping its position) and brings it to front instead of stacking another one.
+5. Each event + offset pair fires once per session. Events that appear in multiple calendar feeds are deduplicated by UID so they only appear once. An alert whose time already passed when the event is first seen (e.g. a meeting added last-minute) still fires immediately, as long as the event hasn't started yet.
+6. Recurring events (RRULE) are fully expanded — daily, weekly, monthly, and yearly patterns are supported.
+7. A menu bar icon shows the next event title and an animated live countdown; clicking it opens a menu with settings and a Quit option.
 
 ---
 
@@ -70,9 +71,9 @@ Clicking the icon shows a dropdown:
 | ------------------------- | ----------------------------------------------------------------------------------- |
 | Event title · start time  | Read-only, shows the next upcoming event                                            |
 | **Set Calendar URLs…** ⌘, | Opens a multi-line dialog; paste one iCal URL per line                              |
-| **Remind me** ▶           | Submenu: 5 / 10 / 15 / 30 minutes before                                            |
+| **Remind me** ▶           | Multi-select submenu: 1 / 2 / 3 / 5 / 10 / 15 / 20 / 30 minutes before — each toggles independently, several can be active at once |
 | **Sound** ✓               | Toggle the Glass sound on reminder                                                  |
-| **Open Calendar** ⌘O      | Opens the day-view reminder window                                                  |
+| **Open Calendar** ⌘O      | Opens the day-view calendar window (stays open — no auto-close)                     |
 | **Testing** ▶             | Mock events, time scrubber, day picker, fallback toggle — see [Testing & debug](#testing--debug) |
 | **Quit** ⌘Q               | Quits the app                                                                       |
 
@@ -82,7 +83,7 @@ All settings are saved in `UserDefaults` and take effect immediately (no restart
 
 ## Reminder window
 
-Always on top, centred, and steals keyboard focus. **Esc** or the title-bar close button dismisses it. The window has **no fixed size** — both dimensions are derived from the day's events:
+Always on top and steals keyboard focus. **Esc** or the title-bar close button dismisses it; alert-triggered windows also close themselves after 60 seconds. A single shared window is reused for everything: it centres itself on first show, and a later alert (or **Open Calendar**) rebuilds its content in place, keeping the position you dragged it to. The window has **no fixed size** — both dimensions are derived from the day's events:
 
 - **Width** scales with the visible time span (45 px per hour), so a busy day is wider than a quiet one.
 - **Height** grows to fit every event (minimum 7 rows), never shrinking below a constant minimum set by the left column.
@@ -115,8 +116,8 @@ A Gantt-style timeline, one row per event sorted by start time.
 - **Time axis** — minimum **09:00 – 18:00**, extended to fit any events outside that band, snapped to whole hours, and capped at **03:00** the next morning. Hour gridlines with labels along the bottom.
 - **"Now" marker** — a solid red vertical line with a dot and the current `HH:mm` at the top.
 - **Event rows** — each draws a bold time badge, an L-shaped start marker + duration line, and the title:
-  - starting **before 13:00** → title to the **right** of the badge;
-  - starting **at/after 13:00** → title to the **left** of the start marker.
+  - by default the title sits to the **right** of the time badge;
+  - a title that wouldn't fit before the timeline's right edge flips to the **left** of the start marker — and once one event flips, every later event flips too, so the rows read consistently.
 - Rows are **clickable** — click to show that event in the left column's top slot; click again to deselect (the selected event's title is drawn bold).
 
 | Event state  | Colour        |
@@ -152,7 +153,7 @@ The menu bar **Testing ▶** submenu drives a simulated environment for working 
 | Force check now       | Re-poll immediately                                                       |
 | Clear shown reminders | Forget which reminders have fired so they can re-trigger                 |
 
-Scrubbing the time slider refreshes any open calendar window **in place** (now-marker, colours, countdown). Toggling mock events, the day, or the fallback view recreates the open calendar window so the change shows immediately.
+Scrubbing the time slider refreshes any open calendar window **in place** (now-marker, colours, countdown) and re-aims the alert timers at the simulated clock — past-due alerts are marked as fired silently, so dragging the slider doesn't trigger a popup storm. To test an alert, scrub to a point *before* it and wait for it to fire, or use **Clear shown reminders** to re-trigger anything currently due. Toggling mock events, the day, or the fallback view rebuilds the open calendar window so the change shows immediately.
 
 The same logic powers a browser prototype under `web/` (TypeScript + Vite), which is the design reference the Swift timeline mirrors.
 
@@ -168,8 +169,8 @@ calendar-blocker/
 ├── .env                                  — local config (git-ignored)
 └── Sources/CalendarBlocker/
     ├── main.swift                        — entry point; NSApplication setup
-    ├── AppDelegate.swift                 — app lifecycle, polling timer, status bar wiring
-    ├── CalendarChecker.swift             — iCal fetch/parse; upcoming + today events
+    ├── AppDelegate.swift                 — app lifecycle, fetch timer, exact-time alert scheduler, status bar wiring
+    ├── CalendarChecker.swift             — iCal fetch/parse; today's events + next event
     ├── ICalParser.swift                  — raw iCal text → Event structs
     ├── RRuleExpander.swift               — RFC 5545 RRULE → concrete occurrence dates
     ├── ReminderWindow.swift              — two-column NSWindow with Gantt timeline
@@ -183,10 +184,10 @@ calendar-blocker/
 
 All settings are stored in `UserDefaults` and configured via the menu bar. No config files or environment variables needed.
 
-| Setting           | Default          | Where to change               |
-| ----------------- | ---------------- | ----------------------------- |
-| iCal URLs         | — (one per line) | Menu bar → Set Calendar URLs… |
-| Warning threshold | 10 min           | Menu bar → Remind me          |
-| Sound             | On               | Menu bar → Sound              |
+| Setting          | Default          | Where to change               |
+| ---------------- | ---------------- | ----------------------------- |
+| iCal URLs        | — (one per line) | Menu bar → Set Calendar URLs… |
+| Reminder offsets | 10 min           | Menu bar → Remind me (multi-select: 1 / 2 / 3 / 5 / 10 / 15 / 20 / 30 min) |
+| Sound            | On               | Menu bar → Sound              |
 
-The poll interval is fixed at 60 s.
+The fetch interval is fixed at 60 s; alert timing is independent of it, so reminders fire at the exact offset regardless of when the last fetch happened.

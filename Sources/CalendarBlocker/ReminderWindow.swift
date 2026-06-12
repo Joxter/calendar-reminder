@@ -60,7 +60,6 @@ private let hoursH:        CGFloat = 12 + 19  // 31
 // Right-column font size — single knob that scales all timeline text.
 private let timelineFontSize:   CGFloat = 13
 private let maxTimelineTitleW:   CGFloat = 150
-private let titleLeftThresholdHour = 13   // events at/after this hour get the title left of the marker
 
 // L-shape style.
 private let shapeStrokeW: CGFloat = 2   // stroke thickness
@@ -77,6 +76,9 @@ private let fallbackListW: CGFloat = 300
 private let accentDefault = accentSoon         // blue  (#2563eb)
 private let accentUrgent  = accentInProgress   // red   (#dc2626)
 private let urgentThreshold: TimeInterval = 120
+
+// Alert pop-ups close themselves after this if the user doesn't.
+private let autoCloseDelay: TimeInterval = 60
 
 // Left-panel title fields — 2 lines max.
 // NSTextField.maximumNumberOfLines does NOT cap Auto Layout intrinsic content size in
@@ -293,8 +295,9 @@ final class TimelineView: NSView {
         // Precompute per-event layout so we can use it across passes.
         // titleRect width = actual rendered text width (capped at maxW), so white backgrounds
         // don't bleed into the now-line or beyond available space.
-        // Morning titles (hour < 13): left-aligned after the time label, capped at maxTimelineTitleW.
-        // Afternoon titles (hour ≥ 13): right-aligned to the event start (x1-6), capped at maxTimelineTitleW.
+        // Titles sit right of the time label by default; a title flips to the left of the
+        // marker when it wouldn't fit before the timeline's right edge — and once one event
+        // flips, every later event flips too, so the rows read consistently.
         struct EvLayout {
             let cy: CGFloat, x1: CGFloat, x2: CGFloat
             let color: NSColor, alpha: CGFloat
@@ -304,6 +307,7 @@ final class TimelineView: NSView {
             let titleRect: NSRect
         }
         var layouts: [EvLayout] = []
+        var flipTitlesLeft = false   // sticky: set by the first title that doesn't fit on the right
         for (i, ev) in events.enumerated() {
             let cy = eventsTop + CGFloat(i) * rowH + rowH / 2
             let x1 = t2x(ev.start), x2 = t2x(ev.end)
@@ -325,7 +329,6 @@ final class TimelineView: NSView {
 
             let txtColor    = done ? NSColor.tertiaryLabelColor : NSColor.labelColor
             let font        = isFocused ? NSFont.boldSystemFont(ofSize: timelineFontSize) : NSFont.systemFont(ofSize: timelineFontSize)
-            let isAfternoon = Calendar.current.component(.hour, from: ev.start) >= titleLeftThresholdHour
             let afterTimeX  = x1 + shapeStrokeW / 2 + 4 + timeSz.width + 6
 
             let truncPara = NSMutableParagraphStyle()
@@ -337,14 +340,18 @@ final class TimelineView: NSView {
             let naturalW = titleStr.size(withAttributes: titleAttrs).width
             let titleH   = titleStr.size(withAttributes: titleAttrs).height
 
+            let drawWRight = min(naturalW, maxTimelineTitleW)
+            if !flipTitlesLeft, afterTimeX + drawWRight > bounds.width - timelinePadR {
+                flipTitlesLeft = true
+            }
+
             let titleRect: NSRect
-            if isAfternoon {
+            if flipTitlesLeft {
                 let maxW  = min(maxTimelineTitleW, max(0, x1 - 6 - timelinePadL))
                 let drawW = min(naturalW, maxW)
                 titleRect = NSRect(x: x1 - 6 - drawW, y: cy - titleH / 2, width: drawW, height: titleH)
             } else {
-                let drawW = min(naturalW, maxTimelineTitleW)
-                titleRect = NSRect(x: afterTimeX, y: cy - titleH / 2, width: drawW, height: titleH)
+                titleRect = NSRect(x: afterTimeX, y: cy - titleH / 2, width: drawWRight, height: titleH)
             }
 
             layouts.append(EvLayout(cy: cy, x1: x1, x2: x2, color: color, alpha: alpha,
@@ -399,16 +406,17 @@ private final class FlippedStackView: NSStackView {
 // MARK: - Reminder Window
 
 final class ReminderWindow: NSWindow {
-    private let event: CalEvent?          // triggering event (nil = opened without a reminder)
-    private var nextEvent: CalEvent?      // event shown in the bottom slot / drives countdown + color
-    private let visibleEvents: [CalEvent] // today's events, sorted by start
-    private let now: Date
-    private let useFallback: Bool
-    private let layout: TimelineLayout?   // nil when the fallback list is shown
+    private var event: CalEvent?            // triggering event (nil = opened without a reminder)
+    private var nextEvent: CalEvent?        // event shown in the bottom slot / drives countdown + color
+    private var visibleEvents: [CalEvent] = []   // today's events, sorted by start
+    private var now = Date()
+    private var useFallback = false
+    private var layout: TimelineLayout?     // nil when the fallback list is shown
 
     private var countdownField: NSTextField?
     private var colonVisible   = true
     private var tickTimer: Timer?
+    private var autoCloseTimer: Timer?
 
     private var leftColumn: NSView?
     private var timelineView: TimelineView?
@@ -420,7 +428,21 @@ final class ReminderWindow: NSWindow {
     /// live-recreated on mock changes, unlike reminder pop-ups.
     var isCalendarWindow: Bool { event == nil }
 
-    init(event: CalEvent?, todayEvents allEvents: [CalEvent]) {
+    init() {
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        isReleasedWhenClosed = false
+        level = .floating
+        isMovableByWindowBackground = true
+    }
+
+    /// (Re)build the window for a trigger + today's events. The app keeps a single
+    /// shared window, so this runs on first show and every reuse.
+    func configure(event: CalEvent?, todayEvents allEvents: [CalEvent]) {
         self.event = event
         let now = Config.now
         self.now = now
@@ -452,25 +474,44 @@ final class ReminderWindow: NSWindow {
         }
         let winW = windowWidth(contentW)
 
-        let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        let origin = NSPoint(x: (screenFrame.width - winW) / 2, y: (screenFrame.height - winH) / 2)
-
-        super.init(
-            contentRect: NSRect(origin: origin, size: NSSize(width: winW, height: winH)),
-            styleMask: [.titled, .closable],
-            backing: .buffered,
-            defer: false
-        )
+        if isVisible {
+            // Reuse: resize in place, keeping the top-left corner where the user put it.
+            let newFrame = frameRect(forContentRect: NSRect(x: 0, y: 0, width: winW, height: winH))
+            let topLeftY = frame.origin.y + frame.height
+            setFrame(NSRect(x: frame.origin.x, y: topLeftY - newFrame.height,
+                            width: newFrame.width, height: newFrame.height), display: true)
+        } else {
+            setContentSize(NSSize(width: winW, height: winH))
+            let screenFrame = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+            setFrameOrigin(NSPoint(x: (screenFrame.width - frame.width) / 2,
+                                   y: (screenFrame.height - frame.height) / 2))
+        }
 
         title = event != nil ? "Meeting Reminder" : "Calendar"
-        isReleasedWhenClosed = false
-        level = .floating
-        isMovableByWindowBackground = true
 
-        let accent = accentColor(for: nextEvent)
-        buildUI(accent: accent)
+        // Reset per-configure state; buildUI replaces the whole content view.
+        selectedEvent  = nil
+        countdownField = nil
+        timelineView   = nil
+        selectedSlot   = nil
+        nextSlotView   = nil
+        leftColumn     = nil
+        buildUI(accent: accentColor(for: nextEvent))
+
         if event != nil, Config.soundEnabled { NSSound.playSystemSound("Glass") }
+
+        tickTimer?.invalidate()
         startTickTimer()   // always: also drives the live time-scrubber refresh
+
+        // Alert pop-ups dismiss themselves if the user doesn't; manual calendar
+        // windows stay open.
+        autoCloseTimer?.invalidate()
+        autoCloseTimer = nil
+        if event != nil {
+            let t = Timer(timeInterval: autoCloseDelay, repeats: false) { [weak self] _ in self?.close() }
+            RunLoop.main.add(t, forMode: .common)
+            autoCloseTimer = t
+        }
     }
 
     /// Refresh the window in place when only the (simulated) clock moved — no
@@ -887,6 +928,8 @@ final class ReminderWindow: NSWindow {
     override func close() {
         tickTimer?.invalidate()
         tickTimer = nil
+        autoCloseTimer?.invalidate()
+        autoCloseTimer = nil
         super.close()
     }
 

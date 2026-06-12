@@ -26,13 +26,22 @@ enum Config {
         return parts[idx + 1].removingPercentEncoding
     }
 
-    static let pollInterval: TimeInterval = 60
+    /// How often the calendar feeds are refetched. Alert timing is independent
+    /// of this — see AppDelegate.rescheduleAlerts.
+    static let fetchInterval: TimeInterval = 60
 
-    static var warningThreshold: TimeInterval {
-        let v = d.double(forKey: "warningThreshold")
-        return v > 0 ? v : 10 * 60
+    /// Reminder offsets (minutes before event start) offered in the "Remind me" menu.
+    static let reminderOptions: [Int] = [1, 2, 3, 5, 10, 15, 20, 30]
+
+    /// Enabled reminder offsets — multiple choice, may be empty.
+    static var reminderMinutes: Set<Int> {
+        if let arr = d.array(forKey: "reminderMinutes") as? [Int] { return Set(arr) }
+        let old = d.double(forKey: "warningThreshold")   // migrate from the single-choice key
+        return [old > 0 ? Int(old / 60) : 10]
     }
-    static func saveWarningThreshold(_ seconds: TimeInterval) { d.set(seconds, forKey: "warningThreshold") }
+    static func saveReminderMinutes(_ minutes: Set<Int>) {
+        d.set(minutes.sorted(), forKey: "reminderMinutes")
+    }
 
     static var soundEnabled: Bool {
         d.object(forKey: "soundEnabled") == nil ? true : d.bool(forKey: "soundEnabled")

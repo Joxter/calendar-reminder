@@ -3,7 +3,6 @@ import Foundation
 enum CalendarError: Error { case noURL }
 
 struct FetchResult {
-    let upcoming: [CalEvent]
     let today: [CalEvent]
     let next: CalEvent?
 }
@@ -54,13 +53,8 @@ enum CalendarChecker {
 
         allToday.sort { $0.start < $1.start }
 
-        let upcoming = allToday.filter { event in
-            let secs = event.startsInSeconds
-            return secs > -60 && secs <= Config.warningThreshold
-        }
-
         let next = allToday.first { $0.start > now }
 
-        return FetchResult(upcoming: upcoming, today: allToday, next: next)
+        return FetchResult(today: allToday, next: next)
     }
 }
