@@ -117,7 +117,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let alertTolerance: TimeInterval = 0.5
 
     private func alertKey(_ event: CalEvent, _ minutes: Int) -> String {
-        "\(event.uid ?? "\(event.title)|\(event.start)")|\(minutes)"
+        "\(event.uid ?? event.title)|\(event.start.timeIntervalSinceReferenceDate)|\(minutes)"
     }
 
     @MainActor
