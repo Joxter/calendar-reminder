@@ -375,7 +375,8 @@ final class StatusBarController: NSObject {
     private func updateMenuEventItem() {
         guard let menuItem = item.menu?.item(withTag: 42) else { return }
         if let ev = nextEvent {
-            menuItem.title = "\(ev.title)  ·  \(StatusBarController.eventTimeFmt.string(from: ev.start))"
+            let truncated = ev.title.count > 40 ? ev.title.prefix(38) + "…" : ev.title
+            menuItem.title = "\(truncated)  ·  \(StatusBarController.eventTimeFmt.string(from: ev.start))"
         } else {
             menuItem.title = "No upcoming events today"
         }

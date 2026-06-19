@@ -77,8 +77,6 @@ private let accentDefault = accentSoon  // blue  (#2563eb)
 private let accentUrgent = accentInProgress  // red   (#dc2626)
 private let urgentThreshold: TimeInterval = 120
 
-// Alert pop-ups close themselves after this if the user doesn't.
-private let autoCloseDelay: TimeInterval = 60
 
 // Left-panel title fields — 2 lines max.
 // NSTextField.maximumNumberOfLines does NOT cap Auto Layout intrinsic content size in
@@ -201,6 +199,7 @@ private func countdownText(_ rawSecs: TimeInterval) -> String {
     }
     return String(format: "%02d:%02d", totalMin, Int(secs) % 60)
 }
+
 
 // MARK: - Timeline View
 
@@ -448,6 +447,13 @@ private final class FlippedStackView: NSStackView {
     override var isFlipped: Bool { true }
 }
 
+/// Tappable row in the fallback list.
+private final class FallbackRowView: NSView {
+    var onTap: (() -> Void)?
+    override func mouseDown(with event: NSEvent) { onTap?() }
+    override func resetCursorRects() { addCursorRect(bounds, cursor: .pointingHand) }
+}
+
 // MARK: - Reminder Window
 
 final class ReminderWindow: NSWindow {
@@ -461,13 +467,13 @@ final class ReminderWindow: NSWindow {
     private var countdownField: NSTextField?
     private var colonVisible = true
     private var tickTimer: Timer?
-    private var autoCloseTimer: Timer?
 
     private var leftColumn: NSView?
     private var timelineView: TimelineView?
     private var selectedSlot: NSView?  // top slot — filled on timeline click
     private var nextSlotView: NSView?  // bottom slot — next event
     private var selectedEvent: CalEvent?
+    private var selectedFallbackRow: FallbackRowView?
 
     /// True when opened via "Open Calendar" (no triggering reminder) — these get
     /// live-recreated on mock changes, unlike reminder pop-ups.
@@ -499,7 +505,8 @@ final class ReminderWindow: NSWindow {
             .filter { cal.isDate($0.start, inSameDayAs: now) }
             .sorted { $0.start < $1.start }
         self.visibleEvents = visible
-        self.nextEvent = event ?? visible.first { $0.end > now }
+        let recentCutoff = now.addingTimeInterval(-5 * 60)
+        self.nextEvent = event ?? visible.first { $0.end > now && $0.start >= recentCutoff }
 
         let fallback = Config.forceFallback || shouldUseFallback(visible, now: now)
         self.useFallback = fallback
@@ -543,6 +550,7 @@ final class ReminderWindow: NSWindow {
 
         // Reset per-configure state; buildUI replaces the whole content view.
         selectedEvent = nil
+        selectedFallbackRow = nil
         countdownField = nil
         timelineView = nil
         selectedSlot = nil
@@ -555,17 +563,6 @@ final class ReminderWindow: NSWindow {
         tickTimer?.invalidate()
         startTickTimer()  // always: also drives the live time-scrubber refresh
 
-        // Alert pop-ups dismiss themselves if the user doesn't; manual calendar
-        // windows stay open.
-        autoCloseTimer?.invalidate()
-        autoCloseTimer = nil
-        if event != nil {
-            let t = Timer(timeInterval: autoCloseDelay, repeats: false) { [weak self] _ in
-                self?.close()
-            }
-            RunLoop.main.add(t, forMode: .common)
-            autoCloseTimer = t
-        }
     }
 
     /// Refresh the window in place when only the (simulated) clock moved — no
@@ -573,7 +570,8 @@ final class ReminderWindow: NSWindow {
     /// Recomputes the next event, rebuilds the bottom slot if it changed, and
     /// repaints the timeline's now-marker / colors / countdown / accent.
     func refreshForTimeChange() {
-        let newNext = event ?? visibleEvents.first { $0.end > Config.now }
+        let recentCutoff = Config.now.addingTimeInterval(-5 * 60)
+        let newNext = event ?? visibleEvents.first { $0.end > Config.now && $0.start >= recentCutoff }
         if newNext != nextEvent {
             nextEvent = newNext
             if let slot = nextSlotView {
@@ -798,13 +796,28 @@ final class ReminderWindow: NSWindow {
 
         if visibleEvents.isEmpty {
             let row = fallbackEmptyRow()
-            stack.addArrangedSubview(row)  // add first — constraint needs a common ancestor
+            stack.addArrangedSubview(row)
             row.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         } else {
-            for ev in visibleEvents {
-                let row = fallbackRow(ev)
+            let lastIndex = visibleEvents.count - 1
+            var nextRow: FallbackRowView? = nil
+            for (i, ev) in visibleEvents.enumerated() {
+                let row = fallbackRow(ev, isLast: i == lastIndex)
                 stack.addArrangedSubview(row)
                 row.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+                if nextRow == nil && ev.end > now { nextRow = row }
+            }
+            // Scroll so the next event is vertically centered.
+            if let target = nextRow {
+                DispatchQueue.main.async {
+                    let rowFrame = target.frame  // in stack's flipped coordinate space
+                    let visH = scroll.contentSize.height
+                    let docH = stack.frame.height
+                    let centerY = rowFrame.midY - visH / 2
+                    let clampedY = max(0, min(centerY, docH - visH))
+                    scroll.contentView.scroll(to: NSPoint(x: 0, y: clampedY))
+                    scroll.reflectScrolledClipView(scroll.contentView)
+                }
             }
         }
     }
@@ -814,20 +827,22 @@ final class ReminderWindow: NSWindow {
     private func fallbackOffsetText(_ ev: CalEvent) -> String {
         if ev.start <= now && now < ev.end { return "now" }
         let secs = ev.start.timeIntervalSince(now)
-        if secs <= 0 { return "" }  // ended
+        if secs <= 0 { return "" }
         return "in " + durString(minutes: Int(ceil(secs / 60)))
     }
 
-    private func fallbackRow(_ ev: CalEvent) -> NSView {
-        let row = NSView()
+    private func fallbackRow(_ ev: CalEvent, isLast: Bool) -> FallbackRowView {
+        let row = FallbackRowView()
         row.translatesAutoresizingMaskIntoConstraints = false
-        if ev.end <= now { row.alphaValue = 0.4 }  // dim ended events
+        row.wantsLayer = true
+        if ev.end <= now { row.alphaValue = 0.4 }
 
+        let upcoming = ev.start > now
         let timeFmt = DateFormatter()
         timeFmt.dateFormat = "HH:mm"
         let time = NSTextField(labelWithString: timeFmt.string(from: ev.start))
         time.font = NSFont.monospacedDigitSystemFont(ofSize: 13, weight: .bold)
-        time.textColor = NSColor(hex: "#000000")
+        time.textColor = upcoming ? accentSoon : NSColor(hex: "#000000")
         time.translatesAutoresizingMaskIntoConstraints = false
         time.setContentHuggingPriority(.required, for: .horizontal)
         time.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -846,33 +861,60 @@ final class ReminderWindow: NSWindow {
         offset.setContentHuggingPriority(.required, for: .horizontal)
         offset.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        let sep = NSView()
-        sep.translatesAutoresizingMaskIntoConstraints = false
-        sep.wantsLayer = true
-        sep.layer?.backgroundColor = NSColor(hex: "#f0f0f0").cgColor
-
         row.addSubview(time)
         row.addSubview(title)
         row.addSubview(offset)
-        row.addSubview(sep)
 
-        NSLayoutConstraint.activate([
+        var constraints: [NSLayoutConstraint] = [
             time.leadingAnchor.constraint(equalTo: row.leadingAnchor, constant: 8),
             time.centerYAnchor.constraint(equalTo: row.centerYAnchor),
 
-            offset.trailingAnchor.constraint(equalTo: row.trailingAnchor, constant: -8),
+            offset.trailingAnchor.constraint(equalTo: row.trailingAnchor, constant: -22),
             offset.centerYAnchor.constraint(equalTo: row.centerYAnchor),
 
             title.leadingAnchor.constraint(equalTo: time.trailingAnchor, constant: 8),
             title.trailingAnchor.constraint(lessThanOrEqualTo: offset.leadingAnchor, constant: -8),
             title.topAnchor.constraint(equalTo: row.topAnchor, constant: 5),
             title.bottomAnchor.constraint(equalTo: row.bottomAnchor, constant: -5),
+        ]
 
-            sep.leadingAnchor.constraint(equalTo: row.leadingAnchor),
-            sep.trailingAnchor.constraint(equalTo: row.trailingAnchor),
-            sep.bottomAnchor.constraint(equalTo: row.bottomAnchor),
-            sep.heightAnchor.constraint(equalToConstant: 1),
-        ])
+        if !isLast {
+            let sep = NSView()
+            sep.translatesAutoresizingMaskIntoConstraints = false
+            sep.wantsLayer = true
+            sep.layer?.backgroundColor = NSColor(hex: "#f0f0f0").cgColor
+            row.addSubview(sep)
+            constraints += [
+                sep.leadingAnchor.constraint(equalTo: row.leadingAnchor),
+                sep.trailingAnchor.constraint(equalTo: row.trailingAnchor),
+                sep.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+                sep.heightAnchor.constraint(equalToConstant: 1),
+            ]
+        }
+
+        NSLayoutConstraint.activate(constraints)
+
+        row.onTap = { [weak self, weak row] in
+            guard let self, let row else { return }
+            // Deselect previous row.
+            self.selectedFallbackRow?.layer?.backgroundColor = nil
+            if self.selectedEvent == ev {
+                self.selectedEvent = nil
+                self.selectedFallbackRow = nil
+                self.selectedSlot?.subviews.forEach { $0.removeFromSuperview() }
+                return
+            }
+            // Select this row.
+            row.layer?.backgroundColor =
+                NSColor.selectedContentBackgroundColor.withAlphaComponent(0.12).cgColor
+            self.selectedFallbackRow = row
+            self.selectedEvent = ev
+            if let slot = self.selectedSlot {
+                slot.subviews.forEach { $0.removeFromSuperview() }
+                self.buildSelectedContent(in: slot, event: ev)
+            }
+        }
+
         return row
     }
 
@@ -956,7 +998,7 @@ final class ReminderWindow: NSWindow {
         let infoStr = dur.isEmpty ? timeStr : "\(timeStr)  ·  \(dur)"
         let infoField = NSTextField(labelWithString: infoStr)
         infoField.translatesAutoresizingMaskIntoConstraints = false
-        infoField.font = NSFont.systemFont(ofSize: 11)
+        infoField.font = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
         infoField.textColor = white.withAlphaComponent(0.7)
         infoField.lineBreakMode = .byTruncatingTail
         view.addSubview(infoField)
@@ -1007,8 +1049,6 @@ final class ReminderWindow: NSWindow {
     override func close() {
         tickTimer?.invalidate()
         tickTimer = nil
-        autoCloseTimer?.invalidate()
-        autoCloseTimer = nil
         super.close()
     }
 
