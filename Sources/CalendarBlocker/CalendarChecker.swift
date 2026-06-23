@@ -53,7 +53,8 @@ enum CalendarChecker {
 
         allToday.sort { $0.start < $1.start }
 
-        let next = allToday.first { $0.start > now }
+        let recentCutoff = now.addingTimeInterval(-5 * 60)
+        let next = allToday.first { $0.end > now && $0.start >= recentCutoff }
 
         return FetchResult(today: allToday, next: next)
     }

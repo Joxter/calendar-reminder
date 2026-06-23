@@ -25,13 +25,14 @@ enum ICalParser {
         var duration: TimeInterval?
         var rrule: String?
         var exdates: [Date] = []
+        var recurrenceId: Date?
     }
 
     // Parses iCal text and returns events whose start falls within `range`.
     // Recurring events (RRULE) are expanded; each occurrence becomes a CalEvent.
     static func parse(_ text: String, expandingIn range: DateInterval, calendarEmail: String? = nil) -> [CalEvent] {
         let unfolded = unfold(text)
-        var result: [CalEvent] = []
+        var rawEvents: [RawEvent] = []
         var raw = RawEvent()
         var inEvent = false
         var calendarName: String?
@@ -50,24 +51,37 @@ enum ICalParser {
                 inEvent = true
                 raw = RawEvent()
             case "END:VEVENT":
-                if inEvent { result += expand(raw, in: range, calendarName: calendarName, calendarEmail: calendarEmail) }
+                if inEvent { rawEvents.append(raw) }
                 inEvent = false
             default:
                 guard inEvent else { continue }
                 // Key is everything before the first ':' or ';'
                 let key = String(line.prefix(while: { $0 != ":" && $0 != ";" }))
                 switch key {
-                case "SUMMARY":  raw.title    = unescapeText(afterColon(line))
-                case "UID":      raw.uid      = afterColon(line)
-                case "DTSTART":  raw.start    = parseDate(line)
-                case "DTEND":    raw.end      = parseDate(line)
-                case "DURATION": raw.duration = parseDuration(afterColon(line))
-                case "RRULE":    raw.rrule    = afterColon(line)
-                case "EXDATE":   raw.exdates += parseDates(line)
+                case "SUMMARY":       raw.title        = unescapeText(afterColon(line))
+                case "UID":           raw.uid          = afterColon(line)
+                case "DTSTART":       raw.start        = parseDate(line)
+                case "DTEND":         raw.end          = parseDate(line)
+                case "DURATION":      raw.duration     = parseDuration(afterColon(line))
+                case "RRULE":         raw.rrule        = afterColon(line)
+                case "EXDATE":        raw.exdates     += parseDates(line)
+                case "RECURRENCE-ID": raw.recurrenceId = parseDate(line)
                 default: break
                 }
             }
         }
+
+        // RFC 5545: a VEVENT with RECURRENCE-ID overrides a specific occurrence of a recurring
+        // series. Add the recurrenceId date to the master event's exdates so the RRULE expander
+        // skips the original occurrence; the overriding VEVENT provides the replacement.
+        for exception in rawEvents {
+            guard let uid = exception.uid, let recId = exception.recurrenceId else { continue }
+            for i in rawEvents.indices where rawEvents[i].uid == uid && rawEvents[i].rrule != nil {
+                rawEvents[i].exdates.append(recId)
+            }
+        }
+
+        let result = rawEvents.flatMap { expand($0, in: range, calendarName: calendarName, calendarEmail: calendarEmail) }
         return result.sorted { $0.start < $1.start }
     }
 

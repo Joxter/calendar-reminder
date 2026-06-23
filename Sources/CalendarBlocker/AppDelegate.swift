@@ -74,8 +74,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             if let next = result.next {
                 let secs = next.startsInSeconds
-                let h = Int(secs) / 3600, m = Int(secs) % 3600 / 60, s = Int(secs) % 60
-                let eta = h > 0 ? "in \(h)h \(m)m" : (m > 0 ? "in \(m)m \(s)s" : "in \(s)s")
+                let eta: String
+                if secs <= 0 {
+                    eta = "now"
+                } else {
+                    let h = Int(secs) / 3600, m = Int(secs) % 3600 / 60, s = Int(secs) % 60
+                    eta = h > 0 ? "in \(h)h \(m)m" : (m > 0 ? "in \(m)m \(s)s" : "in \(s)s")
+                }
                 print("Next event: \"\(next.title)\" at \(timeStr(next.start)) (\(eta))")
             } else {
                 print("No upcoming events found.")
