@@ -32,7 +32,7 @@ private let panelGap: CGFloat = 16  // gap between the selected and next slots
 
 // Right column padding (web rightColPad T/R/B/L = 9/4/4/4).
 private let rightColPadT: CGFloat = 9
-private let rightColPadR: CGFloat = 4
+private let rightColPadR: CGFloat = 2
 private let rightColPadB: CGFloat = 4
 private let rightColPadL: CGFloat = 4
 
@@ -91,7 +91,7 @@ private var leftPanelTitleMaxH: CGFloat {
 // Heights derived from font metrics for left-column window sizing. These are the
 // ground truth the web approximates with `lineHeight(size) = ceil(size * 1.21)`.
 private var timerLineH: CGFloat {
-    let f = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
+    let f = NSFont.monospacedDigitSystemFont(ofSize: countdownDigitSize, weight: .black)
     return ceil(f.ascender - f.descender + f.leading)
 }
 private var nextLblLineH: CGFloat {
@@ -189,15 +189,54 @@ private func accentColor(for next: CalEvent?) -> NSColor {
     return next.startsInSeconds <= urgentThreshold ? accentUrgent : accentDefault
 }
 
-/// Countdown string: "H:MM" when ≥ 1h away, "MM:SS" otherwise, "NOW" once started.
-private func countdownText(_ rawSecs: TimeInterval) -> String {
-    let secs = max(0, rawSecs)
-    guard secs > 0 else { return "NOW" }
-    let totalMin = Int(secs) / 60
-    if totalMin >= 60 {
-        return String(format: "%d:%02d", totalMin / 60, totalMin % 60)
+// Countdown styling — three knobs. The big run is "H:MM" (always with the hour);
+// the small, translucent runs are the "in" prefix and the trailing seconds.
+// Big "H:MM" run. The colon glyph in this font is already narrow (~1.75pt padding
+// each side), so kerning is near-zero — negative values quickly overlap the digits.
+// Seconds are dropped once the hour is two digits (≥10h away) so the readout always
+// fits the ~182pt left column.
+private let countdownDigitSize: CGFloat = 52
+private let countdownUnitSize: CGFloat = 22
+private let countdownUnitAlpha: CGFloat = 0.55
+private let countdownColonKern: CGFloat = 0
+
+/// Builds the countdown as "in H:MM SS" — "in" and seconds small & faded, "H:MM" big.
+/// Seconds are hidden when h ≥ 10. Shows "NOW" (big) once the event has started.
+private func countdownAttributed(_ rawSecs: TimeInterval) -> NSAttributedString {
+    let white = NSColor.white
+    let bigAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedDigitSystemFont(ofSize: countdownDigitSize, weight: .black),
+        .foregroundColor: white,
+    ]
+    let smallAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedDigitSystemFont(ofSize: countdownUnitSize, weight: .bold),
+        .foregroundColor: white.withAlphaComponent(countdownUnitAlpha),
+    ]
+
+    let secs = Int(max(0, rawSecs))  // floor: live seconds counting down
+    guard secs > 0 else { return NSAttributedString(string: "NOW", attributes: bigAttrs) }
+
+    let h = secs / 3600, m = (secs % 3600) / 60, s = secs % 60
+    let result = NSMutableAttributedString()
+    result.append(NSAttributedString(string: "in ", attributes: smallAttrs))
+
+    // "H:MM" with the gap around the colon tightened on both sides.
+    let hm = NSMutableAttributedString(string: String(format: "%d:%02d", h, m), attributes: bigAttrs)
+    let colon = (hm.string as NSString).range(of: ":")
+    if colon.location != NSNotFound {
+        hm.addAttribute(.kern, value: countdownColonKern, range: colon)
+        if colon.location > 0 {
+            hm.addAttribute(
+                .kern, value: countdownColonKern,
+                range: NSRange(location: colon.location - 1, length: 1))
+        }
     }
-    return String(format: "%02d:%02d", totalMin, Int(secs) % 60)
+    result.append(hm)
+
+    if h < 10 {  // two-digit hour ⇒ drop seconds so the line still fits
+        result.append(NSAttributedString(string: String(format: " %02d", s), attributes: smallAttrs))
+    }
+    return result
 }
 
 
@@ -465,7 +504,6 @@ final class ReminderWindow: NSWindow {
     private var layout: TimelineLayout?  // nil when the fallback list is shown
 
     private var countdownField: NSTextField?
-    private var colonVisible = true
     private var tickTimer: Timer?
 
     private var leftColumn: NSView?
@@ -685,10 +723,9 @@ final class ReminderWindow: NSWindow {
             true
         view.addSubview(titleField)
 
-        let timerField = NSTextField(labelWithString: countdownText(event.startsInSeconds))
+        let timerField = NSTextField(labelWithString: "")
         timerField.translatesAutoresizingMaskIntoConstraints = false
-        timerField.font = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
-        timerField.textColor = white
+        timerField.attributedStringValue = countdownAttributed(event.startsInSeconds)
         view.addSubview(timerField)
         self.countdownField = timerField
 
@@ -1024,26 +1061,13 @@ final class ReminderWindow: NSWindow {
 
     private func tick() {
         guard let nextEvent = nextEvent, let field = countdownField else { return }
-        colonVisible.toggle()
 
         // Recolor the left column live: blue by default, red when imminent.
         leftColumn?.layer?.backgroundColor = accentColor(for: nextEvent).cgColor
         // Keep the timeline's "now" marker moving / event colors current.
         timelineView?.needsDisplay = true
 
-        let text = countdownText(nextEvent.startsInSeconds)
-        let white = NSColor.white
-        let font = NSFont.monospacedDigitSystemFont(ofSize: 52, weight: .black)
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: white]
-        let attributed = NSMutableAttributedString(string: text, attributes: attrs)
-        if let colonRange = text.range(of: ":") {
-            let nsRange = NSRange(colonRange, in: text)
-            attributed.addAttribute(
-                .foregroundColor,
-                value: white.withAlphaComponent(colonVisible ? 1 : 0),
-                range: nsRange)
-        }
-        field.attributedStringValue = attributed
+        field.attributedStringValue = countdownAttributed(nextEvent.startsInSeconds)
     }
 
     override func close() {
