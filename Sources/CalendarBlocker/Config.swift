@@ -76,7 +76,18 @@ enum Config {
               startMinute: 14*60, durationMinutes: 60),
         .init(id: "Monthly update, 152min",            title: "Monthly update, 152min",            startMinute: 16*60+15, durationMinutes: 152),
         .init(id: "Very late WTF!? and 52 min!",       title: "Very late WTF!?",                   startMinute: 23*60+23, durationMinutes:  52),
+        // Screenshot preset — nice realistic day, enabled together via "Load screenshot preset"
+        .init(id: "sc-standup",  title: "Team Standup",          startMinute:  9*60+30, durationMinutes:  15),
+        .init(id: "sc-review",   title: "Product Review",         startMinute: 11*60,    durationMinutes:  60),
+        .init(id: "sc-lunch",    title: "Lunch",                  startMinute: 12*60+30, durationMinutes:  60),
+        .init(id: "sc-1on1",     title: "1:1 with Anna",          startMinute: 14*60,    durationMinutes:  30),
+        .init(id: "sc-design",   title: "Design Sprint",          startMinute: 15*60+30, durationMinutes:  90),
+        .init(id: "sc-retro",    title: "Weekly Retro",           startMinute: 17*60,    durationMinutes:  45),
     ]
+
+    static let screenshotPresetIDs: Set<String> = ["sc-standup", "sc-review", "sc-lunch", "sc-1on1", "sc-design", "sc-retro"]
+    // Simulated time for the screenshot preset: 10:45 → Product Review starts in 15 min
+    static let screenshotPresetMinute = 10*60+45
 
     static var enabledMockEventIDs: Set<String> {
         Set(d.stringArray(forKey: "mockEventIDs") ?? [])

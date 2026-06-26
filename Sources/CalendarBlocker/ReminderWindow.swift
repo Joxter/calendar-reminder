@@ -104,10 +104,17 @@ private var calLblLineH: CGFloat {
 
 // Selected-event slot (top): calLabel + calGap + title + infoGap + info
 private var selectedSlotH: CGFloat { calLblLineH + 4 + leftPanelTitleMaxH + 6 + infoLineH }
-// Next-event slot (bottom): nextLabel + title + 1pt tuck + timer
-private var nextSlotH: CGFloat { nextLblLineH + leftPanelTitleMaxH + 1 + timerLineH }
-// Constant minimum window content height: both slots always reserved, regardless of events.
-private var winContentH: CGFloat { winVPad + selectedSlotH + panelGap + nextSlotH + winVPad }
+// Next-event slot (bottom): nextLabel + title (1 or 2 lines) + 1pt tuck + timer
+private var nextTitleLineH: CGFloat {
+    ceil(NSFont.boldSystemFont(ofSize: leftPanelTitleFontSz).boundingRectForFont.height)
+}
+private func nextSlotH(lines: Int) -> CGFloat {
+    nextLblLineH + nextTitleLineH * CGFloat(lines) + 1 + timerLineH
+}
+// Left-column height; nextLines is the measured line count for the next-event title.
+private func leftColH(nextLines: Int) -> CGFloat {
+    winVPad + selectedSlotH + panelGap + nextSlotH(lines: nextLines) + winVPad
+}
 
 // MARK: - Timeline sizing (mirror layout.ts)
 
@@ -187,6 +194,19 @@ private func durString(minutes rawMin: Int) -> String {
 private func accentColor(for next: CalEvent?) -> NSColor {
     guard let next else { return accentNone }
     return next.startsInSeconds <= urgentThreshold ? accentUrgent : accentDefault
+}
+
+/// How many lines (1 or 2) the title needs when rendered in the next-event slot width.
+private func titleLineCount(for title: String) -> Int {
+    guard !title.isEmpty else { return 1 }
+    let font = NSFont.boldSystemFont(ofSize: leftPanelTitleFontSz)
+    let maxW = leftW - leftColPad * 2
+    let rect = (title as NSString).boundingRect(
+        with: CGSize(width: maxW, height: .greatestFiniteMagnitude),
+        options: .usesLineFragmentOrigin,
+        attributes: [.font: font]
+    )
+    return min(2, max(1, Int(ceil(rect.height / nextTitleLineH))))
 }
 
 // Countdown styling — three knobs. The big run is "H:MM" (always with the hour);
@@ -512,6 +532,7 @@ final class ReminderWindow: NSWindow {
     private var nextSlotView: NSView?  // bottom slot — next event
     private var selectedEvent: CalEvent?
     private var selectedFallbackRow: FallbackRowView?
+    private var nextTitleLines = 1
 
     /// True when opened via "Open Calendar" (no triggering reminder) — these get
     /// live-recreated on mock changes, unlike reminder pop-ups.
@@ -549,20 +570,22 @@ final class ReminderWindow: NSWindow {
         let fallback = Config.forceFallback || shouldUseFallback(visible, now: now)
         self.useFallback = fallback
 
+        nextTitleLines = titleLineCount(for: nextEvent?.title ?? "")
+
         let contentW: CGFloat
         let winH: CGFloat
         if fallback {
             self.layout = nil
             contentW = fallbackListW
             winH = max(
-                winContentH,
+                leftColH(nextLines: nextTitleLines),
                 rightColPadT + dateHeaderH + dateHeaderGap + timelineMinHeight + rightColPadB)
         } else {
             let l = computeTimelineLayout(visible, now: now)
             self.layout = l
             contentW = l.width
             winH = max(
-                winContentH,
+                leftColH(nextLines: nextTitleLines),
                 rightColPadT + dateHeaderH + dateHeaderGap + l.height + rightColPadB)
         }
         let winW = windowWidth(contentW)
@@ -687,7 +710,7 @@ final class ReminderWindow: NSWindow {
             next.bottomAnchor.constraint(equalTo: left.bottomAnchor, constant: -winVPad),
             next.leadingAnchor.constraint(equalTo: left.leadingAnchor),
             next.trailingAnchor.constraint(equalTo: left.trailingAnchor),
-            next.heightAnchor.constraint(equalToConstant: nextSlotH),
+            next.heightAnchor.constraint(equalToConstant: nextSlotH(lines: nextTitleLines)),
         ])
 
         self.selectedSlot = selected
@@ -710,17 +733,22 @@ final class ReminderWindow: NSWindow {
         nextLbl.textColor = white.withAlphaComponent(0.9)
         view.addSubview(nextLbl)
 
-        // The explicit heightAnchor is required: maximumNumberOfLines alone does
-        // not cap the Auto Layout intrinsic content size in AppKit.
-        let titleField = NSTextField(wrappingLabelWithString: event.title)
+        let titleField: NSTextField
+        if nextTitleLines == 2 {
+            let f = NSTextField(wrappingLabelWithString: event.title)
+            f.preferredMaxLayoutWidth = leftW - leftColPad * 2
+            f.maximumNumberOfLines = leftPanelMaxTitleLines
+            (f.cell as? NSTextFieldCell)?.truncatesLastVisibleLine = true
+            f.heightAnchor.constraint(lessThanOrEqualToConstant: leftPanelTitleMaxH).isActive = true
+            titleField = f
+        } else {
+            let f = NSTextField(labelWithString: event.title)
+            f.lineBreakMode = .byTruncatingTail
+            titleField = f
+        }
         titleField.translatesAutoresizingMaskIntoConstraints = false
         titleField.font = NSFont.boldSystemFont(ofSize: leftPanelTitleFontSz)
         titleField.textColor = white.withAlphaComponent(0.9)
-        titleField.preferredMaxLayoutWidth = leftW - leftColPad * 2
-        titleField.maximumNumberOfLines = leftPanelMaxTitleLines
-        (titleField.cell as? NSTextFieldCell)?.truncatesLastVisibleLine = true
-        titleField.heightAnchor.constraint(lessThanOrEqualToConstant: leftPanelTitleMaxH).isActive =
-            true
         view.addSubview(titleField)
 
         let timerField = NSTextField(labelWithString: "")

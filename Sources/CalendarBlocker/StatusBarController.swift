@@ -233,6 +233,14 @@ final class StatusBarController: NSObject {
         clearShown.target = self
         sub.addItem(clearShown)
 
+        sub.addItem(.separator())
+
+        let screenshotToggle = NSMenuItem(title: "Screenshot preset events", action: #selector(toggleScreenshotPreset), keyEquivalent: "")
+        screenshotToggle.target = self
+        screenshotToggle.state = Config.enabledMockEventIDs.isSuperset(of: Config.screenshotPresetIDs) ? .on : .off
+        screenshotToggle.tag = 26
+        sub.addItem(screenshotToggle)
+
         let parent = NSMenuItem(title: "Testing", action: nil, keyEquivalent: "")
         parent.submenu = sub
         parent.tag = 20
@@ -354,6 +362,20 @@ final class StatusBarController: NSObject {
     @objc private func forceCheckNow() { onMockChanged?() }
 
     @objc private func clearShownReminders() { onClearShown?() }
+
+    @objc private func toggleScreenshotPreset(_ sender: NSMenuItem) {
+        var ids = Config.enabledMockEventIDs
+        if ids.isSuperset(of: Config.screenshotPresetIDs) {
+            ids.subtract(Config.screenshotPresetIDs)
+            sender.state = .off
+        } else {
+            ids.formUnion(Config.screenshotPresetIDs)
+            sender.state = .on
+        }
+        Config.saveMockEventIDs(ids)
+        applyDisplay()
+        onMockChanged?()
+    }
 
     // MARK: - Standard actions
 
